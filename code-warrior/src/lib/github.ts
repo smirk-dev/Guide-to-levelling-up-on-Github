@@ -140,10 +140,18 @@ export async function calculateGitHubStats(
   username: string,
   accessToken?: string
 ): Promise<GitHubStats> {
-  const [repos, events] = await Promise.all([
-    fetchGitHubRepos(username, accessToken),
-    fetchGitHubEvents(username, accessToken),
-  ]);
+  const headers: HeadersInit = {
+    Accept: 'application/vnd.github.v3+json',
+  };
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  } else if (process.env.GITHUB_API_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_API_TOKEN}`;
+  }
+
+  // Fetch repos to get stars and repo count
+  const repos = await fetchGitHubRepos(username, accessToken);
 
   // Calculate total stars across all repos
   const totalStars = repos.reduce(
@@ -151,33 +159,89 @@ export async function calculateGitHubStats(
     0
   );
 
-  // Count event types for commits, PRs, issues, reviews
-  let totalCommits = 0;
+  // Use GitHub Search API for more accurate counts
+  const [prsResponse, issuesResponse, commitsResponse] = await Promise.all([
+    // Search for PRs created by user
+    fetch(`https://api.github.com/search/issues?q=type:pr+author:${username}`, {
+      headers,
+    }),
+    // Search for issues created by user
+    fetch(`https://api.github.com/search/issues?q=type:issue+author:${username}`, {
+      headers,
+    }),
+    // Get user's events for commit count (best effort from recent activity)
+    fetchGitHubEvents(username, accessToken),
+  ]);
+
   let totalPRs = 0;
   let totalIssues = 0;
+  
+  if (prsResponse.ok) {
+    const prsData = await prsResponse.json();
+    totalPRs = prsData.total_count || 0;
+  }
+
+  if (issuesResponse.ok) {
+    const issuesData = await issuesResponse.json();
+    totalIssues = issuesData.total_count || 0;
+  }
+
+  // Count commits and reviews from recent events
+  let totalCommits = 0;
   let totalReviews = 0;
 
-  events.forEach((event) => {
+  commitsResponse.forEach((event) => {
     switch (event.type) {
       case 'PushEvent':
         // Each PushEvent can contain multiple commits
         totalCommits += event.payload.commits?.length || 0;
-        break;
-      case 'PullRequestEvent':
-        if (event.payload.action === 'opened') {
-          totalPRs++;
-        }
-        break;
-      case 'IssuesEvent':
-        if (event.payload.action === 'opened') {
-          totalIssues++;
-        }
         break;
       case 'PullRequestReviewEvent':
         totalReviews++;
         break;
     }
   });
+
+  // If we have access token, try to get more accurate commit count from user's repos
+  if (accessToken && repos.length > 0) {
+    try {
+      // Get commits from user's top repos (limit to 10 to avoid rate limits)
+      const topRepos = repos.slice(0, 10);
+      const commitCounts = await Promise.all(
+        topRepos.map(async (repo) => {
+          try {
+            const commitsRes = await fetch(
+              `https://api.github.com/repos/${username}/${repo.name}/commits?author=${username}&per_page=1`,
+              { headers }
+            );
+            if (commitsRes.ok) {
+              // Check Link header for pagination to get total count
+              const linkHeader = commitsRes.headers.get('Link');
+              if (linkHeader) {
+                const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+                if (match) {
+                  return parseInt(match[1], 10);
+                }
+              }
+              // If no pagination, there's at least 1 commit if response is ok
+              const commits = await commitsRes.json();
+              return commits.length;
+            }
+            return 0;
+          } catch {
+            return 0;
+          }
+        })
+      );
+      
+      const repoCommits = commitCounts.reduce((sum, count) => sum + count, 0);
+      if (repoCommits > totalCommits) {
+        totalCommits = repoCommits;
+      }
+    } catch (error) {
+      console.error('Error fetching commit counts:', error);
+    }
+  }
 
   return {
     totalStars,
