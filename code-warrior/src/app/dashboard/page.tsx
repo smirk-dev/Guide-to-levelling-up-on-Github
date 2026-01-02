@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { calculateGitHubStats } from '@/lib/github';
 import { calculateRPGStats } from '@/lib/game-logic';
-import { User } from '@/types/database';
+import { User, Quest, UserQuest } from '@/types/database';
 import { RPGStats } from '@/types/database';
 import CharacterSheet from '@/components/rpg/CharacterSheet';
 import { RefreshCw, LogOut } from 'lucide-react';
@@ -18,6 +18,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<RPGStats | null>(null);
+  const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
+  const [activeUserQuest, setActiveUserQuest] = useState<UserQuest | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
