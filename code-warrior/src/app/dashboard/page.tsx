@@ -29,26 +29,45 @@ export default function DashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (session?.user?.username) {
-      loadUserData();
+    if (session?.user) {
+      console.log('Session data:', session.user);
+      const username = session.user.username || (session.user as any).email?.split('@')[0];
+      if (username) {
+        loadUserData();
+      } else {
+        console.error('No username found in session:', session.user);
+        setLoading(false);
+      }
     }
   }, [session]);
 
   async function loadUserData() {
     try {
       setLoading(true);
+      const username = session?.user?.username || (session?.user as any).email?.split('@')[0];
+      
+      if (!username) {
+        console.error('Cannot load user data: no username');
+        return;
+      }
+
+      console.log('Loading user data for username:', username);
+      
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('username', session?.user?.username)
+        .eq('username', username)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       setUser(data);
 
       // Calculate current RPG stats for display
-      const githubStats = await calculateGitHubStats(session?.user?.username || '');
+      const githubStats = await calculateGitHubStats(username);
       const rpgStats = calculateRPGStats(githubStats);
       setStats(rpgStats);
     } catch (error) {
@@ -98,13 +117,20 @@ export default function DashboardPage() {
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-midnight-void flex items-center justify-center">
-        <motion.div
-          className="font-pixel text-loot-gold text-xl"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-        >
-          LOADING...
-        </motion.div>
+        <div className="text-center">
+          <motion.div
+            className="font-pixel text-loot-gold text-xl mb-4"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            LOADING...
+          </motion.div>
+          {session && (
+            <p className="font-mono text-xs text-gray-500">
+              Session: {session.user?.email || session.user?.name || 'Unknown'}
+            </p>
+          )}
+        </div>
       </div>
     );
   }
