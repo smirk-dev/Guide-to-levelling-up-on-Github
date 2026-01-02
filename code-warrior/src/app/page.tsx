@@ -137,8 +137,6 @@ export default function Home() {
         >
           <p className="font-mono text-xs text-gray-600">
             Built with Next.js • Powered by GitHub API • Stored in Supabase
-          <p className="font-mono text-xs text-gray-600">
-            Built with Next.js • Powered by GitHub API • Stored in Supabase
           </p>
         </motion.div>
       </div>
