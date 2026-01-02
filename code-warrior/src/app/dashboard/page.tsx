@@ -308,7 +308,12 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="pt-20">
-        <CharacterSheet user={user} stats={stats} />
+        <CharacterSheet 
+          user={user} 
+          stats={stats} 
+          activeQuest={activeQuest || undefined}
+          activeUserQuest={activeUserQuest || undefined}
+        />
       </div>
     </div>
   );
