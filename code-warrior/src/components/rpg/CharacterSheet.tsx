@@ -3,20 +3,22 @@
 import { motion } from 'framer-motion';
 import { User, Quest, UserQuest } from '@/types/database';
 import { RPGStats } from '@/types/database';
+import type { GitHubStats } from '@/lib/github';
 import Avatar from './Avatar';
 import StatBar from './StatBar';
 import ActiveQuestPreview from './ActiveQuestPreview';
-import { Sword, Heart, Sparkles, Star, Brain } from 'lucide-react';
+import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code } from 'lucide-react';
 import { getRankDisplayName, getXPForNextRank } from '@/lib/game-logic';
 
 interface CharacterSheetProps {
   user: User;
   stats: RPGStats;
+  githubStats?: GitHubStats;
   activeQuest?: Quest;
   activeUserQuest?: UserQuest;
 }
 
-export default function CharacterSheet({ user, stats, activeQuest, activeUserQuest }: CharacterSheetProps) {
+export default function CharacterSheet({ user, stats, githubStats, activeQuest, activeUserQuest }: CharacterSheetProps) {
   const nextRankXP = getXPForNextRank(user.rank_tier);
   const rankName = getRankDisplayName(user.rank_tier);
 
