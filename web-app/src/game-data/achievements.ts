@@ -1,4 +1,4 @@
-import { Achievement, Quest } from '../types/game';
+import type { Achievement, Quest } from '../types/game';
 
 export const ACHIEVEMENTS: Achievement[] = [
     {

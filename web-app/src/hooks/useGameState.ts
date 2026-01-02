@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserState } from '../types/game';
+import type { UserState } from '../types/game';
 import { INITIAL_QUESTS } from '../game-data/achievements';
 
 const INITIAL_STATE: UserState = {
