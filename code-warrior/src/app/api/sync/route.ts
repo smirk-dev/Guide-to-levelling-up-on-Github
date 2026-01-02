@@ -43,15 +43,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: user, error: userError } = await supabase
+    let { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('username', username)
       .single();
 
-    if (userError || !user) {
+    // If user doesn't exist, create them
+    if (userError && userError.code === 'PGRST116') {
+      console.log('User not found, creating new user:', username);
+      
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert({
+          github_id: session.user?.id || 'github-' + Date.now(),
+          username: username,
+          avatar_url: session.user?.image || null,
+          xp: 0,
+          rank_tier: 'C',
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating user:', createError);
+        return NextResponse.json(
+          { error: 'Failed to create user', details: createError },
+          { status: 500 }
+        );
+      }
+
+      user = newUser;
+    } else if (userError || !user) {
       return NextResponse.json(
-        { error: 'User not found in database' },
+        { error: 'User not found in database', details: userError },
         { status: 404 }
       );
     }
