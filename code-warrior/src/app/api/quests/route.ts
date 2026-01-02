@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { supabaseService } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabase';
 import { calculateGitHubStats } from '@/lib/github';
 import { checkQuestCompletion, updateQuestProgress } from '@/lib/quest-logic';
 
@@ -17,9 +17,10 @@ export async function GET() {
     }
 
     const githubId = session.user.id;
+    const supabase = getServiceSupabase();
 
     // Fetch user
-    const { data: user, error: userError } = await supabaseService
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('github_id', githubId)
@@ -30,7 +31,7 @@ export async function GET() {
     }
 
     // Fetch all quests
-    const { data: quests, error: questsError } = await supabaseService
+    const { data: quests, error: questsError } = await supabase
       .from('quests')
       .select('*')
       .eq('is_active', true)
@@ -41,7 +42,7 @@ export async function GET() {
     }
 
     // Fetch user's quest progress
-    const { data: userQuests, error: userQuestsError } = await supabaseService
+    const { data: userQuests, error: userQuestsError } = await supabase
       .from('user_quests')
       .select('*')
       .eq('user_id', user.id);
@@ -77,9 +78,10 @@ export async function POST() {
 
     const githubId = session.user.id;
     const accessToken = (session as any)?.accessToken;
+    const supabase = getServiceSupabase();
 
     // Fetch user
-    const { data: user, error: userError } = await supabaseService
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('github_id', githubId)
@@ -93,7 +95,7 @@ export async function POST() {
     const stats = await calculateGitHubStats(user.username, accessToken);
 
     // Fetch all active quests
-    const { data: quests, error: questsError } = await supabaseService
+    const { data: quests, error: questsError } = await supabase
       .from('quests')
       .select('*')
       .eq('is_active', true);
@@ -103,7 +105,7 @@ export async function POST() {
     }
 
     // Fetch user's current quest progress
-    const { data: userQuests, error: userQuestsError } = await supabaseService
+    const { data: userQuests, error: userQuestsError } = await supabase
       .from('user_quests')
       .select('*')
       .eq('user_id', user.id);
@@ -124,7 +126,7 @@ export async function POST() {
 
       if (existingUserQuest) {
         // Update existing quest progress
-        const { data, error } = await supabaseService
+        const { data, error } = await supabase
           .from('user_quests')
           .update({
             progress: update.progress,
@@ -140,7 +142,7 @@ export async function POST() {
         }
       } else {
         // Create new quest progress entry
-        const { data, error } = await supabaseService
+        const { data, error } = await supabase
           .from('user_quests')
           .insert({
             user_id: user.id,
@@ -159,7 +161,7 @@ export async function POST() {
     }
 
     // Fetch updated user quests
-    const { data: finalUserQuests } = await supabaseService
+    const { data: finalUserQuests } = await supabase
       .from('user_quests')
       .select('*')
       .eq('user_id', user.id);

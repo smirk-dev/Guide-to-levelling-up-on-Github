@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { supabaseService } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabase';
 
 /**
  * POST /api/quests/claim
@@ -21,9 +21,10 @@ export async function POST(request: Request) {
     }
 
     const githubId = session.user.id;
+    const supabase = getServiceSupabase();
 
     // Fetch user
-    const { data: user, error: userError } = await supabaseService
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('github_id', githubId)
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch the quest
-    const { data: quest, error: questError } = await supabaseService
+    const { data: quest, error: questError } = await supabase
       .from('quests')
       .select('*')
       .eq('id', questId)
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch user's quest progress
-    const { data: userQuest, error: userQuestError } = await supabaseService
+    const { data: userQuest, error: userQuestError } = await supabase
       .from('user_quests')
       .select('*')
       .eq('user_id', user.id)
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
     // Update user's XP
     const newXP = user.total_xp + quest.xp_reward;
 
-    const { error: updateUserError } = await supabaseService
+    const { error: updateUserError } = await supabase
       .from('users')
       .update({ total_xp: newXP })
       .eq('id', user.id);
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
     }
 
     // Mark quest as claimed
-    const { data: updatedUserQuest, error: claimError } = await supabaseService
+    const { data: updatedUserQuest, error: claimError } = await supabase
       .from('user_quests')
       .update({ claimed_at: new Date().toISOString() })
       .eq('id', userQuest.id)
@@ -100,7 +101,7 @@ export async function POST(request: Request) {
 
     // If quest has a badge reward, award it
     if (quest.badge_reward) {
-      const { data: badge } = await supabaseService
+      const { data: badge } = await supabase
         .from('badges')
         .select('*')
         .eq('id', quest.badge_reward)
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
 
       if (badge) {
         // Check if user already has this badge
-        const { data: existingBadge } = await supabaseService
+        const { data: existingBadge } = await supabase
           .from('user_badges')
           .select('*')
           .eq('user_id', user.id)
@@ -116,7 +117,7 @@ export async function POST(request: Request) {
           .single();
 
         if (!existingBadge) {
-          await supabaseService.from('user_badges').insert({
+          await supabase.from('user_badges').insert({
             user_id: user.id,
             badge_id: badge.id,
           });
