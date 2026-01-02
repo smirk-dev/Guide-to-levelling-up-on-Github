@@ -44,20 +44,28 @@ export default function DashboardPage() {
   async function loadUserData() {
     try {
       setLoading(true);
+      const githubId = session?.user?.id;
       const username = session?.user?.username || (session?.user as any).email?.split('@')[0];
       
-      if (!username) {
-        console.error('Cannot load user data: no username');
+      if (!username && !githubId) {
+        console.error('Cannot load user data: no identifier');
         return;
       }
 
-      console.log('Loading user data for username:', username);
+      console.log('Loading user data for:', { githubId, username });
       
-      let { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .single();
+      // Try to find by GitHub ID first (more reliable)
+      let { data, error } = githubId
+        ? await supabase
+            .from('users')
+            .select('*')
+            .eq('github_id', githubId)
+            .single()
+        : await supabase
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .single();
 
       // If user doesn't exist, trigger a sync to create them
       if (error && error.code === 'PGRST116') {
@@ -98,8 +106,8 @@ export default function DashboardPage() {
       setUser(data);
 
       // Calculate current RPG stats for display (if not already set from sync)
-      if (!stats) {
-        const githubStats = await calculateGitHubStats(username);
+      if (!stats && data.username) {
+        const githubStats = await calculateGitHubStats(data.username);
         const rpgStats = calculateRPGStats(githubStats);
         setStats(rpgStats);
       }

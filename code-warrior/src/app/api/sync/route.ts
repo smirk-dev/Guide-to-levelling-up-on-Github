@@ -33,30 +33,38 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // Get user from database using GitHub username from session
+    // Get GitHub ID and username from session
+    const githubId = (session as any).user?.id;
     const username = (session as any).user?.username || session.user?.name;
     
-    if (!username) {
+    if (!username && !githubId) {
       return NextResponse.json(
-        { error: 'Username not found in session' },
+        { error: 'No user identifier found in session' },
         { status: 400 }
       );
     }
 
-    let { data: user, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .single();
+    // Try to find user by GitHub ID first (more reliable)
+    let { data: user, error: userError } = githubId 
+      ? await supabase
+          .from('users')
+          .select('*')
+          .eq('github_id', githubId)
+          .single()
+      : await supabase
+          .from('users')
+          .select('*')
+          .eq('username', username)
+          .single();
 
     // If user doesn't exist, create them
     if (userError && userError.code === 'PGRST116') {
-      console.log('User not found, creating new user:', username);
+      console.log('User not found, creating new user:', username, 'github_id:', githubId);
       
       const { data: newUser, error: createError } = await supabase
         .from('users')
         .insert({
-          github_id: session.user?.id || 'github-' + Date.now(),
+          github_id: githubId || 'github-' + Date.now(),
           username: username,
           avatar_url: session.user?.image || null,
           xp: 0,
