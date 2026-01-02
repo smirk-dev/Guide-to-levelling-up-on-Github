@@ -53,15 +53,41 @@ export default function DashboardPage() {
 
       console.log('Loading user data for username:', username);
       
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('username', username)
         .single();
 
-      if (error) {
+      // If user doesn't exist, create them
+      if (error && error.code === 'PGRST116') {
+        console.log('User not found in database, creating...');
+        
+        const { data: newUser, error: createError } = await supabase
+          .from('users')
+          .insert({
+            github_id: session?.user?.id || 'temp-' + Date.now(),
+            username: username,
+            avatar_url: session?.user?.image || null,
+            xp: 0,
+            rank_tier: 'C',
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating user:', createError);
+          throw createError;
+        }
+        
+        data = newUser;
+      } else if (error) {
         console.error('Supabase error:', error);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('No user data returned');
       }
 
       setUser(data);
