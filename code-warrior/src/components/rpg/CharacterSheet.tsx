@@ -1,19 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { User } from '@/types/database';
+import { User, Quest, UserQuest } from '@/types/database';
 import { RPGStats } from '@/types/database';
 import Avatar from './Avatar';
 import StatBar from './StatBar';
+import ActiveQuestPreview from './ActiveQuestPreview';
 import { Sword, Heart, Sparkles, Star, Brain } from 'lucide-react';
 import { getRankDisplayName, getXPForNextRank } from '@/lib/game-logic';
 
 interface CharacterSheetProps {
   user: User;
   stats: RPGStats;
+  activeQuest?: Quest;
+  activeUserQuest?: UserQuest;
 }
 
-export default function CharacterSheet({ user, stats }: CharacterSheetProps) {
+export default function CharacterSheet({ user, stats, activeQuest, activeUserQuest }: CharacterSheetProps) {
   const nextRankXP = getXPForNextRank(user.rank_tier);
   const rankName = getRankDisplayName(user.rank_tier);
 
