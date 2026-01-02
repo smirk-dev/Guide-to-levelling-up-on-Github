@@ -5,6 +5,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -21,9 +22,9 @@ const config: Config = {
         'critical-red': '#da3633', // Errors/alerts
       },
       fontFamily: {
-        'pixel': ['"Press Start 2P"', 'cursive'], // Headers/titles
-        'mono': ['"Fira Code"', 'monospace'], // Body text
-        'sans': ['Inter', 'sans-serif'], // UI elements
+        'pixel': ['var(--font-press-start)', 'cursive'], // Headers/titles
+        'mono': ['var(--font-fira-code)', 'monospace'], // Body text
+        'sans': ['var(--font-inter)', 'sans-serif'], // UI elements
       },
     },
   },
