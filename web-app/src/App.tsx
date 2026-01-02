@@ -104,17 +104,18 @@ function App() {
                   </div>
                   {!isCompleted && (
                     <button
-                      onClick={() => handleQuestClick(quest.id, quest.xpReward)}
+                      disabled={verifying === quest.id}
+                      onClick={() => handleQuestClick(quest.id, quest.xpReward, quest.requirement)}
                       style={{
-                        background: 'var(--primary)',
+                        background: verifying === quest.id ? 'var(--text-muted)' : 'var(--primary)',
                         color: '#fff',
                         border: 'none',
                         padding: '0.6rem 1.2rem',
                         borderRadius: '8px',
-                        cursor: 'pointer',
+                        cursor: verifying === quest.id ? 'wait' : 'pointer',
                         fontWeight: 600
                       }}>
-                      Complete
+                      {verifying === quest.id ? 'Verifying...' : 'Complete'}
                     </button>
                   )}
                 </div>
