@@ -46,9 +46,12 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async session({ session, token }) {
-      // Add GitHub ID to session for easier access
+      // Add GitHub data to session for easier access
       if (token.sub) {
         session.user.id = token.sub;
+      }
+      if (token.username) {
+        session.user.username = token.username;
       }
       return session;
     },
@@ -60,6 +63,7 @@ export const authOptions: NextAuthOptions = {
       if (profile) {
         const githubProfile = profile as any;
         token.githubId = githubProfile.id.toString();
+        token.username = githubProfile.login;
       }
       return token;
     },

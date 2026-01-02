@@ -29,7 +29,7 @@ export default function DashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (session?.user?.name) {
+    if (session?.user?.username) {
       loadUserData();
     }
   }, [session]);
@@ -40,7 +40,7 @@ export default function DashboardPage() {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('username', session?.user?.name)
+        .eq('username', session?.user?.username)
         .single();
 
       if (error) throw error;
@@ -48,7 +48,7 @@ export default function DashboardPage() {
       setUser(data);
 
       // Calculate current RPG stats for display
-      const githubStats = await calculateGitHubStats(session?.user?.name || '');
+      const githubStats = await calculateGitHubStats(session?.user?.username || '');
       const rpgStats = calculateRPGStats(githubStats);
       setStats(rpgStats);
     } catch (error) {

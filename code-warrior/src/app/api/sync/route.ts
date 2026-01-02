@@ -33,11 +33,20 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // Get user from database
+    // Get user from database using GitHub username from session
+    const username = (session as any).user?.username || session.user?.name;
+    
+    if (!username) {
+      return NextResponse.json(
+        { error: 'Username not found in session' },
+        { status: 400 }
+      );
+    }
+
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
-      .eq('username', session.user.name)
+      .eq('username', username)
       .single();
 
     if (userError || !user) {
@@ -131,10 +140,19 @@ export async function GET(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
+    const username = (session as any).user?.username || session.user?.name;
+    
+    if (!username) {
+      return NextResponse.json(
+        { canSync: true, waitTime: 0 },
+        { status: 200 }
+      );
+    }
+
     const { data: user } = await supabase
       .from('users')
       .select('last_synced_at')
-      .eq('username', session.user.name)
+      .eq('username', username)
       .single();
 
     if (!user) {
