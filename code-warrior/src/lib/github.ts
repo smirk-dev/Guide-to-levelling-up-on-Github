@@ -81,8 +81,10 @@ export async function fetchGitHubRepos(
     headers.Authorization = `token ${process.env.GITHUB_API_TOKEN}`;
   }
 
+  console.log('Fetching repos for username:', username);
+
   const response = await fetch(
-    `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`,
+    `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`,
     {
       headers,
       next: { revalidate: 900 },
@@ -90,7 +92,9 @@ export async function fetchGitHubRepos(
   );
 
   if (!response.ok) {
-    throw new Error(`GitHub API error: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error('GitHub API error:', response.status, errorText);
+    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
   }
 
   return response.json();
