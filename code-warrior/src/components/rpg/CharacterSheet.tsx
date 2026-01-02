@@ -21,9 +21,9 @@ export default function CharacterSheet({ user, stats, activeQuest, activeUserQue
   const rankName = getRankDisplayName(user.rank_tier);
 
   return (
-    <div className="min-h-screen bg-midnight-void text-white p-8">
-      {/* 3-Column Grid Layout from ux-design.md */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="min-h-screen bg-midnight-void text-white p-4 md:p-8">
+      {/* 3-Column Grid Layout from ux-design.md - Responsive */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
         
         {/* LEFT COLUMN: The Hero */}
         <motion.div

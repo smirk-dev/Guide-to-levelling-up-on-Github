@@ -2,13 +2,15 @@
 
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Sword, Zap, Star } from 'lucide-react';
+import { soundManager } from '@/lib/sound';
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [poweringUp, setPoweringUp] = useState(false);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -16,15 +18,49 @@ export default function Home() {
     }
   }, [status, router]);
 
-  if (status === 'loading') {
+  const handleSignIn = () => {
+    setPoweringUp(true);
+    soundManager.syncStart();
+    setTimeout(() => {
+      signIn('github', { callbackUrl: '/dashboard' });
+    }, 1000);
+  };
+
+  if (status === 'loading' || poweringUp) {
     return (
-      <div className="min-h-screen bg-midnight-void flex items-center justify-center">
+      <div className="min-h-screen bg-midnight-void flex items-center justify-center relative overflow-hidden">
+        {/* CRT Power-Up Effect */}
         <motion.div
-          className="font-pixel text-loot-gold text-xl"
+          className="absolute inset-0 bg-loot-gold/10"
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ 
+            scaleY: [0, 1, 1],
+            opacity: [0, 0.5, 0],
+          }}
+          transition={{ 
+            duration: 1.5,
+            times: [0, 0.5, 1],
+          }}
+          style={{ transformOrigin: 'center' }}
+        />
+        
+        {/* Scanlines */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0.7] }}
+          transition={{ duration: 1 }}
+        />
+
+        <motion.div
+          className="font-pixel text-loot-gold text-xl z-10"
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
         >
-          LOADING...
+          {poweringUp ? 'POWERING UP...' : 'LOADING...'}
         </motion.div>
       </div>
     );
@@ -113,7 +149,8 @@ export default function Home() {
           transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
         >
           <button
-            onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+            onClick={handleSignIn}
+            onMouseEnter={() => soundManager.hover()}
             className="group relative px-8 py-4 bg-loot-gold text-midnight-void font-pixel text-sm rounded-lg hover:bg-yellow-500 transition-all transform hover:scale-105 shadow-xl"
           >
             <div className="flex items-center gap-3">

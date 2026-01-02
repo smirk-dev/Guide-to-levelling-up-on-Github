@@ -9,9 +9,13 @@ import { calculateRPGStats } from '@/lib/game-logic';
 import { User, Quest, UserQuest } from '@/types/database';
 import { RPGStats } from '@/types/database';
 import CharacterSheet from '@/components/rpg/CharacterSheet';
-import { RefreshCw, LogOut } from 'lucide-react';
+import FloatingXP from '@/components/effects/FloatingXP';
+import Confetti from '@/components/effects/Confetti';
+import { RefreshCw, LogOut, Menu, X, Scroll } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { soundManager } from '@/lib/sound';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -23,6 +27,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
+  const [showXP, setShowXP] = useState(false);
+  const [xpAmount, setXPAmount] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -196,6 +204,7 @@ export default function DashboardPage() {
     try {
       setSyncing(true);
       setSyncMessage('');
+      soundManager.syncStart();
 
       const response = await fetch('/api/sync', {
         method: 'POST',
@@ -205,24 +214,36 @@ export default function DashboardPage() {
 
       if (response.status === 429) {
         setSyncMessage(`⏰ Cooldown: Wait ${result.waitTime}s`);
+        soundManager.error();
         return;
       }
 
       if (!response.ok) {
         setSyncMessage(`❌ ${result.error}`);
+        soundManager.error();
         return;
       }
 
       if (result.rankedUp) {
         setSyncMessage(`🎉 RANK UP! +${result.gainedXP} XP!`);
+        soundManager.rankUp();
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
       } else {
         setSyncMessage(`✅ Synced! +${result.gainedXP} XP`);
+        soundManager.syncComplete();
+        if (result.gainedXP > 0) {
+          setXPAmount(result.gainedXP);
+          setShowXP(true);
+          soundManager.xpGain();
+        }
       }
 
       // Reload user data
       await loadUserData();
     } catch (error) {
       setSyncMessage('❌ Sync failed');
+      soundManager.error();
       console.error('Sync error:', error);
     } finally {
       setSyncing(false);
@@ -270,12 +291,28 @@ export default function DashboardPage() {
 
   return (
     <div className="relative">
-      {/* Top Action Bar */}
+      {/* Floating XP Animation */}
+      {showXP && <FloatingXP amount={xpAmount} onComplete={() => setShowXP(false)} />}
+      
+      {/* Confetti Effect */}
+      <Confetti trigger={showConfetti} />
+
+      {/* Top Action Bar - Desktop */}
       <div className="fixed top-0 left-0 right-0 bg-gray-900/95 border-b-2 border-gray-800 backdrop-blur-sm z-50">
-        <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-          <h1 className="font-pixel text-sm text-loot-gold">CODE WARRIOR</h1>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
+          <h1 className="font-pixel text-xs md:text-sm text-loot-gold">CODE WARRIOR</h1>
           
-          <div className="flex items-center gap-4">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onMouseEnter={() => soundManager.hover()}
+            className="lg:hidden p-2 text-loot-gold"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-4">
             {syncMessage && (
               <motion.span
                 className="font-mono text-sm text-mana-blue"
@@ -286,8 +323,21 @@ export default function DashboardPage() {
               </motion.span>
             )}
             
+            <Link href="/quests">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onMouseEnter={() => soundManager.hover()}
+                className="flex items-center gap-2 px-4 py-2 bg-mana-blue/20 border border-mana-blue/50 text-mana-blue font-pixel text-xs rounded hover:bg-mana-blue/30 transition-colors"
+              >
+                <Scroll className="w-4 h-4" />
+                QUESTS
+              </motion.button>
+            </Link>
+
             <button
               onClick={handleSync}
+              onMouseEnter={() => soundManager.hover()}
               disabled={syncing}
               className="flex items-center gap-2 px-4 py-2 bg-loot-gold text-midnight-void font-pixel text-xs rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -296,7 +346,11 @@ export default function DashboardPage() {
             </button>
 
             <button
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => {
+                soundManager.click();
+                signOut({ callbackUrl: '/' });
+              }}
+              onMouseEnter={() => soundManager.hover()}
               className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 font-pixel text-xs rounded hover:bg-critical-red hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4" />
@@ -304,6 +358,56 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="lg:hidden border-t border-gray-800 bg-gray-900 overflow-hidden"
+            >
+              <div className="p-4 space-y-2">
+                {syncMessage && (
+                  <div className="font-mono text-sm text-mana-blue mb-2">
+                    {syncMessage}
+                  </div>
+                )}
+                
+                <Link href="/quests" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full flex items-center gap-2 px-4 py-3 bg-mana-blue/20 border border-mana-blue/50 text-mana-blue font-pixel text-xs rounded">
+                    <Scroll className="w-4 h-4" />
+                    QUESTS
+                  </button>
+                </Link>
+
+                <button
+                  onClick={() => {
+                    handleSync();
+                    setMobileMenuOpen(false);
+                  }}
+                  disabled={syncing}
+                  className="w-full flex items-center gap-2 px-4 py-3 bg-loot-gold text-midnight-void font-pixel text-xs rounded disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  {syncing ? 'SYNCING...' : 'SYNC STATS'}
+                </button>
+
+                <button
+                  onClick={() => {
+                    soundManager.click();
+                    signOut({ callbackUrl: '/' });
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-3 bg-gray-800 text-gray-300 font-pixel text-xs rounded"
+                >
+                  <LogOut className="w-4 h-4" />
+                  LOGOUT
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Main Content */}
