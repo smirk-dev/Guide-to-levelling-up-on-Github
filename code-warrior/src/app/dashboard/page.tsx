@@ -59,28 +59,33 @@ export default function DashboardPage() {
         .eq('username', username)
         .single();
 
-      // If user doesn't exist, create them
+      // If user doesn't exist, trigger a sync to create them
       if (error && error.code === 'PGRST116') {
-        console.log('User not found in database, creating...');
+        console.log('User not found in database, triggering initial sync...');
         
-        const { data: newUser, error: createError } = await supabase
-          .from('users')
-          .insert({
-            github_id: session?.user?.id || 'temp-' + Date.now(),
-            username: username,
-            avatar_url: session?.user?.image || null,
-            xp: 0,
-            rank_tier: 'C',
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating user:', createError);
-          throw createError;
+        try {
+          const syncResponse = await fetch('/api/sync', {
+            method: 'POST',
+          });
+          
+          const syncResult = await syncResponse.json();
+          
+          if (syncResponse.ok && syncResult.user) {
+            data = syncResult.user;
+            
+            // Also calculate stats from sync result
+            if (syncResult.stats) {
+              const rpgStats = calculateRPGStats(syncResult.stats);
+              setStats(rpgStats);
+            }
+          } else {
+            console.error('Sync failed:', syncResult);
+            throw new Error(syncResult.error || 'Failed to create user');
+          }
+        } catch (syncError) {
+          console.error('Error during initial sync:', syncError);
+          throw syncError;
         }
-        
-        data = newUser;
       } else if (error) {
         console.error('Supabase error:', error);
         throw error;
@@ -92,10 +97,12 @@ export default function DashboardPage() {
 
       setUser(data);
 
-      // Calculate current RPG stats for display
-      const githubStats = await calculateGitHubStats(username);
-      const rpgStats = calculateRPGStats(githubStats);
-      setStats(rpgStats);
+      // Calculate current RPG stats for display (if not already set from sync)
+      if (!stats) {
+        const githubStats = await calculateGitHubStats(username);
+        const rpgStats = calculateRPGStats(githubStats);
+        setStats(rpgStats);
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
