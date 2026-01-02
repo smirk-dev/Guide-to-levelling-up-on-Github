@@ -9,5 +9,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Backend for GitHub Level Up Game"
+  "description": "Backend for GitHub Level Up Game",
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
 }
