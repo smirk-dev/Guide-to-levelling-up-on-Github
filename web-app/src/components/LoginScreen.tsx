@@ -1,6 +1,17 @@
+import { useState, useEffect } from 'react';
 import { loginWithGitHub } from '../services/api';
 
 export default function LoginScreen() {
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const errorParam = params.get('error');
+        if (errorParam) {
+            setError(errorParam);
+        }
+    }, []);
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -11,6 +22,19 @@ export default function LoginScreen() {
             padding: '2rem',
             textAlign: 'center'
         }}>
+            {error && (
+                <div style={{
+                    background: 'rgba(247, 118, 142, 0.2)',
+                    border: '1px solid var(--danger)',
+                    color: 'var(--danger)',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    marginBottom: '2rem',
+                    maxWidth: '500px'
+                }}>
+                    <strong>Login Failed:</strong> {error === 'auth_failed' ? 'Authentication failed. Please try again.' : error}
+                </div>
+            )}
             <div className="glass-panel" style={{
                 padding: '3rem',
                 maxWidth: '500px',

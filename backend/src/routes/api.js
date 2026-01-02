@@ -8,13 +8,18 @@ const router = express.Router();
 // Get current user info
 router.get('/user', authenticateToken, async (req, res) => {
     try {
-        const session = userSessions.get(req.user.githubId);
+        // Get accessToken from JWT payload
+        const accessToken = req.user.accessToken;
 
-        if (!session) {
-            return res.status(401).json({ error: 'Session not found' });
+        if (!accessToken) {
+            // Fallback to session if JWT doesn't have token (old tokens)
+            const session = userSessions.get(req.user.githubId);
+            if (!session) {
+                return res.status(401).json({ error: 'Session expired. Please login again.' });
+            }
         }
 
-        const stats = await fetchGitHubStats(session.accessToken);
+        const stats = await fetchGitHubStats(accessToken || userSessions.get(req.user.githubId)?.accessToken);
         const achievements = calculateAchievements(stats);
         const levelInfo = calculateLevel(stats);
 
@@ -31,7 +36,7 @@ router.get('/user', authenticateToken, async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching user data:', error);
-        res.status(500).json({ error: 'Failed to fetch user data' });
+        res.status(500).json({ error: 'Failed to fetch user data', details: error.message });
     }
 });
 

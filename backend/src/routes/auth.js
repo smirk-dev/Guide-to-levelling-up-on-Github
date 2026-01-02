@@ -39,32 +39,44 @@ router.get('/callback', async (req, res) => {
         const tokenData = await tokenResponse.json();
 
         if (tokenData.error) {
-            return res.redirect(`${process.env.FRONTEND_URL}?error=${tokenData.error}`);
+            console.error('GitHub Token Error:', tokenData);
+            return res.redirect(`${process.env.FRONTEND_URL}?error=${tokenData.error_description || tokenData.error}`);
         }
 
         const accessToken = tokenData.access_token;
+        console.log('Access Token acquired, fetching user info...');
 
         // Fetch user info
         const userResponse = await fetch('https://api.github.com/user', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Accept': 'application/vnd.github.v3+json'
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'GitHub-Level-Up-App'
             }
         });
 
-        const userData = await userResponse.json();
+        if (!userResponse.ok) {
+            const errorText = await userResponse.text();
+            console.error('User Info Error:', errorText);
+            return res.redirect(`${process.env.FRONTEND_URL}?error=user_fetch_failed&details=${encodeURIComponent(errorText.substring(0, 100))}`);
+        }
 
-        // Create JWT token
+        const userData = await userResponse.json();
+        console.log('User authenticated:', userData.login);
+
+        // Create JWT token with accessToken included
+        // Note: In production, encrypt the accessToken before storing in JWT
         const jwtToken = jwt.sign(
             {
                 githubId: userData.id,
-                username: userData.login
+                username: userData.login,
+                accessToken: accessToken  // Include access token in JWT
             },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        // Store access token (in production, encrypt and store in DB)
+        // Also store in memory as backup
         userSessions.set(userData.id, {
             accessToken,
             username: userData.login,

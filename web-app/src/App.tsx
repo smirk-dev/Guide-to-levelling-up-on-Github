@@ -20,7 +20,12 @@ function App() {
         .catch(err => {
           console.error('Failed to fetch user data:', err);
           setLoading(false);
-          setToken(null);
+          // Don't clear token immediately so we can see if there was a server error
+          if (err.message.includes('Faied to fetch')) {
+            setToken(null); // Network error, likely backend down
+          }
+          // For now, keep token to debug, or clear if 401
+          // setToken(null);
         });
     } else {
       setLoading(false);

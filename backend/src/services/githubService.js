@@ -17,7 +17,9 @@ export async function fetchGitHubStats(accessToken) {
         const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
 
         // Fetch total commits (approximate from recent activity)
+        // Note: Need to pass username explicitly in newer Octokit versions
         const { data: events } = await octokit.activity.listEventsForAuthenticatedUser({
+            username: user.login,
             per_page: 100
         });
 
