@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { calculateGitHubStats } from '@/lib/github';
+import { calculateGitHubStats, type GitHubStats } from '@/lib/github';
 import { calculateRPGStats } from '@/lib/game-logic';
 import { User, Quest, UserQuest } from '@/types/database';
 import { RPGStats } from '@/types/database';
@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<RPGStats | null>(null);
+  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
   const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
   const [activeUserQuest, setActiveUserQuest] = useState<UserQuest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -153,9 +154,10 @@ export default function DashboardPage() {
       // Calculate current RPG stats for display (if not already set from sync)
       // Use the actual GitHub username we fetched
       if (!stats && (actualUsername || data.username)) {
-        const githubStats = await calculateGitHubStats(actualUsername || data.username);
-        const rpgStats = calculateRPGStats(githubStats);
+        const ghStats = await calculateGitHubStats(actualUsername || data.username);
+        const rpgStats = calculateRPGStats(ghStats);
         setStats(rpgStats);
+        setGithubStats(ghStats); // Store raw GitHub stats
       }
 
       // Load active quest
