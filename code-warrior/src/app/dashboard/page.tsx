@@ -241,6 +241,11 @@ export default function DashboardPage() {
         }
       }
 
+      // Update GitHub stats from sync result
+      if (result.stats) {
+        setGithubStats(result.stats);
+      }
+
       // Reload user data
       await loadUserData();
     } catch (error) {
@@ -416,7 +421,8 @@ export default function DashboardPage() {
       <div className="pt-20">
         <CharacterSheet 
           user={user} 
-          stats={stats} 
+          stats={stats}
+          githubStats={githubStats || undefined}
           activeQuest={activeQuest || undefined}
           activeUserQuest={activeUserQuest || undefined}
         />
