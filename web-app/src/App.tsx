@@ -3,9 +3,28 @@ import { ACHIEVEMENTS } from './game-data/achievements'
 
 function App() {
   const { gameState, setUsername, completeQuest, quests } = useGameState();
+  const [verifying, setVerifying] = useState<string | null>(null);
 
-  const handleQuestClick = (questId: string, reward: number) => {
-    completeQuest(questId, reward);
+  const handleQuestClick = async (questId: string, reward: number, requirement?: any) => {
+    if (requirement?.type === 'api_check') {
+      if (gameState.username === 'Guest User') {
+        alert("Please set your GitHub username first!");
+        return;
+      }
+
+      setVerifying(questId);
+      const { checkQuestRequirement } = await import('./services/github');
+      const passed = await checkQuestRequirement(gameState.username, requirement.metric, requirement.target);
+      setVerifying(null);
+
+      if (passed) {
+        completeQuest(questId, reward);
+      } else {
+        alert(`Requirement not met yet! Check your GitHub stats.`);
+      }
+    } else {
+      completeQuest(questId, reward);
+    }
   };
 
   const progressPercent = (gameState.currentXP / gameState.xpToNextLevel) * 100;
