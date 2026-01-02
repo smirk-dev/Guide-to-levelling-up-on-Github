@@ -472,6 +472,127 @@ graph TD
 
 ---
 
+## 🏅 GitHub Achievements: Native Badges
+
+<div align="center">
+
+### 🎖️ Badge Overview
+
+</div>
+
+| 🏅 **Badge** | ✅ **How to Earn** | 🧭 **Status/Notes** |
+|:-------------|:-------------------|:--------------------|
+| 🧊 **Arctic Code Vault Contributor** | Contribute code to repositories preserved in the GitHub Archive Program's Arctic Code Vault | Historical badge; no longer earnable |
+| 🧠 **Galaxy Brain** | Have an answer marked as **Accepted** in a GitHub Discussions thread | Earnable where Discussions are enabled |
+| ❤️ **Heart On Your Sleeve** | React to content on GitHub with a ❤️ | In limited testing/unreleased; may not appear for all users |
+| 🚁 **Mars 2020 Contributor** | Contribute to the Mars 2020 Helicopter Mission repository | Historical badge; no longer earnable |
+| 🧙 **Open Sourcerer** | Unannounced by GitHub | Criteria unconfirmed/unreleased |
+| 🤝 **Pair Extraordinaire** | Co-author commits in a pull request that gets merged | Use `Co-authored-by:` trailers; badge is active |
+| 💜 **Public Sponsor** | Actively sponsor at least one account/org via GitHub Sponsors | Badge displays while sponsorship is active |
+| 🦈 **Pull Shark** | Have pull requests merged | GitHub has not published the exact threshold; keep merging PRs |
+| ⚡ **Quickdraw** | Close an issue or pull request within 5 minutes of opening it | Time-based trigger on self-opened items |
+| ⭐ **Starstruck** | Create a repository that receives a certain number of stars | Threshold not published; build and share a popular repo |
+| 🎲 **YOLO** | Merge a pull request without an approved review | Not recommended for production, but badge awards automatically |
+
+> 🔒 Achievements are automatic—no manual toggles. GitHub does not publish exact numeric thresholds for Pull Shark or Starstruck, so focus on steady contributions and quality projects.
+
+<div align="center">
+
+### 🔎 Where to See Them
+
+</div>
+
+1. Open your GitHub profile → **Achievements** panel.  
+2. Hover to see criteria; click **Hide** on a badge if you prefer privacy.  
+3. Badges sync automatically across profile, orgs, and sponsors page.
+
+<div align="center">
+
+### ⚡ Quick Actions to Target Badges
+
+</div>
+
+| 🎯 **Action** | 🏅 **Badges Impacted** | 💡 **Tip** |
+|:-------------|:-----------------------|:------------|
+| Merge quality PRs regularly | Pull Shark, Pair Extraordinaire | Add `Co-authored-by:` lines when pairing |
+| Answer GitHub Discussions | Galaxy Brain | Prefer concise, reproducible solutions |
+| Sponsor maintainers | Public Sponsor | Small monthly tiers still count |
+| Launch and promote a useful repo | Starstruck | Add docs, screenshots, and a demo link |
+| Keep issue/PR hygiene tight | Quickdraw | Close duplicates fast (explain why) |
+
+---
+
+## 🧭 New to GitHub? Quickstart Tutorial
+
+<div align="center">
+
+```mermaid
+graph TD
+   A[Install Git] --> B[Create GitHub account]
+   B --> C[Create repo]
+   C --> D[Clone locally]
+   D --> E[Add README + commit]
+   E --> F[Push to GitHub]
+   F --> G[Open issue/PR]
+   G --> H[Earn stats, trophies, badges]
+   style A fill:#4ECDC4
+   style H fill:#FFD700
+```
+
+</div>
+
+<details>
+<summary>📋 <strong>Step-by-Step</strong></summary>
+
+1. **Install Git + sign in**: Install Git, then run:
+  ```bash
+  git config --global user.name "Your Name"
+  git config --global user.email "you@example.com"
+  ```
+2. **Create a repository on GitHub**: New repo → name it; add a license if you know which one you need.
+3. **Clone locally**:
+  ```bash
+  git clone https://github.com/your-username/your-repo.git
+  cd your-repo
+  ```
+4. **Add a README** (and any starter files):
+  ```bash
+  echo "# My First Project" > README.md
+  git add README.md
+  git commit -m "chore: add README"
+  git push origin main
+  ```
+5. **Open an issue for work you plan to do**: Write what/why; this builds history.
+6. **Create a branch and a pull request**:
+  ```bash
+  git checkout -b feature/hello
+  echo "print('hello')" > hello.py
+  git add hello.py
+  git commit -m "feat: add hello script"
+  git push origin feature/hello
+  ```
+  Then open a PR on GitHub, link the issue, and request review.
+7. **Respond and merge**: Address review comments, then merge. Delete the branch to keep things tidy.
+8. **Watch achievements grow**: Merged PRs feed Pull Shark, co-authored commits feed Pair Extraordinaire, discussions answers feed Galaxy Brain, etc.
+
+</details>
+
+<div align="center">
+
+### 🧰 Beginner-Friendly Checklist
+
+</div>
+
+| ✅ **Do This** | 🎯 **Why It Matters** |
+|:---------------|:----------------------|
+| Keep a living README in your profile repo (`your-username/your-username`) | Shows stats/trophies on your profile page |
+| Use small, frequent commits with clear messages | Easier reviews; faster Pull Shark progress |
+| Start with docs/issues before code | Low-friction way to contribute and learn a codebase |
+| Answer one Discussions question per week | Targets Galaxy Brain and builds reputation |
+| Sponsor a maintainer you rely on | Unlocks Public Sponsor and supports the ecosystem |
+
+---
+
 ## 🚀 Strategic Improvement Guide
 
 <div align="center">
