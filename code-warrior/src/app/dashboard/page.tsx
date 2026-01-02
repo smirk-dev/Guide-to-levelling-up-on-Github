@@ -45,6 +45,7 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const githubId = session?.user?.id;
+      const accessToken = (session as any)?.accessToken;
       const username = session?.user?.username || (session?.user as any).email?.split('@')[0];
       
       if (!username && !githubId) {
@@ -53,6 +54,27 @@ export default function DashboardPage() {
       }
 
       console.log('Loading user data for:', { githubId, username });
+
+      // First, fetch the ACTUAL GitHub username from the API
+      let actualUsername: string | null = null;
+      if (accessToken) {
+        try {
+          const githubUserResponse = await fetch('https://api.github.com/user', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: 'application/vnd.github.v3+json',
+            },
+          });
+          
+          if (githubUserResponse.ok) {
+            const githubUser = await githubUserResponse.json();
+            actualUsername = githubUser.login;
+            console.log('Fetched actual GitHub username:', actualUsername);
+          }
+        } catch (error) {
+          console.error('Error fetching GitHub username:', error);
+        }
+      }
       
       // Try to find by GitHub ID first (more reliable)
       let { data, error } = githubId
@@ -64,8 +86,21 @@ export default function DashboardPage() {
         : await supabase
             .from('users')
             .select('*')
-            .eq('username', username)
+            .eq('username', actualUsername || username)
             .single();
+
+      // If user exists but username is wrong, update it
+      if (data && actualUsername && data.username !== actualUsername) {
+        console.log('Updating username from', data.username, 'to', actualUsername);
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ username: actualUsername })
+          .eq('github_id', githubId);
+        
+        if (!updateError) {
+          data.username = actualUsername;
+        }
+      }
 
       // If user doesn't exist, trigger a sync to create them
       if (error && error.code === 'PGRST116') {
@@ -106,8 +141,9 @@ export default function DashboardPage() {
       setUser(data);
 
       // Calculate current RPG stats for display (if not already set from sync)
-      if (!stats && data.username) {
-        const githubStats = await calculateGitHubStats(data.username);
+      // Use the actual GitHub username we fetched
+      if (!stats && (actualUsername || data.username)) {
+        const githubStats = await calculateGitHubStats(actualUsername || data.username);
         const rpgStats = calculateRPGStats(githubStats);
         setStats(rpgStats);
       }
