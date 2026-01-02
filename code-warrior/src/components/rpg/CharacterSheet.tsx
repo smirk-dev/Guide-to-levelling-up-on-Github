@@ -82,10 +82,10 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Heart className="w-4 h-4 text-health-green" />
-                <span className="font-pixel text-xs text-health-green">HEALTH</span>
+                <span className="font-pixel text-xs text-health-green">HEALTH (Commits)</span>
               </div>
               <StatBar
-                label="Commit Stamina"
+                label="Commit Activity"
                 current={stats.health}
                 max={100}
                 color="health"
@@ -96,10 +96,10 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-mana-blue" />
-                <span className="font-pixel text-xs text-mana-blue">MANA</span>
+                <span className="font-pixel text-xs text-mana-blue">MANA (Reviews)</span>
               </div>
               <StatBar
-                label="Review Energy"
+                label="Code Review Energy"
                 current={stats.mana}
                 max={100}
                 color="mana"
@@ -125,21 +125,21 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
               <div className="flex items-center gap-3">
                 <Sword className="w-5 h-5 text-critical-red" />
                 <div>
-                  <p className="text-xs text-gray-400">Strength</p>
+                  <p className="text-xs text-gray-400">Strength (PRs)</p>
                   <p className="font-pixel text-lg text-critical-red">{stats.strength}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Star className="w-5 h-5 text-loot-gold" />
                 <div>
-                  <p className="text-xs text-gray-400">Charisma</p>
+                  <p className="text-xs text-gray-400">Charisma (Stars)</p>
                   <p className="font-pixel text-lg text-loot-gold">{stats.charisma}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Brain className="w-5 h-5 text-mana-blue" />
                 <div>
-                  <p className="text-xs text-gray-400">Wisdom</p>
+                  <p className="text-xs text-gray-400">Wisdom (Issues)</p>
                   <p className="font-pixel text-lg text-mana-blue">{stats.wisdom}</p>
                 </div>
               </div>
@@ -147,21 +147,81 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                 <Sparkles className="w-5 h-5 text-health-green" />
                 <div>
                   <p className="text-xs text-gray-400">Total XP</p>
-                  <p className="font-pixel text-lg text-health-green">{user.xp}</p>
+                  <p className="font-pixel text-lg text-health-green">{user.total_xp}</p>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* RIGHT COLUMN: The Inventory (Achievements/Loot) */}
+        {/* RIGHT COLUMN: The Inventory (Achievements/Loot) + GitHub Stats */}
         <motion.div
-          className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm"
+          className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm space-y-6"
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h3 className="font-pixel text-xl text-loot-gold mb-4">
+          {/* GitHub Stats Section */}
+          {githubStats && (
+            <div>
+              <h3 className="font-pixel text-xl text-mana-blue mb-4 flex items-center gap-2">
+                <Code className="w-5 h-5" />
+                GITHUB STATS
+              </h3>
+              
+              <div className="space-y-3">
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-loot-gold" />
+                    <span className="text-sm text-gray-300">Stars Received</span>
+                  </div>
+                  <span className="font-pixel text-lg text-loot-gold">{githubStats.totalStars}</span>
+                </div>
+
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <GitPullRequest className="w-4 h-4 text-critical-red" />
+                    <span className="text-sm text-gray-300">Pull Requests</span>
+                  </div>
+                  <span className="font-pixel text-lg text-critical-red">{githubStats.totalPRs}</span>
+                </div>
+
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <GitCommit className="w-4 h-4 text-health-green" />
+                    <span className="text-sm text-gray-300">Commits</span>
+                  </div>
+                  <span className="font-pixel text-lg text-health-green">{githubStats.totalCommits}</span>
+                </div>
+
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-mana-blue" />
+                    <span className="text-sm text-gray-300">Issues Opened</span>
+                  </div>
+                  <span className="font-pixel text-lg text-mana-blue">{githubStats.totalIssues}</span>
+                </div>
+
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-mana-blue" />
+                    <span className="text-sm text-gray-300">Code Reviews</span>
+                  </div>
+                  <span className="font-pixel text-lg text-mana-blue">{githubStats.totalReviews}</span>
+                </div>
+
+                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="w-4 h-4 text-loot-gold" />
+                    <span className="text-sm text-gray-300">Public Repos</span>
+                  </div>
+                  <span className="font-pixel text-lg text-loot-gold">{githubStats.totalRepos}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <h3 className="font-pixel text-xl text-loot-gold">
             RECENT LOOT
           </h3>
           
