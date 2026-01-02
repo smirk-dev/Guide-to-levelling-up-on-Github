@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGameState } from './hooks/useGameState'
 import { ACHIEVEMENTS } from './game-data/achievements'
 

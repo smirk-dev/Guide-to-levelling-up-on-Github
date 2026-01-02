@@ -19,7 +19,7 @@ export async function fetchGitHubStats(username: string) {
     }
 }
 
-export async function checkQuestRequirement(username: string, metric: string, target: number): Promise<boolean> {
+export async function checkQuestRequirement(username: string, metric: string, _target: number): Promise<boolean> {
     // In a real app, this would use the GitHub Search API to count PRs, etc.
     // For prototype, we will fetch basic stats or mock the Search API call
     // to avoid rate limits during dev/demo.
