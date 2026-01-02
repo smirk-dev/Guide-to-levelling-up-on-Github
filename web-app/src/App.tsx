@@ -2,7 +2,7 @@ import { useGameState } from './hooks/useGameState'
 import { ACHIEVEMENTS } from './game-data/achievements'
 
 function App() {
-  const { gameState, completeQuest, quests } = useGameState();
+  const { gameState, setUsername, completeQuest, quests } = useGameState();
 
   const handleQuestClick = (questId: string, reward: number) => {
     completeQuest(questId, reward);
@@ -15,7 +15,18 @@ function App() {
       {/* Header / HUD */}
       <header className="glass-panel" style={{ padding: '2rem', width: '100%', maxWidth: '900px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="gradient-text" style={{ fontSize: '2.5rem', margin: 0 }}>{gameState.username}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <h1 className="gradient-text" style={{ fontSize: '2.5rem', margin: 0 }}>{gameState.username}</h1>
+            <button
+              onClick={() => {
+                const name = prompt("Enter your GitHub username:");
+                if (name) setUsername(name);
+              }}
+              style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Edit
+            </button>
+          </div>
           <p style={{ color: 'var(--text-muted)' }}>Level {gameState.level} Developer</p>
         </div>
 
@@ -36,7 +47,7 @@ function App() {
       </header>
 
       {/* Main Content Grid */}
-      <main style={{ width: '100%', maxWidth: '900px', display: 'grid', gridTemplateColumns: 'repea(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+      <main style={{ width: '100%', maxWidth: '900px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
 
         {/* Active Quests Column */}
         <section style={{ flex: 2, minWidth: '300px' }}>

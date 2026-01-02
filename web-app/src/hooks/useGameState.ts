@@ -63,6 +63,7 @@ export function useGameState() {
         gameState,
         addXP,
         completeQuest,
+        setUsername: (name: string) => setGameState(prev => ({ ...prev, username: name })),
         quests: INITIAL_QUESTS
     };
 }
