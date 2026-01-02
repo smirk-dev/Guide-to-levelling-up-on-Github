@@ -68,6 +68,9 @@ export default function CharacterSheet({ user, stats, activeQuest, activeUserQue
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
+          {/* Main Quest Card */}
+          <ActiveQuestPreview quest={activeQuest} userQuest={activeUserQuest} />
+
           <div>
             <h3 className="font-pixel text-xl text-loot-gold mb-4">
               CHARACTER STATS
