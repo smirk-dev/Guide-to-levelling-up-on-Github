@@ -149,10 +149,46 @@ export default function DashboardPage() {
         const rpgStats = calculateRPGStats(githubStats);
         setStats(rpgStats);
       }
+
+      // Load active quest
+      await loadActiveQuest(data.id);
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadActiveQuest(userId: string) {
+    try {
+      // Fetch all active quests
+      const { data: quests } = await supabase
+        .from('quests')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: true });
+
+      if (!quests || quests.length === 0) return;
+
+      // Fetch user's quest progress
+      const { data: userQuests } = await supabase
+        .from('user_quests')
+        .select('*')
+        .eq('user_id', userId);
+
+      // Find first incomplete quest
+      const incompleteQuest = quests.find(quest => {
+        const userQuest = userQuests?.find(uq => uq.quest_id === quest.id);
+        return !userQuest || userQuest.status !== 'completed' || !userQuest.claimed_at;
+      });
+
+      if (incompleteQuest) {
+        setActiveQuest(incompleteQuest);
+        const userQuest = userQuests?.find(uq => uq.quest_id === incompleteQuest.id);
+        setActiveUserQuest(userQuest || null);
+      }
+    } catch (error) {
+      console.error('Error loading active quest:', error);
     }
   }
 
