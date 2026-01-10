@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { getServiceSupabase } from '@/lib/supabase';
 import { calculateGitHubStats } from '@/lib/github';
 import { checkQuestCompletion, updateQuestProgress } from '@/lib/quest-logic';
@@ -10,9 +11,10 @@ import { checkQuestCompletion, updateQuestProgress } from '@/lib/quest-logic';
  */
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
+      console.error('Quests GET: No session or user ID found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -70,9 +72,10 @@ export async function GET() {
  */
 export async function POST() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
+      console.error('Quests POST: No session or user ID found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
