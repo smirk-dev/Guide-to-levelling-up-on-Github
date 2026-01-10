@@ -1,14 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { User, Quest, UserQuest } from '@/types/database';
+import { User, Quest, UserQuest, Badge } from '@/types/database';
 import { RPGStats } from '@/types/database';
 import type { GitHubStats } from '@/lib/github';
 import Avatar from './Avatar';
 import StatBar from './StatBar';
 import ActiveQuestPreview from './ActiveQuestPreview';
-import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code } from 'lucide-react';
+import BadgeSlot from './BadgeSlot';
+import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code, ArrowRight } from 'lucide-react';
 import { getRankDisplayName, getXPForNextRank } from '@/lib/game-logic';
+import Link from 'next/link';
 
 interface CharacterSheetProps {
   user: User;
@@ -16,9 +18,11 @@ interface CharacterSheetProps {
   githubStats?: GitHubStats;
   activeQuest?: Quest;
   activeUserQuest?: UserQuest;
+  equippedBadges?: Badge[];
+  onBadgeUnequip?: (badgeId: string) => Promise<void>;
 }
 
-export default function CharacterSheet({ user, stats, githubStats, activeQuest, activeUserQuest }: CharacterSheetProps) {
+export default function CharacterSheet({ user, stats, githubStats, activeQuest, activeUserQuest, equippedBadges, onBadgeUnequip }: CharacterSheetProps) {
   const nextRankXP = getXPForNextRank(user.rank_tier);
   const rankName = getRankDisplayName(user.rank_tier);
 
@@ -46,19 +50,34 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
           {/* Equipped Badges Section */}
           <div className="mt-8">
-            <h4 className="font-pixel text-xs text-loot-gold mb-4 flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              EQUIPPED BADGES
-            </h4>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((slot) => (
-                <div
-                  key={slot}
-                  className="aspect-square border-2 border-dashed border-gray-700 rounded flex items-center justify-center text-gray-600 text-xs"
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-pixel text-xs text-loot-gold flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                EQUIPPED BADGES
+              </h4>
+              <Link href="/badges">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-1 text-xs text-mana-blue hover:text-loot-gold transition-colors"
                 >
-                  SLOT {slot}
-                </div>
-              ))}
+                  View All
+                  <ArrowRight className="w-3 h-3" />
+                </motion.button>
+              </Link>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {[1, 2, 3].map((slotNumber) => {
+                const badge = equippedBadges && equippedBadges[slotNumber - 1] ? equippedBadges[slotNumber - 1] : null;
+                return (
+                  <BadgeSlot
+                    key={slotNumber}
+                    slotNumber={slotNumber}
+                    badge={badge}
+                    onUnequip={onBadgeUnequip}
+                  />
+                );
+              })}
             </div>
           </div>
         </motion.div>
