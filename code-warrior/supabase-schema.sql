@@ -18,7 +18,7 @@ CREATE TABLE users (
   avatar_url TEXT,
   xp INTEGER DEFAULT 0 NOT NULL,
   rank_tier rank_tier DEFAULT 'C' NOT NULL,
-  last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT NULL, -- Allow NULL for first-time users
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
