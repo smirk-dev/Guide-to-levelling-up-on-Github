@@ -3,12 +3,12 @@
 import { motion } from 'framer-motion';
 import { User, Quest, UserQuest, Badge } from '@/types/database';
 import { RPGStats } from '@/types/database';
-import type { GitHubStats } from '@/lib/github';
+import type { GitHubStats, GitHubAchievement } from '@/lib/github';
 import Avatar from './Avatar';
 import StatBar from './StatBar';
 import ActiveQuestPreview from './ActiveQuestPreview';
 import BadgeSlot from './BadgeSlot';
-import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code, ArrowRight } from 'lucide-react';
+import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code, ArrowRight, Award } from 'lucide-react';
 import { getRankDisplayName, getXPForNextRank } from '@/lib/game-logic';
 import Link from 'next/link';
 
@@ -19,10 +19,11 @@ interface CharacterSheetProps {
   activeQuest?: Quest;
   activeUserQuest?: UserQuest;
   equippedBadges?: Badge[];
+  githubAchievements?: GitHubAchievement[];
   onBadgeUnequip?: (badgeId: string) => Promise<void>;
 }
 
-export default function CharacterSheet({ user, stats, githubStats, activeQuest, activeUserQuest, equippedBadges, onBadgeUnequip }: CharacterSheetProps) {
+export default function CharacterSheet({ user, stats, githubStats, activeQuest, activeUserQuest, equippedBadges, githubAchievements, onBadgeUnequip }: CharacterSheetProps) {
   const nextRankXP = getXPForNextRank(user.rank_tier);
   const rankName = getRankDisplayName(user.rank_tier);
 
@@ -166,7 +167,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                 <Sparkles className="w-5 h-5 text-health-green" />
                 <div>
                   <p className="text-xs text-gray-400">Total XP</p>
-                  <p className="font-pixel text-lg text-health-green">{user.total_xp}</p>
+                  <p className="font-pixel text-lg text-health-green">{user.xp}</p>
                 </div>
               </div>
             </div>
@@ -240,6 +241,34 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             </div>
           )}
 
+          {/* GitHub Achievements Section */}
+          {githubAchievements && githubAchievements.length > 0 && (
+            <div>
+              <h3 className="font-pixel text-xl text-loot-gold mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5" />
+                GITHUB ACHIEVEMENTS
+              </h3>
+
+              <div className="grid grid-cols-2 gap-2">
+                {githubAchievements.map((achievement, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-gray-800/50 border border-loot-gold/30 rounded p-3 text-center"
+                  >
+                    <div className="text-2xl mb-1">🏆</div>
+                    <p className="font-pixel text-xs text-loot-gold">{achievement.name}</p>
+                    {achievement.tier && (
+                      <p className="text-xs text-gray-400 mt-1">{achievement.tier}</p>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <h3 className="font-pixel text-xl text-loot-gold">
             RECENT LOOT
           </h3>
@@ -265,15 +294,6 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             </div>
           </div>
 
-          {/* Quest Preview (Placeholder for Epic 3) */}
-          <div className="mt-8">
-            <h4 className="font-pixel text-xs text-gray-500 mb-3">
-              ACTIVE QUESTS
-            </h4>
-            <div className="border-2 border-dashed border-gray-700 rounded p-4 text-center text-gray-600 text-xs">
-              Quest system coming in Epic 3...
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>

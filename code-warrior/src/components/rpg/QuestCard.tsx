@@ -68,11 +68,12 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
               Victory Conditions:
             </p>
             <div className="text-sm text-gray-400 font-mono">
-              {quest.criteria_type === 'repo_created' && '• Create a new repository'}
-              {quest.criteria_type === 'pr_merged' && `• Merge ${quest.criteria_value} pull request(s)`}
-              {quest.criteria_type === 'commits' && `• Make ${quest.criteria_value} commit(s)`}
-              {quest.criteria_type === 'stars_received' && `• Receive ${quest.criteria_value} star(s)`}
-              {quest.criteria_type === 'issues_created' && `• Create ${quest.criteria_value} issue(s)`}
+              {quest.criteria_type === 'REPO_COUNT' && `• Create ${quest.criteria_threshold} repository/repositories`}
+              {quest.criteria_type === 'PR_MERGED' && `• Merge ${quest.criteria_threshold} pull request(s)`}
+              {quest.criteria_type === 'COMMIT_COUNT' && `• Make ${quest.criteria_threshold} commit(s)`}
+              {quest.criteria_type === 'STAR_COUNT' && `• Receive ${quest.criteria_threshold} star(s)`}
+              {quest.criteria_type === 'ISSUE_COUNT' && `• Create ${quest.criteria_threshold} issue(s)`}
+              {quest.criteria_type === 'REVIEW_COUNT' && `• Review ${quest.criteria_threshold} pull request(s)`}
             </div>
           </div>
 
@@ -96,12 +97,12 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
             <div className="mb-4">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
                 <span>Progress</span>
-                <span>{userQuest.progress || 0} / {quest.criteria_value}</span>
+                <span>{userQuest.progress || 0} / {quest.criteria_threshold}</span>
               </div>
               <div className="h-2 bg-midnight-void rounded-full overflow-hidden border border-mana-blue/30">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${((userQuest.progress || 0) / quest.criteria_value) * 100}%` }}
+                  animate={{ width: `${((userQuest.progress || 0) / quest.criteria_threshold) * 100}%` }}
                   className="h-full bg-gradient-to-r from-mana-blue to-loot-gold"
                 />
               </div>

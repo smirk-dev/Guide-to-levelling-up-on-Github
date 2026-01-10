@@ -9,7 +9,11 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: 'read:user user:email public_repo',
+          // Request write permissions to allow users to create issues/PRs from the app
+          // repo: Full control of private and public repositories (includes issue/PR creation)
+          // read:user: Read user profile data
+          // user:email: Access user email addresses
+          scope: 'read:user user:email repo',
         },
       },
     }),

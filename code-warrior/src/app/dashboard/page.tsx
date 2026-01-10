@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { calculateGitHubStats, type GitHubStats } from '@/lib/github';
+import { calculateGitHubStats, fetchGitHubAchievements, type GitHubStats, type GitHubAchievement } from '@/lib/github';
 import { calculateRPGStats } from '@/lib/game-logic';
 import { User, Quest, UserQuest, Badge } from '@/types/database';
 import { RPGStats } from '@/types/database';
@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<RPGStats | null>(null);
   const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
+  const [githubAchievements, setGithubAchievements] = useState<GitHubAchievement[]>([]);
   const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
   const [activeUserQuest, setActiveUserQuest] = useState<UserQuest | null>(null);
   const [equippedBadges, setEquippedBadges] = useState<Badge[]>([]);
@@ -176,10 +177,14 @@ export default function DashboardPage() {
       // Calculate current RPG stats for display (if not already set from sync)
       // Use the actual GitHub username we fetched
       if (!stats && (actualUsername || data.username)) {
-        const ghStats = await calculateGitHubStats(actualUsername || data.username);
+        const ghStats = await calculateGitHubStats(actualUsername || data.username, accessToken);
         const rpgStats = calculateRPGStats(ghStats, loadedBadges); // Pass badges for stat boosts
         setStats(rpgStats);
         setGithubStats(ghStats); // Store raw GitHub stats
+
+        // Fetch GitHub achievements
+        const achievements = await fetchGitHubAchievements(actualUsername || data.username, accessToken);
+        setGithubAchievements(achievements);
       }
 
       // Load active quest
@@ -530,6 +535,7 @@ export default function DashboardPage() {
           user={user}
           stats={stats}
           githubStats={githubStats || undefined}
+          githubAchievements={githubAchievements}
           activeQuest={activeQuest || undefined}
           activeUserQuest={activeUserQuest || undefined}
           equippedBadges={equippedBadges}

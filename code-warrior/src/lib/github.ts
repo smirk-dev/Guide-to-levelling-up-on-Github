@@ -34,6 +34,14 @@ export interface GitHubStats {
   totalReviews: number;
 }
 
+// GitHub Achievement badge structure
+export interface GitHubAchievement {
+  name: string;
+  tier?: string; // 'x1', 'x2', 'x3', 'x4' for tiered achievements
+  iconUrl: string;
+  unlockedAt?: string;
+}
+
 /**
  * Fetch GitHub user profile
  */
@@ -202,44 +210,42 @@ export async function calculateGitHubStats(
     }
   });
 
-  // If we have access token, try to get more accurate commit count from user's repos
-  if (accessToken && repos.length > 0) {
+  // If we have access token, use GraphQL API for accurate commit count
+  if (accessToken) {
     try {
-      // Get commits from user's top repos (limit to 10 to avoid rate limits)
-      const topRepos = repos.slice(0, 10);
-      const commitCounts = await Promise.all(
-        topRepos.map(async (repo) => {
-          try {
-            const commitsRes = await fetch(
-              `https://api.github.com/repos/${username}/${repo.name}/commits?author=${username}&per_page=1`,
-              { headers }
-            );
-            if (commitsRes.ok) {
-              // Check Link header for pagination to get total count
-              const linkHeader = commitsRes.headers.get('Link');
-              if (linkHeader) {
-                const match = linkHeader.match(/page=(\d+)>; rel="last"/);
-                if (match) {
-                  return parseInt(match[1], 10);
-                }
+      const graphqlQuery = {
+        query: `
+          query($username: String!) {
+            user(login: $username) {
+              contributionsCollection {
+                totalCommitContributions
+                restrictedContributionsCount
               }
-              // If no pagination, there's at least 1 commit if response is ok
-              const commits = await commitsRes.json();
-              return commits.length;
             }
-            return 0;
-          } catch {
-            return 0;
           }
-        })
-      );
-      
-      const repoCommits = commitCounts.reduce((sum, count) => sum + count, 0);
-      if (repoCommits > totalCommits) {
-        totalCommits = repoCommits;
+        `,
+        variables: { username }
+      };
+
+      const graphqlResponse = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+
+      if (graphqlResponse.ok) {
+        const graphqlData = await graphqlResponse.json();
+        const contributions = graphqlData.data?.user?.contributionsCollection;
+        if (contributions) {
+          totalCommits = contributions.totalCommitContributions + (contributions.restrictedContributionsCount || 0);
+        }
       }
     } catch (error) {
-      console.error('Error fetching commit counts:', error);
+      console.error('Error fetching commit count via GraphQL:', error);
+      // Fall back to event-based count if GraphQL fails
     }
   }
 
@@ -251,4 +257,55 @@ export async function calculateGitHubStats(
     totalIssues,
     totalReviews,
   };
+}
+
+/**
+ * Fetch user's GitHub achievement badges
+ * Note: GitHub doesn't provide a public API for achievements yet,
+ * so we'll need to scrape the profile page or use a proxy service
+ */
+export async function fetchGitHubAchievements(
+  username: string,
+  accessToken?: string
+): Promise<GitHubAchievement[]> {
+  try {
+    // For now, return empty array as GitHub doesn't expose achievements via API
+    // In the future, we can:
+    // 1. Scrape from profile page (https://github.com/username?tab=achievements)
+    // 2. Use a third-party service that extracts this data
+    // 3. Wait for GitHub to add this to their API
+
+    // Placeholder: return common achievements based on stats
+    const stats = await calculateGitHubStats(username, accessToken);
+    const achievements: GitHubAchievement[] = [];
+
+    // Generate achievements based on stats (simplified version)
+    if (stats.totalPRs >= 1) {
+      achievements.push({
+        name: 'Pull Shark',
+        tier: stats.totalPRs >= 128 ? 'x4' : stats.totalPRs >= 64 ? 'x3' : stats.totalPRs >= 16 ? 'x2' : 'x1',
+        iconUrl: '/achievements/pull-shark.png',
+      });
+    }
+
+    if (stats.totalRepos >= 1) {
+      achievements.push({
+        name: 'Quickdraw',
+        tier: stats.totalRepos >= 32 ? 'x4' : stats.totalRepos >= 16 ? 'x3' : stats.totalRepos >= 8 ? 'x2' : 'x1',
+        iconUrl: '/achievements/quickdraw.png',
+      });
+    }
+
+    if (stats.totalIssues + stats.totalPRs >= 1) {
+      achievements.push({
+        name: 'YOLO',
+        iconUrl: '/achievements/yolo.png',
+      });
+    }
+
+    return achievements;
+  } catch (error) {
+    console.error('Error fetching achievements:', error);
+    return [];
+  }
 }
