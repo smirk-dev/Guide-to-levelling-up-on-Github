@@ -2,7 +2,7 @@
 
 export type RankTier = 'C' | 'B' | 'A' | 'AA' | 'AAA' | 'S' | 'SS' | 'SSS';
 export type QuestStatus = 'ACTIVE' | 'COMPLETED';
-export type CriteriaType = 'REPO_COUNT' | 'PR_MERGED' | 'STAR_COUNT';
+export type CriteriaType = 'REPO_COUNT' | 'PR_MERGED' | 'STAR_COUNT' | 'COMMIT_COUNT' | 'ISSUE_COUNT' | 'REVIEW_COUNT';
 
 export interface User {
   id: string;
@@ -23,6 +23,8 @@ export interface Quest {
   xp_reward: number;
   criteria_type: CriteriaType;
   criteria_threshold: number;
+  is_active: boolean;
+  badge_reward: string | null;
   created_at: string;
 }
 
@@ -31,7 +33,9 @@ export interface UserQuest {
   user_id: string;
   quest_id: string;
   status: QuestStatus;
+  progress: number;
   completed_at: string | null;
+  claimed_at: string | null;
   created_at: string;
 }
 
@@ -41,6 +45,14 @@ export interface Badge {
   icon_slug: string;
   stat_boost: Record<string, number> | null;
   created_at: string;
+}
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_id: string;
+  equipped: boolean;
+  earned_at: string;
 }
 
 // RPG Stats computed from GitHub data
