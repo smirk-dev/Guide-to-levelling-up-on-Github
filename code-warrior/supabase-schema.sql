@@ -5,7 +5,7 @@
 -- Create ENUM types for structured data
 CREATE TYPE rank_tier AS ENUM ('C', 'B', 'A', 'AA', 'AAA', 'S', 'SS', 'SSS');
 CREATE TYPE quest_status AS ENUM ('ACTIVE', 'COMPLETED');
-CREATE TYPE criteria_type AS ENUM ('REPO_COUNT', 'PR_MERGED', 'STAR_COUNT');
+CREATE TYPE criteria_type AS ENUM ('REPO_COUNT', 'PR_MERGED', 'STAR_COUNT', 'COMMIT_COUNT', 'ISSUE_COUNT', 'REVIEW_COUNT');
 
 -- ============================================
 -- Table: users
@@ -37,6 +37,8 @@ CREATE TABLE quests (
   xp_reward INTEGER NOT NULL,
   criteria_type criteria_type NOT NULL,
   criteria_threshold INTEGER NOT NULL,
+  is_active BOOLEAN DEFAULT true NOT NULL,
+  badge_reward UUID REFERENCES badges(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -49,7 +51,9 @@ CREATE TABLE user_quests (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   quest_id UUID NOT NULL REFERENCES quests(id) ON DELETE CASCADE,
   status quest_status DEFAULT 'ACTIVE' NOT NULL,
+  progress INTEGER DEFAULT 0 NOT NULL,
   completed_at TIMESTAMP WITH TIME ZONE,
+  claimed_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id, quest_id)
 );
@@ -71,12 +75,29 @@ CREATE TABLE badges (
 );
 
 -- ============================================
+-- Table: user_badges
+-- Join table tracking user badge ownership and equipment
+-- ============================================
+CREATE TABLE user_badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  badge_id UUID NOT NULL REFERENCES badges(id) ON DELETE CASCADE,
+  equipped BOOLEAN DEFAULT false NOT NULL,
+  earned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, badge_id)
+);
+
+-- Index for fast user badge lookups
+CREATE INDEX idx_user_badges_user_id ON user_badges(user_id);
+CREATE INDEX idx_user_badges_equipped ON user_badges(user_id, equipped);
+
+-- ============================================
 -- Seed Data: Initial Quests (Tutorial)
 -- From docs/project-brief.md
 -- ============================================
 INSERT INTO quests (title, description, xp_reward, criteria_type, criteria_threshold) VALUES
   ('The First Step', 'Create your first GitHub repository and begin your journey as a Code Warrior.', 50, 'REPO_COUNT', 1),
-  ('Community Voice', 'Open an issue in any repository to earn the Scroll of Truth.', 30, 'REPO_COUNT', 1),
+  ('Community Voice', 'Open an issue in any repository to earn the Scroll of Truth.', 30, 'ISSUE_COUNT', 1),
   ('The Merger', 'Successfully merge your first pull request to prove your strength.', 100, 'PR_MERGED', 1);
 
 -- ============================================
