@@ -1,5 +1,36 @@
 # Troubleshooting Guide
 
+## Recent Fixes (2026-01-10)
+
+### Sync Cooldown Issues Fixed
+
+**Problem:** New users were getting "Sync on cooldown" errors immediately after creation.
+
+**Root Cause:** The `last_synced_at` column had a default value of `NOW()`, causing immediate cooldown for new users.
+
+**Solution:** 
+1. Updated sync API to skip cooldown check when `last_synced_at` is `NULL`
+2. Modified user creation to set `last_synced_at` as `NULL` for new users
+3. Added migration to update existing database schema
+
+**To Apply Migration:**
+Run this SQL in your Supabase SQL Editor:
+```sql
+ALTER TABLE users 
+  ALTER COLUMN last_synced_at DROP DEFAULT,
+  ALTER COLUMN last_synced_at DROP NOT NULL;
+```
+
+### Enhanced Error Logging
+
+**Problem:** Error messages showing as empty objects `{}` in console.
+
+**Solution:**
+- All errors now show detailed messages with JSON stringification
+- Added comprehensive logging throughout the sync process
+- GitHub API errors now show status codes and response details
+- Supabase errors show error codes, messages, and hints
+
 ## Console Errors Fixed
 
 ### Error Loading User / Supabase Error
