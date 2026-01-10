@@ -53,17 +53,26 @@ export const authOptions: NextAuthOptions = {
       if (token.username) {
         session.user.username = token.username;
       }
+      // Pass access token to session for API calls
+      if (token.accessToken) {
+        (session as any).accessToken = token.accessToken;
+      }
       return session;
     },
     async jwt({ token, account, profile }) {
       // Store GitHub access token for API calls
       if (account?.access_token) {
         token.accessToken = account.access_token;
+        console.log('Stored access token in JWT');
       }
       if (profile) {
         const githubProfile = profile as any;
         token.githubId = githubProfile.id.toString();
         token.username = githubProfile.login;
+        console.log('Stored GitHub profile in JWT:', { 
+          githubId: token.githubId, 
+          username: token.username 
+        });
       }
       return token;
     },
