@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { calculateGitHubStats, type GitHubStats } from '@/lib/github';
 import { calculateRPGStats } from '@/lib/game-logic';
-import { User, Quest, UserQuest } from '@/types/database';
+import { User, Quest, UserQuest, Badge } from '@/types/database';
 import { RPGStats } from '@/types/database';
 import CharacterSheet from '@/components/rpg/CharacterSheet';
 import FloatingXP from '@/components/effects/FloatingXP';
 import Confetti from '@/components/effects/Confetti';
-import { RefreshCw, LogOut, Menu, X, Scroll } from 'lucide-react';
+import { RefreshCw, LogOut, Menu, X, Scroll, Trophy } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { soundManager } from '@/lib/sound';
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
   const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
   const [activeUserQuest, setActiveUserQuest] = useState<UserQuest | null>(null);
+  const [equippedBadges, setEquippedBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
@@ -60,11 +61,17 @@ export default function DashboardPage() {
       const username = session?.user?.username || (session?.user as any).email?.split('@')[0];
       
       if (!username && !githubId) {
-        console.error('Cannot load user data: no identifier');
+        console.error('Cannot load user data: no identifier found in session');
+        console.error('Session data:', session);
+        setLoading(false);
         return;
       }
 
-      console.log('Loading user data for:', { githubId, username });
+      if (!accessToken) {
+        console.warn('No access token found in session - GitHub API calls may fail');
+      }
+
+      console.log('Loading user data for:', { githubId, username, hasAccessToken: !!accessToken });
 
       // First, fetch the ACTUAL GitHub username from the API
       let actualUsername: string | null = null;
@@ -81,13 +88,19 @@ export default function DashboardPage() {
             const githubUser = await githubUserResponse.json();
             actualUsername = githubUser.login;
             console.log('Fetched actual GitHub username:', actualUsername);
+          } else {
+            const errorText = await githubUserResponse.text();
+            console.error('GitHub API error:', githubUserResponse.status, errorText);
           }
         } catch (error) {
-          console.error('Error fetching GitHub username:', error);
+          console.error('Error fetching GitHub username:', error instanceof Error ? error.message : error);
         }
+      } else {
+        console.log('No access token available, will use session username');
       }
       
       // Try to find by GitHub ID first (more reliable)
+      console.log('Querying Supabase for user:', { githubId, username: actualUsername || username });
       let { data, error } = githubId
         ? await supabase
             .from('users')
@@ -99,6 +112,8 @@ export default function DashboardPage() {
             .select('*')
             .eq('username', actualUsername || username)
             .single();
+
+      console.log('Supabase query result:', { hasData: !!data, error: error?.message || null });
 
       // If user exists but username is wrong, update it
       if (data && actualUsername && data.username !== actualUsername) {
@@ -126,10 +141,13 @@ export default function DashboardPage() {
           
           if (syncResponse.ok && syncResult.user) {
             data = syncResult.user;
-            
+
+            // Load badges for new user (will be empty initially)
+            const badges = await loadEquippedBadges(syncResult.user.id);
+
             // Also calculate stats from sync result
             if (syncResult.stats) {
-              const rpgStats = calculateRPGStats(syncResult.stats);
+              const rpgStats = calculateRPGStats(syncResult.stats, badges);
               setStats(rpgStats);
             }
           } else {
@@ -141,7 +159,8 @@ export default function DashboardPage() {
           throw syncError;
         }
       } else if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error:', error.message || error);
+        console.error('Error details:', { code: error.code, details: error.details, hint: error.hint });
         throw error;
       }
 
@@ -151,11 +170,14 @@ export default function DashboardPage() {
 
       setUser(data);
 
+      // Load equipped badges first
+      const loadedBadges = await loadEquippedBadges(data.id);
+
       // Calculate current RPG stats for display (if not already set from sync)
       // Use the actual GitHub username we fetched
       if (!stats && (actualUsername || data.username)) {
         const ghStats = await calculateGitHubStats(actualUsername || data.username);
-        const rpgStats = calculateRPGStats(ghStats);
+        const rpgStats = calculateRPGStats(ghStats, loadedBadges); // Pass badges for stat boosts
         setStats(rpgStats);
         setGithubStats(ghStats); // Store raw GitHub stats
       }
@@ -163,7 +185,8 @@ export default function DashboardPage() {
       // Load active quest
       await loadActiveQuest(data.id);
     } catch (error) {
-      console.error('Error loading user:', error);
+      console.error('Error loading user:', error instanceof Error ? error.message : error);
+      console.error('Full error:', error);
     } finally {
       setLoading(false);
     }
@@ -199,6 +222,71 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error loading active quest:', error);
+    }
+  }
+
+  async function loadEquippedBadges(userId: string): Promise<Badge[]> {
+    try {
+      // Fetch user's equipped badges
+      const { data: userBadges, error: userBadgesError } = await supabase
+        .from('user_badges')
+        .select('badge_id')
+        .eq('user_id', userId)
+        .eq('equipped', true);
+
+      if (userBadgesError || !userBadges || userBadges.length === 0) {
+        setEquippedBadges([]);
+        return [];
+      }
+
+      // Fetch the actual badge data
+      const badgeIds = userBadges.map(ub => ub.badge_id);
+      const { data: badges, error: badgesError } = await supabase
+        .from('badges')
+        .select('*')
+        .in('id', badgeIds);
+
+      if (badgesError || !badges) {
+        setEquippedBadges([]);
+        return [];
+      }
+
+      setEquippedBadges(badges);
+      return badges;
+    } catch (error) {
+      console.error('Error loading equipped badges:', error);
+      setEquippedBadges([]);
+      return [];
+    }
+  }
+
+  async function handleBadgeUnequip(badgeId: string) {
+    try {
+      soundManager.click();
+
+      const response = await fetch('/api/badges/unequip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ badgeId }),
+      });
+
+      if (response.ok && user) {
+        // Reload equipped badges
+        const updatedBadges = await loadEquippedBadges(user.id);
+
+        // Recalculate stats with updated badges
+        if (githubStats) {
+          const rpgStats = calculateRPGStats(githubStats, updatedBadges);
+          setStats(rpgStats);
+        }
+
+        soundManager.click();
+      } else {
+        soundManager.error();
+      }
+    } catch (error) {
+      console.error('Error unequipping badge:', error);
+      soundManager.error();
     }
   }
 
@@ -309,13 +397,13 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <h1 className="font-pixel text-xs md:text-sm text-loot-gold">CODE WARRIOR</h1>
           
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Treasure Chest Icon */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             onMouseEnter={() => soundManager.hover()}
-            className="lg:hidden p-2 text-loot-gold"
+            className="lg:hidden p-2 text-loot-gold text-2xl"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : '📦'}
           </button>
 
           {/* Desktop Navigation */}
@@ -339,6 +427,18 @@ export default function DashboardPage() {
               >
                 <Scroll className="w-4 h-4" />
                 QUESTS
+              </motion.button>
+            </Link>
+
+            <Link href="/leaderboard">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onMouseEnter={() => soundManager.hover()}
+                className="flex items-center gap-2 px-4 py-2 bg-loot-gold/20 border border-loot-gold/50 text-loot-gold font-pixel text-xs rounded hover:bg-loot-gold/30 transition-colors"
+              >
+                <Trophy className="w-4 h-4" />
+                HALL OF FAME
               </motion.button>
             </Link>
 
@@ -389,6 +489,13 @@ export default function DashboardPage() {
                   </button>
                 </Link>
 
+                <Link href="/leaderboard" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full flex items-center gap-2 px-4 py-3 bg-loot-gold/20 border border-loot-gold/50 text-loot-gold font-pixel text-xs rounded">
+                    <Trophy className="w-4 h-4" />
+                    HALL OF FAME
+                  </button>
+                </Link>
+
                 <button
                   onClick={() => {
                     handleSync();
@@ -419,12 +526,14 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="pt-20">
-        <CharacterSheet 
-          user={user} 
+        <CharacterSheet
+          user={user}
           stats={stats}
           githubStats={githubStats || undefined}
           activeQuest={activeQuest || undefined}
           activeUserQuest={activeUserQuest || undefined}
+          equippedBadges={equippedBadges}
+          onBadgeUnequip={handleBadgeUnequip}
         />
       </div>
     </div>
