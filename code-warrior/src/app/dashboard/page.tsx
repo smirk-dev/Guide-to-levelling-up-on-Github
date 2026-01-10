@@ -152,7 +152,17 @@ export default function DashboardPage() {
               setStats(rpgStats);
             }
           } else {
-            console.error('Sync failed:', syncResult);
+            // Handle sync cooldown gracefully
+            if (syncResponse.status === 429) {
+              console.log('Sync on cooldown:', syncResult.message || 'Please wait before syncing again');
+              console.log('Wait time:', syncResult.waitTime, 'seconds');
+              throw new Error(syncResult.message || 'Sync on cooldown');
+            }
+            
+            console.error('Sync failed with status:', syncResponse.status);
+            console.error('Sync error details:', JSON.stringify(syncResult, null, 2));
+            console.error('Error message:', syncResult.error);
+            console.error('Error details:', syncResult.details);
             throw new Error(syncResult.error || 'Failed to create user');
           }
         } catch (syncError) {
@@ -190,8 +200,11 @@ export default function DashboardPage() {
       // Load active quest
       await loadActiveQuest(data.id);
     } catch (error) {
-      console.error('Error loading user:', error instanceof Error ? error.message : error);
-      console.error('Full error:', error);
+      console.error('Error loading user:', error instanceof Error ? error.message : String(error));
+      if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+      }
+      console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     } finally {
       setLoading(false);
     }
