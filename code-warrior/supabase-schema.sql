@@ -27,6 +27,19 @@ CREATE TABLE users (
 CREATE INDEX idx_users_github_id ON users(github_id);
 
 -- ============================================
+-- Table: badges
+-- Defines badge items that boost stats
+-- MUST BE CREATED BEFORE quests (which references it)
+-- ============================================
+CREATE TABLE badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  icon_slug VARCHAR(255) NOT NULL,
+  stat_boost JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
 -- Table: quests
 -- Defines the tutorial/quest templates
 -- ============================================
@@ -61,18 +74,6 @@ CREATE TABLE user_quests (
 -- Index for fast user quest lookups
 CREATE INDEX idx_user_quests_user_id ON user_quests(user_id);
 CREATE INDEX idx_user_quests_status ON user_quests(status);
-
--- ============================================
--- Table: badges
--- Defines badge items that boost stats
--- ============================================
-CREATE TABLE badges (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  icon_slug VARCHAR(255) NOT NULL,
-  stat_boost JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
 
 -- ============================================
 -- Table: user_badges
