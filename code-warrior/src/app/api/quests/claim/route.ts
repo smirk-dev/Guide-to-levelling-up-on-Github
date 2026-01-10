@@ -76,11 +76,11 @@ export async function POST(request: Request) {
     }
 
     // Update user's XP
-    const newXP = user.total_xp + quest.xp_reward;
+    const newXP = user.xp + quest.xp_reward;
 
     const { error: updateUserError } = await supabase
       .from('users')
-      .update({ total_xp: newXP })
+      .update({ xp: newXP })
       .eq('id', user.id);
 
     if (updateUserError) {
