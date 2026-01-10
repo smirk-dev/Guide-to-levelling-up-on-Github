@@ -9,42 +9,49 @@ export function checkQuestCompletion(
   stats: GitHubStats,
   userQuest?: UserQuest
 ): { completed: boolean; progress: number } {
-  const criteriaValue = quest.criteria_value;
+  const criteriaValue = quest.criteria_threshold;
 
   switch (quest.criteria_type) {
-    case 'repo_created':
+    case 'REPO_COUNT':
       // Check total public repos
       return {
         completed: stats.totalRepos >= criteriaValue,
         progress: Math.min(stats.totalRepos, criteriaValue),
       };
 
-    case 'pr_merged':
+    case 'PR_MERGED':
       // Check merged pull requests
       return {
-        completed: stats.pullRequests >= criteriaValue,
-        progress: Math.min(stats.pullRequests, criteriaValue),
+        completed: stats.totalPRs >= criteriaValue,
+        progress: Math.min(stats.totalPRs, criteriaValue),
       };
 
-    case 'commits':
+    case 'COMMIT_COUNT':
       // Check total commits
       return {
-        completed: stats.commits >= criteriaValue,
-        progress: Math.min(stats.commits, criteriaValue),
+        completed: stats.totalCommits >= criteriaValue,
+        progress: Math.min(stats.totalCommits, criteriaValue),
       };
 
-    case 'stars_received':
+    case 'STAR_COUNT':
       // Check stars received
       return {
-        completed: stats.stars >= criteriaValue,
-        progress: Math.min(stats.stars, criteriaValue),
+        completed: stats.totalStars >= criteriaValue,
+        progress: Math.min(stats.totalStars, criteriaValue),
       };
 
-    case 'issues_created':
+    case 'ISSUE_COUNT':
       // Check issues opened
       return {
-        completed: stats.issues >= criteriaValue,
-        progress: Math.min(stats.issues, criteriaValue),
+        completed: stats.totalIssues >= criteriaValue,
+        progress: Math.min(stats.totalIssues, criteriaValue),
+      };
+
+    case 'REVIEW_COUNT':
+      // Check reviews submitted
+      return {
+        completed: stats.totalReviews >= criteriaValue,
+        progress: Math.min(stats.totalReviews, criteriaValue),
       };
 
     default:
