@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 import { getServiceSupabase } from '@/lib/supabase';
 
 const MAX_EQUIPPED_BADGES = 3;
@@ -10,9 +11,10 @@ const MAX_EQUIPPED_BADGES = 3;
  */
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
+      console.error('Badge equip: No session or user ID found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
