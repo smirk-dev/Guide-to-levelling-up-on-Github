@@ -69,53 +69,74 @@ export async function POST(request: NextRequest) {
           avatar_url: session.user?.image || null,
           xp: 0,
           rank_tier: 'C',
+          last_synced_at: null, // Allow immediate first sync
         })
         .select()
         .single();
 
       if (createError) {
         console.error('Error creating user:', createError);
+        console.error('Create error details:', JSON.stringify(createError, null, 2));
         return NextResponse.json(
-          { error: 'Failed to create user', details: createError },
+          { 
+            error: 'Failed to create user', 
+            details: createError.message || createError,
+            code: createError.code 
+          },
           { status: 500 }
         );
       }
 
       user = newUser;
+      console.log('Successfully created new user:', user.id);
     } else if (userError || !user) {
+      console.error('User lookup error:', userError);
       return NextResponse.json(
-        { error: 'User not found in database', details: userError },
+        { error: 'User not found in database', details: userError?.message || userError },
         { status: 404 }
       );
     }
 
     // 2. Check last sync time (prevent rate limit abuse)
-    const lastSynced = new Date(user.last_synced_at);
+    // Skip cooldown check for first-time sync (when last_synced_at is null)
     const now = new Date();
-    const timeSinceSync = now.getTime() - lastSynced.getTime();
-    const SYNC_COOLDOWN = 5 * 60 * 1000; // 5 minutes
+    if (user.last_synced_at) {
+      const lastSynced = new Date(user.last_synced_at);
+      const timeSinceSync = now.getTime() - lastSynced.getTime();
+      const SYNC_COOLDOWN = 5 * 60 * 1000; // 5 minutes
 
-    if (timeSinceSync < SYNC_COOLDOWN) {
-      const waitTime = Math.ceil((SYNC_COOLDOWN - timeSinceSync) / 1000);
-      return NextResponse.json(
-        { 
-          error: 'Sync on cooldown',
-          message: `Please wait ${waitTime} seconds before syncing again`,
-          waitTime 
-        },
-        { status: 429 }
-      );
+      if (timeSinceSync < SYNC_COOLDOWN) {
+        const waitTime = Math.ceil((SYNC_COOLDOWN - timeSinceSync) / 1000);
+        console.log(`Sync cooldown active. Wait ${waitTime} seconds.`);
+        return NextResponse.json(
+          { 
+            error: 'Sync on cooldown',
+            message: `Please wait ${waitTime} seconds before syncing again`,
+            waitTime 
+          },
+          { status: 429 }
+        );
+      }
+    } else {
+      console.log('First time sync - no cooldown applied');
     }
 
     // 3. Fetch GitHub stats
+    console.log('Fetching GitHub stats for:', user.username);
     const githubStats = await calculateGitHubStats(
       user.username,
       (session as any).accessToken
     );
+    console.log('GitHub stats calculated:', { 
+      commits: githubStats.commits, 
+      prs: githubStats.pullRequests,
+      repos: githubStats.publicRepos 
+    });
 
     // 4. Calculate RPG stats
     const newXP = calculateXP(githubStats);
     const newRank = calculateRankTier(newXP);
+    console.log('RPG stats calculated:', { newXP, newRank, oldXP: user.xp, oldRank: user.rank_tier });
 
     // 5. Update database
     const { data: updatedUser, error: updateError } = await supabase
@@ -131,11 +152,17 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Error updating user:', updateError);
+      console.error('Update error details:', JSON.stringify(updateError, null, 2));
       return NextResponse.json(
-        { error: 'Failed to update user stats' },
+        { 
+          error: 'Failed to update user stats', 
+          details: updateError.message || updateError 
+        },
         { status: 500 }
       );
     }
+
+    console.log('User successfully updated:', updatedUser.id);
 
     // 6. Return success with updated data
     return NextResponse.json({
@@ -148,8 +175,15 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Sync error:', error);
+    console.error('Error details:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error) {
+      console.error('Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { error: 'Internal server error', details: (error as Error).message },
+      { 
+        error: 'Internal server error', 
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
