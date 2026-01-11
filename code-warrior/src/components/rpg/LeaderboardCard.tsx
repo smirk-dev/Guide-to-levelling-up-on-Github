@@ -29,30 +29,30 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
   const isSilver = rank === 2;
   const isBronze = rank === 3;
 
-  // Color classes for top 3
-  const glowColor = isGold
-    ? 'shadow-[0_0_30px_rgba(255,215,0,0.6)]'
+  // Color classes for top 3 - pixel art style
+  const pixelGlow = isGold
+    ? { boxShadow: '0 0 0 2px var(--loot-gold-2), 0 0 0 4px var(--loot-gold-1), 0 0 0 6px var(--loot-gold-0)' }
     : isSilver
-    ? 'shadow-[0_0_30px_rgba(192,192,192,0.6)]'
+    ? { boxShadow: '0 0 0 2px #c0c0c0, 0 0 0 4px #a0a0a0, 0 0 0 6px #808080' }
     : isBronze
-    ? 'shadow-[0_0_30px_rgba(205,127,50,0.6)]'
-    : '';
+    ? { boxShadow: '0 0 0 2px #cd7f32, 0 0 0 4px #a0522d, 0 0 0 6px #8b4513' }
+    : {};
 
   const borderColor = isGold
-    ? 'border-loot-gold'
+    ? 'border-loot-gold-2'
     : isSilver
     ? 'border-gray-300'
     : isBronze
     ? 'border-orange-600'
-    : 'border-gray-700';
+    : 'border-gray-pixel-0';
 
-  const bgGradient = isGold
-    ? 'bg-gradient-to-r from-loot-gold/20 to-loot-gold/5'
+  const bgSolid = isGold
+    ? 'bg-midnight-void-2'
     : isSilver
-    ? 'bg-gradient-to-r from-gray-300/20 to-gray-300/5'
+    ? 'bg-midnight-void-2'
     : isBronze
-    ? 'bg-gradient-to-r from-orange-600/20 to-orange-600/5'
-    : 'bg-gray-900/50';
+    ? 'bg-midnight-void-2'
+    : 'bg-midnight-void-1';
 
   // Rank icon
   const RankIcon = isGold ? Crown : isSilver ? Medal : isBronze ? Trophy : null;
@@ -62,34 +62,43 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: rank * 0.05 }}
+      whileHover={{ scale: 1.02 }}
       className={`
-        relative p-4 rounded-lg border-2 backdrop-blur-sm
-        ${borderColor} ${bgGradient} ${glowColor}
-        ${isCurrentUser ? 'ring-2 ring-mana-blue' : ''}
-        transition-all duration-300 hover:scale-[1.02]
+        relative p-4 rounded-pixel-sm border-3 pixel-perfect
+        ${borderColor} ${bgSolid}
+        ${isCurrentUser ? 'ring-2 ring-mana-blue-2' : ''}
       `}
+      style={isTop3 ? pixelGlow : {}}
     >
       {/* Rank Number with special badge for top 3 */}
       <div className="absolute -left-3 -top-3 flex items-center justify-center">
         {isTop3 ? (
           <div className={`
-            relative w-12 h-12 rounded-full flex items-center justify-center
-            ${isGold ? 'bg-loot-gold' : isSilver ? 'bg-gray-300' : 'bg-orange-600'}
-            shadow-lg
-          `}>
-            <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full" />
-            <span className="font-pixel text-xs text-midnight-void relative z-10">
+            relative w-12 h-12 flex items-center justify-center pixel-perfect
+            ${isGold ? 'bg-loot-gold-2' : isSilver ? 'bg-gray-300' : 'bg-orange-600'}
+            border-2 ${isGold ? 'border-loot-gold-4' : isSilver ? 'border-gray-100' : 'border-orange-400'}
+            shadow-pixel-md
+          `}
+          style={{
+            clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+          }}
+          >
+            <span className="font-pixel text-xs text-midnight-void-0 relative z-10 no-smooth">
               {rank}
             </span>
             {RankIcon && (
               <div className="absolute -top-1 -right-1">
-                <RankIcon className="w-4 h-4 text-midnight-void" />
+                <RankIcon className="w-4 h-4 text-midnight-void-0 stroke-[3px]" />
               </div>
             )}
           </div>
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-700 flex items-center justify-center">
-            <span className="font-pixel text-xs text-gray-400">
+          <div className="w-10 h-10 bg-midnight-void-2 border-2 border-gray-pixel-0 flex items-center justify-center pixel-perfect"
+            style={{
+              clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+            }}
+          >
+            <span className="font-pixel text-xs text-gray-400 no-smooth">
               {rank}
             </span>
           </div>
