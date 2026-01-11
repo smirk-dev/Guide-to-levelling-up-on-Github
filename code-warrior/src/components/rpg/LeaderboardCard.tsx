@@ -163,23 +163,14 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
         </div>
       </div>
 
-      {/* Animated pulse for top 3 */}
+      {/* Pixel corner decorations for top 3 */}
       {isTop3 && (
-        <motion.div
-          className={`
-            absolute inset-0 rounded-lg -z-10
-            ${isGold ? 'bg-loot-gold/10' : isSilver ? 'bg-gray-300/10' : 'bg-orange-600/10'}
-          `}
-          animate={{
-            opacity: [0, 0.5, 0],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
+        <>
+          <div className={`absolute top-1 left-1 w-2 h-2 ${isGold ? 'bg-loot-gold-3' : isSilver ? 'bg-gray-100' : 'bg-orange-400'}`} />
+          <div className={`absolute top-1 right-1 w-2 h-2 ${isGold ? 'bg-loot-gold-3' : isSilver ? 'bg-gray-100' : 'bg-orange-400'}`} />
+          <div className={`absolute bottom-1 left-1 w-2 h-2 ${isGold ? 'bg-loot-gold-3' : isSilver ? 'bg-gray-100' : 'bg-orange-400'}`} />
+          <div className={`absolute bottom-1 right-1 w-2 h-2 ${isGold ? 'bg-loot-gold-3' : isSilver ? 'bg-gray-100' : 'bg-orange-400'}`} />
+        </>
       )}
     </motion.div>
   );
