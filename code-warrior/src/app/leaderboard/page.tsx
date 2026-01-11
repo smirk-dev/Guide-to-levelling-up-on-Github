@@ -132,11 +132,11 @@ export default function LeaderboardPage() {
                 animate={{ opacity: 1 }}
                 className="text-center py-12"
               >
-                <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">
+                <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4 stroke-[3px]" />
+                <p className="text-gray-400 font-mono">
                   No warriors have claimed their place yet.
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 mt-2 font-mono">
                   Be the first to sync your GitHub stats!
                 </p>
               </motion.div>
