@@ -8,7 +8,7 @@ import Avatar from './Avatar';
 import StatBar from './StatBar';
 import ActiveQuestPreview from './ActiveQuestPreview';
 import BadgeSlot from './BadgeSlot';
-import { Sword, Heart, Sparkles, Star, Brain, GitBranch, GitPullRequest, GitCommit, BookOpen, Code, ArrowRight, Award } from 'lucide-react';
+import { PixelSword, PixelHeart, PixelStar, PixelCode, PixelCheckmark } from '@/components/icons/PixelIcon';
 import { getRankDisplayName, getXPForNextRank } from '@/lib/game-logic';
 import Link from 'next/link';
 
