@@ -74,35 +74,23 @@ export default function BadgeSlot({ slotNumber, badge, onUnequip, disabled }: Ba
             </motion.div>
           </div>
 
-          {/* Glow Effect */}
-          <motion.div
-            className="absolute inset-0 bg-loot-gold/20 rounded-lg -z-10"
-            animate={{
-              opacity: [0.2, 0.5, 0.2],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
+          {/* Pixel Glow Effect - removed smooth blur */}
 
           {/* Unequip Button (shows on hover) */}
           {!disabled && (
             <motion.div
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1 }}
-              className="absolute top-1 right-1 bg-critical-red/90 rounded-full p-1"
+              className="absolute top-1 right-1 bg-critical-red-1 rounded-pixel p-1 border border-critical-red-0"
             >
-              <X className="w-3 h-3 text-white" />
+              <X className="w-3 h-3 text-white stroke-[3px]" />
             </motion.div>
           )}
 
           {/* Stat Boost Tooltip (shows on hover) */}
           {badge.stat_boost && (
-            <div className="absolute bottom-0 left-0 right-0 bg-gray-900/95 p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="font-pixel text-loot-gold truncate">{badge.name}</div>
+            <div className="absolute bottom-0 left-0 right-0 bg-midnight-void-0 border-t-2 border-loot-gold-1 p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="font-pixel text-loot-gold-2 truncate">{badge.name}</div>
               <div className="text-gray-400 text-[10px] truncate">
                 {getStatBoostText(badge.stat_boost)}
               </div>
