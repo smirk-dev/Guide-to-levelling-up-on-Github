@@ -1,355 +1,218 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { PixelShield, PixelCheckmark } from '@/components/icons/PixelIcon';
-import type { Badge } from '@/types/database';
-import Link from 'next/link';
+import {
+  PageLayout,
+  BadgeGrid,
+  PixelFrame,
+  LoadingScreen,
+  Toast,
+  IconBadge,
+} from '@/components';
 import { soundManager } from '@/lib/sound';
+import type { Badge, UserBadge } from '@/types/database';
 
-interface BadgeInventoryItem extends Badge {
-  owned: boolean;
-  equipped: boolean;
-  earned_at: string | null;
+interface BadgesData {
+  badges: Badge[];
+  userBadges: UserBadge[];
 }
 
 export default function BadgesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [inventory, setInventory] = useState<BadgeInventoryItem[]>([]);
-  const [equippedCount, setEquippedCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
+  const [loadingBadgeId, setLoadingBadgeId] = useState<string | null>(null);
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
-    } else if (status === 'authenticated') {
-      loadInventory();
     }
   }, [status, router]);
 
-  const loadInventory = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch badges data
+  const { data, isLoading } = useQuery<BadgesData>({
+    queryKey: ['badges'],
+    queryFn: async () => {
+      const res = await fetch('/api/badges/inventory');
+      if (!res.ok) throw new Error('Failed to fetch badges');
+      return res.json();
+    },
+    enabled: status === 'authenticated',
+  });
 
-      const response = await fetch('/api/badges/inventory');
-      const data = await response.json();
-
-      if (response.ok) {
-        setInventory(data.inventory || []);
-        setEquippedCount(data.equippedCount || 0);
-      } else {
-        setError(data.error || 'Failed to load inventory');
-      }
-    } catch (err) {
-      console.error('Error loading inventory:', err);
-      setError('Failed to load inventory');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEquip = async (badgeId: string) => {
-    try {
-      setActionInProgress(badgeId);
-      soundManager.click();
-
-      const response = await fetch('/api/badges/equip', {
+  // Equip badge mutation
+  const equipMutation = useMutation({
+    mutationFn: async (badgeId: string) => {
+      setLoadingBadgeId(badgeId);
+      const res = await fetch('/api/badges/equip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ badgeId }),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        soundManager.questComplete();
-        await loadInventory(); // Reload to get updated state
-      } else {
-        soundManager.error();
-        alert(data.error || 'Failed to equip badge');
-      }
-    } catch (err) {
-      console.error('Error equipping badge:', err);
-      soundManager.error();
-      alert('Failed to equip badge');
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const handleUnequip = async (badgeId: string) => {
-    try {
-      setActionInProgress(badgeId);
+      if (!res.ok) throw new Error('Equip failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['badges'] });
       soundManager.click();
+      setToast({
+        message: 'Badge equipped!',
+        type: 'success',
+        visible: true,
+      });
+      setLoadingBadgeId(null);
+    },
+    onError: () => {
+      soundManager.error();
+      setToast({
+        message: 'Failed to equip badge',
+        type: 'error',
+        visible: true,
+      });
+      setLoadingBadgeId(null);
+    },
+  });
 
-      const response = await fetch('/api/badges/unequip', {
+  // Unequip badge mutation
+  const unequipMutation = useMutation({
+    mutationFn: async (badgeId: string) => {
+      setLoadingBadgeId(badgeId);
+      const res = await fetch('/api/badges/unequip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ badgeId }),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        soundManager.click();
-        await loadInventory(); // Reload to get updated state
-      } else {
-        soundManager.error();
-        alert(data.error || 'Failed to unequip badge');
-      }
-    } catch (err) {
-      console.error('Error unequipping badge:', err);
+      if (!res.ok) throw new Error('Unequip failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['badges'] });
+      soundManager.click();
+      setToast({
+        message: 'Badge unequipped',
+        type: 'info',
+        visible: true,
+      });
+      setLoadingBadgeId(null);
+    },
+    onError: () => {
       soundManager.error();
-      alert('Failed to unequip badge');
-    } finally {
-      setActionInProgress(null);
-    }
-  };
+      setToast({
+        message: 'Failed to unequip badge',
+        type: 'error',
+        visible: true,
+      });
+      setLoadingBadgeId(null);
+    },
+  });
 
-  // Map icon slugs to emoji
-  const getIconForBadge = (iconSlug: string) => {
-    const icons: Record<string, string> = {
-      sword: '⚔️',
-      scroll: '📜',
-      shark: '🦈',
-      yolo: '🎲',
-      shield: '🛡️',
-      crown: '👑',
-      star: '⭐',
-    };
-    return icons[iconSlug] || '🏆';
-  };
-
-  // Get stat boost display text
-  const getStatBoostText = (statBoost: Record<string, number> | null) => {
-    if (!statBoost) return 'No stat boost';
-    return Object.entries(statBoost)
-      .map(([stat, value]) => `+${value} ${stat.charAt(0).toUpperCase() + stat.slice(1)}`)
-      .join(', ');
-  };
-
-  if (status === 'loading' || loading) {
-    return (
-      <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-spin inline-block">⚙️</div>
-          <p className="text-gray-400 font-mono">Loading Badge Collection...</p>
-        </div>
-      </div>
-    );
+  if (status === 'loading' || isLoading) {
+    return <LoadingScreen message="LOADING BADGES" />;
   }
 
-  return (
-    <div className="min-h-screen bg-midnight-void-0 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          {/* Back Button */}
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
-          >
-            <span>←</span>
-            <span>Back to Dashboard</span>
-          </Link>
+  if (!session || !data) {
+    return <LoadingScreen message="LOADING BADGE DATA" />;
+  }
 
-          {/* Title */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative">
-              <PixelShield className="text-loot-gold-2" size="lg" />
+  const unlockedCount = data.userBadges.length;
+  const totalCount = data.badges.length;
+  const equippedCount = data.userBadges.filter((ub) => ub.equipped).length;
+
+  return (
+    <PageLayout
+      title="BADGES"
+      subtitle="Collect and equip badges for stat boosts"
+    >
+      {/* Toast */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.visible}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
+
+      {/* Stats Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 md:mb-12"
+      >
+        <PixelFrame variant="gold" padding="lg">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
+            <div className="text-center min-w-[90px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-[var(--xp-light)] mb-2">
+                {unlockedCount}/{totalCount}
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                UNLOCKED
+              </p>
             </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
-                style={{
-                  textShadow: '-2px -2px 0 var(--loot-gold-0), 2px -2px 0 var(--loot-gold-0), -2px 2px 0 var(--loot-gold-0), 2px 2px 0 var(--loot-gold-0)'
-                }}
-              >
-                BADGE COLLECTION
-              </h1>
-              <p className="text-gray-400 mt-2 font-mono">
-                Equip up to 3 badges to boost your stats ({equippedCount}/3 equipped)
+            <div className="text-center min-w-[90px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-[var(--gold-light)] mb-2">
+                {equippedCount}/3
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                EQUIPPED
+              </p>
+            </div>
+            <div className="text-center min-w-[90px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-white mb-2">
+                {Math.round((unlockedCount / (totalCount || 1)) * 100)}%
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                COLLECTION
               </p>
             </div>
           </div>
+        </PixelFrame>
+      </motion.div>
 
-          <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1" />
-        </motion.div>
+      {/* Badge Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8 md:mb-12"
+      >
+        <BadgeGrid
+          badges={data.badges}
+          userBadges={data.userBadges}
+          onEquipBadge={(badgeId) => equipMutation.mutate(badgeId)}
+          onUnequipBadge={(badgeId) => unequipMutation.mutate(badgeId)}
+          loadingBadgeId={loadingBadgeId}
+        />
+      </motion.div>
 
-        {/* Error State */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-midnight-void-2 border-2 border-critical-red-1 rounded-pixel-sm p-4 mb-6 pixel-perfect"
-          >
-            <p className="text-critical-red-1 font-mono">{error}</p>
-            <button
-              onClick={loadInventory}
-              className="mt-2 text-sm text-loot-gold-2 hover:text-loot-gold-3 font-mono"
-            >
-              Try again
-            </button>
-          </motion.div>
-        )}
-
-        {/* Badge Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {inventory.map((badge, index) => (
-            <motion.div
-              key={badge.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              className={`
-                relative p-6 rounded-pixel-sm border-3 pixel-perfect
-                ${badge.owned
-                  ? badge.equipped
-                    ? 'border-loot-gold-2 bg-midnight-void-2'
-                    : 'border-mana-blue-1 bg-midnight-void-1'
-                  : 'border-gray-pixel-0 bg-midnight-void-1 opacity-60'
-                }
-              `}
-              style={badge.equipped ? {
-                boxShadow: '0 0 0 2px var(--loot-gold-1), 0 0 0 4px var(--loot-gold-0)'
-              } : {}}
-            >
-              {/* Badge Icon */}
-              <div className="text-center mb-4">
-                <motion.div
-                  className={`text-6xl mb-3 inline-block ${!badge.owned ? 'grayscale' : ''}`}
-                  animate={badge.equipped ? { rotate: [0, 5, -5, 0] } : {}}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {badge.owned ? getIconForBadge(badge.icon_slug) : <span className="text-4xl">🔒</span>}
-                </motion.div>
-
-                {/* Equipped Indicator */}
-                {badge.equipped && (
-                  <motion.div
-                    className="absolute top-4 right-4 bg-loot-gold-2 border-2 border-loot-gold-4 p-1 pixel-perfect"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    style={{
-                      clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
-                    }}
-                  >
-                    <PixelCheckmark className="text-midnight-void-0" size="md" />
-                  </motion.div>
-                )}
-
-                {/* Locked Indicator */}
-                {!badge.owned && (
-                  <div className="absolute top-4 left-4 bg-midnight-void-2 border-2 border-gray-pixel-0 p-2 pixel-perfect"
-                    style={{
-                      clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
-                    }}
-                  >
-                    <span className="text-sm">🔒</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Badge Info */}
-              <div className="text-center mb-4">
-                <h3 className={`font-pixel text-lg mb-2 no-smooth ${badge.owned ? 'text-white' : 'text-gray-600'}`}>
-                  {badge.name}
-                </h3>
-                <p className={`text-sm mb-2 font-mono ${badge.owned ? 'text-loot-gold-2' : 'text-gray-600'}`}>
-                  {getStatBoostText(badge.stat_boost)}
-                </p>
-                {badge.earned_at && (
-                  <p className="text-xs text-gray-500 font-mono">
-                    Earned {new Date(badge.earned_at).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-
-              {/* Action Button */}
-              {badge.owned && (
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 1 }}
-                  onClick={() => badge.equipped ? handleUnequip(badge.id) : handleEquip(badge.id)}
-                  onMouseEnter={() => soundManager.hover()}
-                  disabled={actionInProgress === badge.id || (!badge.equipped && equippedCount >= 3)}
-                  className={`
-                    w-full px-4 py-2 font-pixel text-xs rounded-pixel border-3 pixel-perfect no-smooth
-                    ${badge.equipped
-                      ? 'bg-critical-red-1 border-critical-red-1 text-midnight-void-0'
-                      : equippedCount >= 3
-                      ? 'bg-midnight-void-2 border-gray-pixel-0 text-gray-500 cursor-not-allowed'
-                      : 'bg-loot-gold-2 border-loot-gold-2 text-midnight-void-0'
-                    }
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                  style={badge.equipped ? {
-                    borderColor: 'var(--critical-red-1) var(--midnight-void-3) var(--midnight-void-3) var(--critical-red-1)',
-                    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
-                  } : equippedCount >= 3 ? {} : {
-                    borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
-                    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
-                  }}
-                >
-                  {actionInProgress === badge.id ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="inline-block animate-spin">⚙️</span>
-                      PROCESSING...
-                    </span>
-                  ) : badge.equipped ? (
-                    'UNEQUIP'
-                  ) : equippedCount >= 3 ? (
-                    'SLOTS FULL'
-                  ) : (
-                    'EQUIP'
-                  )}
-                </motion.button>
-              )}
-
-              {!badge.owned && (
-                <div className="text-center text-xs text-gray-600 font-pixel no-smooth">
-                  LOCKED
-                </div>
-              )}
-
-              {/* Pixel corner decorations for equipped badges */}
-              {badge.equipped && (
-                <>
-                  <div className="absolute top-1 left-1 w-2 h-2 bg-loot-gold-3" />
-                  <div className="absolute top-1 right-1 w-2 h-2 bg-loot-gold-3" />
-                  <div className="absolute bottom-1 left-1 w-2 h-2 bg-loot-gold-3" />
-                  <div className="absolute bottom-1 right-1 w-2 h-2 bg-loot-gold-3" />
-                </>
-              )}
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {inventory.length === 0 && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <PixelShield className="text-gray-600 mx-auto mb-4" size="lg" />
-            <p className="text-gray-400 font-mono">No badges available yet.</p>
-            <p className="text-sm text-gray-500 mt-2 font-mono">
-              Complete quests to earn badges!
-            </p>
-          </motion.div>
-        )}
-      </div>
-    </div>
+      {/* Info hint */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-8 md:mt-10"
+      >
+        <PixelFrame variant="stone" padding="lg">
+          <div className="flex items-start gap-4">
+            <IconBadge size={28} color="#8b949e" />
+            <div className="flex-1">
+              <p className="font-pixel text-[9px] md:text-[10px] text-[var(--gray-highlight)] mb-3">
+                BADGE TIPS
+              </p>
+              <ul className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)] space-y-2">
+                <li>• Complete quests and achievements to unlock new badges</li>
+                <li>• Equip up to 3 badges at once for stat boosts</li>
+                <li>• Different badges enhance different character stats</li>
+                <li>• Rare badges provide stronger bonuses</li>
+              </ul>
+            </div>
+          </div>
+        </PixelFrame>
+      </motion.div>
+    </PageLayout>
   );
 }
