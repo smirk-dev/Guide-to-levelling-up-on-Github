@@ -1,575 +1,435 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { calculateGitHubStats, fetchGitHubAchievements, type GitHubStats, type GitHubAchievement } from '@/lib/github';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import {
+  PageLayout,
+  CharacterSheet,
+  QuestCard,
+  PixelFrame,
+  PixelButton,
+  PixelBadge,
+  LoadingScreen,
+  Toast,
+  FloatingXP,
+  IconSync,
+  IconScroll,
+  IconCommit,
+  IconPullRequest,
+  IconIssue,
+  IconReview,
+  IconStar,
+  IconXP,
+  StatBar,
+} from '@/components';
 import { calculateRPGStats } from '@/lib/game-logic';
-import { User, Quest, UserQuest, Badge } from '@/types/database';
-import { RPGStats } from '@/types/database';
-import CharacterSheet from '@/components/rpg/CharacterSheet';
-import FloatingXP from '@/components/effects/FloatingXP';
-import Confetti from '@/components/effects/Confetti';
-import { PixelRefresh, PixelLogout, PixelScroll, PixelTrophy } from '@/components/icons/PixelIcon';
-import { signOut } from 'next-auth/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { soundManager } from '@/lib/sound';
-import Link from 'next/link';
-import { get3DButtonStyle } from '@/lib/pixel-utils';
+import type { User, Quest, UserQuest, RankTier } from '@/types/database';
+
+interface DashboardData {
+  user: User | null;
+  quests: Quest[];
+  userQuests: UserQuest[];
+}
+
+interface GitHubStats {
+  commits: number;
+  pullRequests: number;
+  issues: number;
+  reviews: number;
+  stars: number;
+}
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState<RPGStats | null>(null);
-  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
-  const [githubAchievements, setGithubAchievements] = useState<GitHubAchievement[]>([]);
-  const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
-  const [activeUserQuest, setActiveUserQuest] = useState<UserQuest | null>(null);
-  const [equippedBadges, setEquippedBadges] = useState<Badge[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMessage, setSyncMessage] = useState('');
-  const [showXP, setShowXP] = useState(false);
-  const [xpAmount, setXPAmount] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
+  const [floatingXP, setFloatingXP] = useState<{ amount: number; key: number } | null>(null);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[Dashboard] Session status:', status, 'Session:', session);
+  }, [status, session]);
+
+  // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
+      console.log('[Dashboard] Not authenticated, redirecting to home');
       router.push('/');
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (session?.user) {
-      console.log('Session data:', session.user);
-      const username = session.user.username || (session.user as any).email?.split('@')[0];
-      if (username) {
-        loadUserData();
-      } else {
-        console.error('No username found in session:', session.user);
-        setLoading(false);
-      }
-    }
-  }, [session]);
-
-  async function loadUserData() {
-    try {
-      setLoading(true);
-      const githubId = session?.user?.id;
-      const accessToken = (session as any)?.accessToken;
-      const username = session?.user?.username || (session?.user as any).email?.split('@')[0];
+  // Fetch dashboard data - fetch whenever we have a status (unauthenticated will handle redirect)
+  const { data, isLoading, refetch, error, isFetching } = useQuery<DashboardData>({
+    queryKey: ['dashboard', session?.user?.id],
+    queryFn: async () => {
+      console.log('[Dashboard] Query function called, status:', status);
       
-      if (!username && !githubId) {
-        console.error('Cannot load user data: no identifier found in session');
-        console.error('Session data:', session);
-        setLoading(false);
-        return;
-      }
-
-      if (!accessToken) {
-        console.warn('No access token found in session - GitHub API calls may fail');
-      }
-
-      console.log('Loading user data for:', { githubId, username, hasAccessToken: !!accessToken });
-
-      // First, fetch the ACTUAL GitHub username from the API
-      let actualUsername: string | null = null;
-      if (accessToken) {
-        try {
-          const githubUserResponse = await fetch('https://api.github.com/user', {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              Accept: 'application/vnd.github.v3+json',
-            },
-          });
-          
-          if (githubUserResponse.ok) {
-            const githubUser = await githubUserResponse.json();
-            actualUsername = githubUser.login;
-            console.log('Fetched actual GitHub username:', actualUsername);
-          } else {
-            const errorText = await githubUserResponse.text();
-            console.error('GitHub API error:', githubUserResponse.status, errorText);
-          }
-        } catch (error) {
-          console.error('Error fetching GitHub username:', error instanceof Error ? error.message : error);
-        }
-      } else {
-        console.log('No access token available, will use session username');
+      // If not authenticated by the time the query runs, throw
+      if (status === 'unauthenticated') {
+        throw new Error('Not authenticated');
       }
       
-      // Try to find by GitHub ID first (more reliable)
-      console.log('Querying Supabase for user:', { githubId, username: actualUsername || username });
-      let { data, error } = githubId
-        ? await supabase
-            .from('users')
-            .select('*')
-            .eq('github_id', githubId)
-            .single()
-        : await supabase
-            .from('users')
-            .select('*')
-            .eq('username', actualUsername || username)
-            .single();
+      console.log('[Dashboard] Fetching dashboard data');
+      const questsRes = await fetch('/api/quests');
 
-      console.log('Supabase query result:', { hasData: !!data, error: error?.message || null });
+      console.log('[Dashboard] Quests response:', questsRes.status, questsRes.statusText);
 
-      // If user exists but username is wrong, update it
-      if (data && actualUsername && data.username !== actualUsername) {
-        console.log('Updating username from', data.username, 'to', actualUsername);
-        const { error: updateError } = await supabase
-          .from('users')
-          .update({ username: actualUsername })
-          .eq('github_id', githubId);
-        
-        if (!updateError) {
-          data.username = actualUsername;
-        }
+      if (!questsRes.ok) {
+        console.error('Quests fetch error:', questsRes.status, questsRes.statusText);
+        const errorBody = await questsRes.text();
+        console.error('Error body:', errorBody);
+        throw new Error(`Failed to fetch data: ${questsRes.status}`);
       }
 
-      // If user doesn't exist, trigger a sync to create them
-      if (error && error.code === 'PGRST116') {
-        console.log('User not found in database, triggering initial sync...');
-        
-        try {
-          const syncResponse = await fetch('/api/sync', {
-            method: 'POST',
-          });
-          
-          const syncResult = await syncResponse.json();
-          
-          if (syncResponse.ok && syncResult.user) {
-            data = syncResult.user;
+      const questsData = await questsRes.json();
+      console.log('[Dashboard] Fetched data:', questsData);
 
-            // Load badges for new user (will be empty initially)
-            const badges = await loadEquippedBadges(syncResult.user.id);
+      return {
+        user: questsData.user || null,
+        quests: questsData.quests || [],
+        userQuests: questsData.userQuests || [],
+      };
+    },
+    // Only enable after we know the auth status is NOT loading
+    enabled: status !== 'loading' && status !== 'unauthenticated',
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
-            // Also calculate stats from sync result
-            if (syncResult.stats) {
-              const rpgStats = calculateRPGStats(syncResult.stats, badges);
-              setStats(rpgStats);
-            }
-          } else {
-            // Handle sync cooldown gracefully
-            if (syncResponse.status === 429) {
-              console.log('Sync on cooldown:', syncResult.message || 'Please wait before syncing again');
-              console.log('Wait time:', syncResult.waitTime, 'seconds');
-              throw new Error(syncResult.message || 'Sync on cooldown');
-            }
-            
-            console.error('Sync failed with status:', syncResponse.status);
-            console.error('Sync error details:', JSON.stringify(syncResult, null, 2));
-            console.error('Error message:', syncResult.error);
-            console.error('Error details:', syncResult.details);
-            throw new Error(syncResult.error || 'Failed to create user');
-          }
-        } catch (syncError) {
-          console.error('Error during initial sync:', syncError);
-          throw syncError;
-        }
-      } else if (error) {
-        console.error('Supabase error:', error.message || error);
-        console.error('Error details:', { code: error.code, details: error.details, hint: error.hint });
-        throw error;
+  // Sync mutation
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/sync', { method: 'POST' });
+      if (!res.ok) throw new Error('Sync failed');
+      return res.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      soundManager.xpGain();
+
+      if (result.xpGained > 0) {
+        setFloatingXP({ amount: result.xpGained, key: Date.now() });
       }
 
-      if (!data) {
-        throw new Error('No user data returned');
-      }
-
-      setUser(data);
-
-      // Load equipped badges first
-      const loadedBadges = await loadEquippedBadges(data.id);
-
-      // Calculate current RPG stats for display (if not already set from sync)
-      // Use the actual GitHub username we fetched
-      if (!stats && (actualUsername || data.username)) {
-        const ghStats = await calculateGitHubStats(actualUsername || data.username, accessToken);
-        const rpgStats = calculateRPGStats(ghStats, loadedBadges); // Pass badges for stat boosts
-        setStats(rpgStats);
-        setGithubStats(ghStats); // Store raw GitHub stats
-
-        // Fetch GitHub achievements
-        const achievements = await fetchGitHubAchievements(actualUsername || data.username, accessToken);
-        setGithubAchievements(achievements);
-      }
-
-      // Load active quest
-      await loadActiveQuest(data.id);
-    } catch (error) {
-      console.error('Error loading user:', error instanceof Error ? error.message : String(error));
-      if (error instanceof Error) {
-        console.error('Error stack:', error.stack);
-      }
-      console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadActiveQuest(userId: string) {
-    try {
-      // Fetch all active quests
-      const { data: quests } = await supabase
-        .from('quests')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
-
-      if (!quests || quests.length === 0) return;
-
-      // Fetch user's quest progress
-      const { data: userQuests } = await supabase
-        .from('user_quests')
-        .select('*')
-        .eq('user_id', userId);
-
-      // Find first incomplete quest
-      const incompleteQuest = quests.find(quest => {
-        const userQuest = userQuests?.find(uq => uq.quest_id === quest.id);
-        return !userQuest || userQuest.status !== 'completed' || !userQuest.claimed_at;
+      setToast({
+        message: 'Stats synced successfully!',
+        type: 'success',
+        visible: true,
       });
+    },
+    onError: () => {
+      soundManager.error();
+      setToast({
+        message: 'Failed to sync stats',
+        type: 'error',
+        visible: true,
+      });
+    },
+  });
 
-      if (incompleteQuest) {
-        setActiveQuest(incompleteQuest);
-        const userQuest = userQuests?.find(uq => uq.quest_id === incompleteQuest.id);
-        setActiveUserQuest(userQuest || null);
-      }
-    } catch (error) {
-      console.error('Error loading active quest:', error);
-    }
-  }
-
-  async function loadEquippedBadges(userId: string): Promise<Badge[]> {
-    try {
-      // Fetch user's equipped badges
-      const { data: userBadges, error: userBadgesError } = await supabase
-        .from('user_badges')
-        .select('badge_id')
-        .eq('user_id', userId)
-        .eq('equipped', true);
-
-      if (userBadgesError || !userBadges || userBadges.length === 0) {
-        setEquippedBadges([]);
-        return [];
-      }
-
-      // Fetch the actual badge data
-      const badgeIds = userBadges.map(ub => ub.badge_id);
-      const { data: badges, error: badgesError } = await supabase
-        .from('badges')
-        .select('*')
-        .in('id', badgeIds);
-
-      if (badgesError || !badges) {
-        setEquippedBadges([]);
-        return [];
-      }
-
-      setEquippedBadges(badges);
-      return badges;
-    } catch (error) {
-      console.error('Error loading equipped badges:', error);
-      setEquippedBadges([]);
-      return [];
-    }
-  }
-
-  async function handleBadgeUnequip(badgeId: string) {
-    try {
-      soundManager.click();
-
-      const response = await fetch('/api/badges/unequip', {
+  // Claim quest mutation
+  const claimMutation = useMutation({
+    mutationFn: async (questId: string) => {
+      const res = await fetch('/api/quests/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ badgeId }),
+        body: JSON.stringify({ questId }),
       });
+      if (!res.ok) throw new Error('Claim failed');
+      return res.json();
+    },
+    onSuccess: (result, questId) => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      soundManager.questComplete();
 
-      if (response.ok && user) {
-        // Reload equipped badges
-        const updatedBadges = await loadEquippedBadges(user.id);
-
-        // Recalculate stats with updated badges
-        if (githubStats) {
-          const rpgStats = calculateRPGStats(githubStats, updatedBadges);
-          setStats(rpgStats);
-        }
-
-        soundManager.click();
-      } else {
-        soundManager.error();
+      const quest = data?.quests.find((q) => q.id === questId);
+      if (quest) {
+        setFloatingXP({ amount: quest.xp_reward, key: Date.now() });
       }
-    } catch (error) {
-      console.error('Error unequipping badge:', error);
+
+      setToast({
+        message: 'Quest reward claimed!',
+        type: 'success',
+        visible: true,
+      });
+    },
+    onError: () => {
       soundManager.error();
-    }
+      setToast({
+        message: 'Failed to claim quest',
+        type: 'error',
+        visible: true,
+      });
+    },
+  });
+
+  // Show loading while session is being checked
+  if (status === 'loading') {
+    return <LoadingScreen message="INITIALIZING" />;
   }
 
-  async function handleSync() {
-    try {
-      setSyncing(true);
-      setSyncMessage('');
-      soundManager.syncStart();
-
-      const response = await fetch('/api/sync', {
-        method: 'POST',
-      });
-
-      const result = await response.json();
-
-      if (response.status === 429) {
-        setSyncMessage(`⏰ Cooldown: Wait ${result.waitTime}s`);
-        soundManager.error();
-        return;
-      }
-
-      if (!response.ok) {
-        setSyncMessage(`❌ ${result.error}`);
-        soundManager.error();
-        return;
-      }
-
-      if (result.rankedUp) {
-        setSyncMessage(`🎉 RANK UP! +${result.gainedXP} XP!`);
-        soundManager.rankUp();
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3000);
-      } else {
-        setSyncMessage(`✅ Synced! +${result.gainedXP} XP`);
-        soundManager.syncComplete();
-        if (result.gainedXP > 0) {
-          setXPAmount(result.gainedXP);
-          setShowXP(true);
-          soundManager.xpGain();
-        }
-      }
-
-      // Update GitHub stats from sync result
-      if (result.stats) {
-        setGithubStats(result.stats);
-      }
-
-      // Reload user data
-      await loadUserData();
-    } catch (error) {
-      setSyncMessage('❌ Sync failed');
-      soundManager.error();
-      console.error('Sync error:', error);
-    } finally {
-      setSyncing(false);
-    }
+  // Redirect if not authenticated (this will push to home)
+  if (status === 'unauthenticated') {
+    return <LoadingScreen message="REDIRECTING" />;
   }
 
-  if (status === 'loading' || loading) {
+  // At this point, status === 'authenticated'
+  // Show loading while fetching dashboard data
+  if (isLoading && !data) {
+    return <LoadingScreen message="LOADING DASHBOARD" />;
+  }
+
+  // Show error if data fetch failed after all retries and no cached data
+  if (error && !data) {
+    console.error('[Dashboard] Query error:', error);
     return (
-      <div className="min-h-screen bg-midnight-void flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            className="font-pixel text-loot-gold text-xl mb-4"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-          >
-            LOADING...
-          </motion.div>
-          {session && (
-            <p className="font-mono text-xs text-gray-500">
-              Session: {session.user?.email || session.user?.name || 'Unknown'}
-            </p>
-          )}
-        </div>
-      </div>
+      <PageLayout title="DASHBOARD">
+        <PixelFrame variant="critical" className="max-w-2xl mx-auto mt-20">
+          <div className="text-center text-[var(--critical)] font-pixel text-sm">
+            <div className="mb-4">ERROR LOADING DASHBOARD</div>
+            <div className="text-xs mb-4">
+              {error instanceof Error ? error.message : 'Unknown error'}
+            </div>
+            <PixelButton onClick={() => refetch()}>RETRY</PixelButton>
+          </div>
+        </PixelFrame>
+      </PageLayout>
     );
   }
 
-  if (!user || !stats) {
-    return (
-      <div className="min-h-screen bg-midnight-void flex items-center justify-center">
-        <div className="text-center">
-          <p className="font-pixel text-critical-red text-lg mb-4">
-            ERROR: User data not found
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="font-mono text-mana-blue hover:text-loot-gold transition-colors"
-          >
-            Return to Home
-          </button>
-        </div>
-      </div>
-    );
+  // Ensure we have user data before rendering
+  if (!data?.user) {
+    console.warn('[Dashboard] No user data available', { 
+      data 
+    });
+    return <LoadingScreen message="PREPARING ADVENTURE" />;
   }
+
+  const user = data.user;
+  const rpgStats = calculateRPGStats({
+    totalStars: 0, // We'd need GitHub stats here
+    totalRepos: 0,
+    totalCommits: 0,
+    totalPRs: 0,
+    totalIssues: 0,
+    totalReviews: 0,
+  });
+
+  // Calculate level from XP
+  const level = Math.floor(user.xp / 1000) + 1;
+
+  // Get next rank threshold
+  const rankThresholds: Record<RankTier, number> = {
+    C: 1000,
+    B: 3000,
+    A: 6000,
+    AA: 10000,
+    AAA: 15000,
+    S: 25000,
+    SS: 50000,
+    SSS: Infinity,
+  };
+  const xpToNextRank = rankThresholds[user.rank_tier];
+
+  // Get active quests (limit to 3 for preview)
+  const activeQuests = data.quests
+    .map((quest) => ({
+      quest,
+      userQuest: data.userQuests.find((uq) => uq.quest_id === quest.id) || null,
+    }))
+    .filter(({ userQuest }) => userQuest?.status === 'ACTIVE' || !userQuest)
+    .slice(0, 3);
+
+  // Quick stats
+  const completedQuests = data.userQuests.filter((uq) => uq.status === 'COMPLETED').length;
+  const claimableQuests = data.userQuests.filter(
+    (uq) => uq.status === 'COMPLETED' && !uq.claimed_at
+  ).length;
 
   return (
-    <div className="relative">
-      {/* Floating XP Animation */}
-      {showXP && <FloatingXP amount={xpAmount} onComplete={() => setShowXP(false)} />}
-      
-      {/* Confetti Effect */}
-      <Confetti trigger={showConfetti} />
+    <PageLayout
+      title="DASHBOARD"
+      subtitle={`Welcome back, ${user.username}!`}
+      onSync={() => syncMutation.mutate()}
+      syncing={syncMutation.isPending}
+    >
+      {/* Toast */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.visible}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
 
-      {/* Top Action Bar - Desktop */}
-      <div className="fixed top-0 left-0 right-0 bg-midnight-void-1 border-b-3 border-gray-pixel-0 z-50 pixel-perfect">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
-          <h1 className="font-pixel text-xs md:text-sm text-loot-gold">CODE WARRIOR</h1>
-          
-          {/* Mobile Menu Button - Treasure Chest Icon */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            onMouseEnter={() => soundManager.hover()}
-            className="lg:hidden p-2 text-loot-gold text-2xl"
-          >
-            {mobileMenuOpen ? '✕' : '📦'}
-          </button>
+      {/* Floating XP */}
+      {floatingXP && (
+        <FloatingXP
+          key={floatingXP.key}
+          amount={floatingXP.amount}
+          x={50}
+          y={30}
+          onComplete={() => setFloatingXP(null)}
+        />
+      )}
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4">
-            {syncMessage && (
-              <motion.span
-                className="font-mono text-sm text-mana-blue"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {syncMessage}
-              </motion.span>
-            )}
-            
-            <Link href="/quests">
-              <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 1 }}
-                onMouseEnter={() => soundManager.hover()}
-                className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
-                style={get3DButtonStyle('blue')}
-              >
-                <PixelScroll className="text-midnight-void-0" size="md" />
-                QUESTS
-              </motion.button>
-            </Link>
-
-            <Link href="/leaderboard">
-              <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 1 }}
-                onMouseEnter={() => soundManager.hover()}
-                className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
-                style={get3DButtonStyle('gold')}
-              >
-                <PixelTrophy className="text-midnight-void-0" size="md" />
-                HALL OF FAME
-              </motion.button>
-            </Link>
-
-            <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ y: syncing ? 0 : 1 }}
-              onClick={handleSync}
-              onMouseEnter={() => soundManager.hover()}
-              disabled={syncing}
-              className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth disabled:opacity-50 disabled:cursor-not-allowed"
-              style={get3DButtonStyle('gold')}
-            >
-              <PixelRefresh className={`text-midnight-void-0 ${syncing ? 'animate-spin' : ''}`} size="md" />
-              {syncing ? 'SYNCING...' : 'SYNC STATS'}
-            </motion.button>
-
-            <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ y: 1 }}
-              onClick={() => {
-                soundManager.click();
-                signOut({ callbackUrl: '/' });
-              }}
-              onMouseEnter={() => soundManager.hover()}
-              className="flex items-center gap-2 px-4 py-2 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth hover:border-critical-red-1 hover:text-critical-red-1 transition-colors"
-            >
-              <PixelLogout className="text-gray-300 hover:text-critical-red-1" size="md" />
-              LOGOUT
-            </motion.button>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 max-w-7xl mx-auto">
+        {/* Left Column - Character Sheet */}
+        <div className="lg:col-span-1 space-y-4">
+          <CharacterSheet
+            username={user.username}
+            avatarUrl={user.avatar_url}
+            xp={user.xp}
+            rankTier={user.rank_tier}
+            stats={rpgStats}
+            level={level}
+            xpToNextRank={xpToNextRank}
+          />
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden border-t-2 border-gray-pixel-0 bg-midnight-void-1 overflow-hidden"
-            >
-              <div className="p-4 space-y-2">
-                {syncMessage && (
-                  <div className="font-mono text-sm text-mana-blue mb-2">
-                    {syncMessage}
-                  </div>
-                )}
-
-                <Link href="/quests" onClick={() => setMobileMenuOpen(false)}>
-                  <button
-                    className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
-                    style={get3DButtonStyle('blue')}
-                  >
-                    <PixelScroll className="text-midnight-void-0" size="md" />
-                    QUESTS
-                  </button>
-                </Link>
-
-                <Link href="/leaderboard" onClick={() => setMobileMenuOpen(false)}>
-                  <button
-                    className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
-                    style={get3DButtonStyle('gold')}
-                  >
-                    <PixelTrophy className="text-midnight-void-0" size="md" />
-                    HALL OF FAME
-                  </button>
-                </Link>
-
-                <button
-                  onClick={() => {
-                    handleSync();
-                    setMobileMenuOpen(false);
-                  }}
-                  disabled={syncing}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth disabled:opacity-50"
-                  style={get3DButtonStyle('gold')}
-                >
-                  <PixelRefresh className={`text-midnight-void-0 ${syncing ? 'animate-spin' : ''}`} size="md" />
-                  {syncing ? 'SYNCING...' : 'SYNC STATS'}
-                </button>
-
-                <button
-                  onClick={() => {
-                    soundManager.click();
-                    signOut({ callbackUrl: '/' });
-                  }}
-                  className="w-full flex items-center gap-2 px-4 py-3 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth"
-                >
-                  <PixelLogout className="text-gray-300" size="md" />
-                  LOGOUT
-                </button>
+        {/* Right Column - Quick Stats & Active Quests */}
+        <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+          {/* Quick Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <PixelFrame variant="mana" padding="lg">
+              <h3 className="font-pixel text-[12px] text-[var(--mana-light)] mb-4">
+                QUICK STATS
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <IconXP size={24} color="#ffd700" className="mx-auto mb-2" />
+                  <p className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
+                    {user.xp.toLocaleString()}
+                  </p>
+                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                    TOTAL XP
+                  </p>
+                </div>
+                <div className="text-center">
+                  <IconScroll size={24} color="#2ea043" className="mx-auto mb-2" />
+                  <p className="font-pixel-heading text-[16px] text-[var(--health-light)]">
+                    {completedQuests}
+                  </p>
+                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                    QUESTS DONE
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="font-pixel-heading text-[24px] text-white mb-2">
+                    {level}
+                  </p>
+                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                    LEVEL
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="font-pixel-heading text-[24px] text-[var(--gold-light)] mb-2">
+                    {user.rank_tier}
+                  </p>
+                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                    RANK
+                  </p>
+                </div>
               </div>
+            </PixelFrame>
+          </motion.div>
+
+          {/* Claimable Quests Alert */}
+          {claimableQuests > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <PixelFrame variant="gold" padding="md">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <IconScroll size={24} color="#ffd700" />
+                    <div>
+                      <p className="font-pixel text-[10px] text-[var(--gold-light)]">
+                        REWARDS AVAILABLE!
+                      </p>
+                      <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                        {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready to claim
+                      </p>
+                    </div>
+                  </div>
+                  <PixelBadge variant="gold" size="md">
+                    {claimableQuests}
+                  </PixelBadge>
+                </div>
+              </PixelFrame>
             </motion.div>
           )}
-        </AnimatePresence>
-      </div>
 
-      {/* Main Content */}
-      <div className="pt-20">
-        <CharacterSheet
-          user={user}
-          stats={stats}
-          githubStats={githubStats || undefined}
-          githubAchievements={githubAchievements}
-          activeQuest={activeQuest || undefined}
-          activeUserQuest={activeUserQuest || undefined}
-          equippedBadges={equippedBadges}
-          onBadgeUnequip={handleBadgeUnequip}
-        />
+          {/* Active Quests Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-pixel text-[12px] text-[var(--gold-light)]">
+                ACTIVE QUESTS
+              </h3>
+              <a
+                href="/quests"
+                className="font-pixel text-[8px] text-[var(--mana-light)] hover:underline"
+              >
+                VIEW ALL →
+              </a>
+            </div>
+
+            <div className="grid gap-4">
+              {activeQuests.map(({ quest, userQuest }, index) => (
+                <motion.div
+                  key={quest.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
+                  <QuestCard
+                    quest={quest}
+                    userQuest={userQuest}
+                    onClaim={() => claimMutation.mutate(quest.id)}
+                    loading={claimMutation.isPending}
+                  />
+                </motion.div>
+              ))}
+
+              {activeQuests.length === 0 && (
+                <PixelFrame variant="stone" padding="md">
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center">
+                    No active quests. Sync your GitHub to start new adventures!
+                  </p>
+                </PixelFrame>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Last Sync Info */}
+          {user.last_synced_at && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-center"
+            >
+              <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                LAST SYNCED: {new Date(user.last_synced_at).toLocaleString()}
+              </p>
+            </motion.div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
