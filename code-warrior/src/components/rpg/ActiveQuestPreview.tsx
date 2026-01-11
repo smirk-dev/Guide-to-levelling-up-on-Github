@@ -38,7 +38,7 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
   }
 
   const progress = userQuest?.progress || 0;
-  const isCompleted = userQuest?.status === 'completed';
+  const isCompleted = userQuest?.status === 'COMPLETED';
   const canClaim = isCompleted && !userQuest?.claimed_at;
   const progressPercentage = (progress / quest.criteria_value) * 100;
 
