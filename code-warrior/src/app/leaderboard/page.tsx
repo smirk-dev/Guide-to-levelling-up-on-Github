@@ -56,17 +56,17 @@ export default function LeaderboardPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-midnight-void to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-loot-gold animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading Hall of Fame...</p>
+          <Loader2 className="w-12 h-12 text-loot-gold-2 animate-spin mx-auto mb-4 stroke-[3px]" />
+          <p className="text-gray-400 font-mono">Loading Hall of Fame...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-midnight-void to-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-midnight-void-0 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
