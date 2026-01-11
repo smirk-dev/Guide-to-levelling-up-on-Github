@@ -63,7 +63,7 @@ export default function RewardModal({
                   onClick={onClose}
                   className="absolute top-4 right-4 p-2 rounded-pixel bg-midnight-void-2 border-2 border-gray-pixel-0 hover:border-critical-red-1 transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400 stroke-[3px]" />
+                  <span className="text-gray-400 font-bold text-lg">✕</span>
                 </button>
 
                 {/* Chest Opening Animation */}
