@@ -486,7 +486,7 @@ export default function DashboardPage() {
               onMouseEnter={() => soundManager.hover()}
               className="flex items-center gap-2 px-4 py-2 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth hover:border-critical-red-1 hover:text-critical-red-1 transition-colors"
             >
-              <LogOut className="w-4 h-4 stroke-[3px]" />
+              <PixelLogout className="text-gray-300 hover:text-critical-red-1" size="md" />
               LOGOUT
             </motion.button>
           </div>
