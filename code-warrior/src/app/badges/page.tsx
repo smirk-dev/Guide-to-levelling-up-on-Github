@@ -231,7 +231,7 @@ export default function BadgesPage() {
                   animate={badge.equipped ? { rotate: [0, 5, -5, 0] } : {}}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {badge.owned ? getIconForBadge(badge.icon_slug) : <Lock className="w-16 h-16 text-gray-600" />}
+                  {badge.owned ? getIconForBadge(badge.icon_slug) : <Lock className="w-16 h-16 text-gray-600 stroke-[3px]" />}
                 </motion.div>
 
                 {/* Equipped Indicator */}
@@ -278,25 +278,32 @@ export default function BadgesPage() {
               {/* Action Button */}
               {badge.owned && (
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 1 }}
                   onClick={() => badge.equipped ? handleUnequip(badge.id) : handleEquip(badge.id)}
                   onMouseEnter={() => soundManager.hover()}
                   disabled={actionInProgress === badge.id || (!badge.equipped && equippedCount >= 3)}
                   className={`
-                    w-full px-4 py-2 font-pixel text-xs rounded transition-colors
+                    w-full px-4 py-2 font-pixel text-xs rounded-pixel border-3 pixel-perfect no-smooth
                     ${badge.equipped
-                      ? 'bg-critical-red/20 border border-critical-red/50 text-critical-red hover:bg-critical-red/30'
+                      ? 'bg-critical-red-1 border-critical-red-1 text-midnight-void-0'
                       : equippedCount >= 3
-                      ? 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed'
-                      : 'bg-loot-gold/20 border border-loot-gold/50 text-loot-gold hover:bg-loot-gold/30'
+                      ? 'bg-midnight-void-2 border-gray-pixel-0 text-gray-500 cursor-not-allowed'
+                      : 'bg-loot-gold-2 border-loot-gold-2 text-midnight-void-0'
                     }
                     disabled:opacity-50 disabled:cursor-not-allowed
                   `}
+                  style={badge.equipped ? {
+                    borderColor: 'var(--critical-red-1) var(--midnight-void-3) var(--midnight-void-3) var(--critical-red-1)',
+                    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
+                  } : equippedCount >= 3 ? {} : {
+                    borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
+                    boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
+                  }}
                 >
                   {actionInProgress === badge.id ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin stroke-[3px]" />
                       PROCESSING...
                     </span>
                   ) : badge.equipped ? (
@@ -310,25 +317,19 @@ export default function BadgesPage() {
               )}
 
               {!badge.owned && (
-                <div className="text-center text-xs text-gray-600 font-pixel">
+                <div className="text-center text-xs text-gray-600 font-pixel no-smooth">
                   LOCKED
                 </div>
               )}
 
-              {/* Glow effect for equipped badges */}
+              {/* Pixel corner decorations for equipped badges */}
               {badge.equipped && (
-                <motion.div
-                  className="absolute inset-0 bg-loot-gold/20 rounded-lg -z-10"
-                  animate={{
-                    opacity: [0.2, 0.5, 0.2],
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
+                <>
+                  <div className="absolute top-1 left-1 w-2 h-2 bg-loot-gold-3" />
+                  <div className="absolute top-1 right-1 w-2 h-2 bg-loot-gold-3" />
+                  <div className="absolute bottom-1 left-1 w-2 h-2 bg-loot-gold-3" />
+                  <div className="absolute bottom-1 right-1 w-2 h-2 bg-loot-gold-3" />
+                </>
               )}
             </motion.div>
           ))}
@@ -341,9 +342,9 @@ export default function BadgesPage() {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">No badges available yet.</p>
-            <p className="text-sm text-gray-500 mt-2">
+            <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4 stroke-[3px]" />
+            <p className="text-gray-400 font-mono">No badges available yet.</p>
+            <p className="text-sm text-gray-500 mt-2 font-mono">
               Complete quests to earn badges!
             </p>
           </motion.div>
