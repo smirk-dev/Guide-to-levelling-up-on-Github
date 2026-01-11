@@ -54,6 +54,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      user, // Include the user object in the response
       quests: quests || [],
       userQuests: userQuests || [],
     });
