@@ -79,7 +79,7 @@ export default function LeaderboardPage() {
             href="/dashboard"
             className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
           >
-            <ArrowLeft className="w-4 h-4 stroke-[3px]" />
+            <span>←</span>
             <span>Back to Dashboard</span>
           </Link>
 
