@@ -22,16 +22,16 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={`
-        relative p-6 rounded-lg border-2 backdrop-blur-sm
-        ${isActive ? 'border-loot-gold bg-loot-gold/10' : 'border-mana-blue/30 bg-midnight-void/50'}
+        relative p-6 rounded-pixel-sm border-3 pixel-perfect
+        ${isActive ? 'border-loot-gold-2 bg-midnight-void-2' : 'border-mana-blue-1 bg-midnight-void-1'}
         ${isCompleted ? 'opacity-75' : ''}
       `}
     >
-      {/* Holographic corner accents */}
-      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-loot-gold/50" />
-      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-loot-gold/50" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-loot-gold/50" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-loot-gold/50" />
+      {/* Pixel corner decorations */}
+      <div className="absolute top-1 left-1 w-2 h-2 bg-loot-gold-2" />
+      <div className="absolute top-1 right-1 w-2 h-2 bg-loot-gold-2" />
+      <div className="absolute bottom-1 left-1 w-2 h-2 bg-loot-gold-2" />
+      <div className="absolute bottom-1 right-1 w-2 h-2 bg-loot-gold-2" />
 
       <div className="flex items-start gap-4">
         {/* Quest Icon */}
