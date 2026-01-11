@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Scroll, ArrowRight } from 'lucide-react';
+import { PixelScroll } from '@/components/icons/PixelIcon';
 import Link from 'next/link';
 import type { Quest, UserQuest } from '@/types/database';
 import { get3DButtonStyle } from '@/lib/pixel-utils';
