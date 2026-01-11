@@ -143,7 +143,7 @@ export default function RewardModal({
                     <div className="bg-midnight-void-2 border-3 border-mana-blue-1 rounded-pixel-sm p-4 pixel-perfect">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Trophy className="w-6 h-6 text-mana-blue-2 stroke-[3px]" />
+                          <PixelTrophy className="text-mana-blue-2" size="md" />
                           <span className="font-bold text-lg">New Badge Unlocked!</span>
                         </div>
                         <motion.span
