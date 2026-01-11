@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Scroll, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import type { Quest, UserQuest } from '@/types/database';
+import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 interface QuestCardProps {
   quest: Quest;
