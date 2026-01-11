@@ -28,12 +28,12 @@ export default function QuestLog({ quests, userQuests, onClaimQuest }: QuestLogP
   // Group quests by status
   const activeQuests = quests.filter(quest => {
     const userQuest = userQuests.find(uq => uq.quest_id === quest.id);
-    return !userQuest || userQuest.status === 'in_progress';
+    return !userQuest || userQuest.status === 'ACTIVE';
   });
 
   const completedQuests = quests.filter(quest => {
     const userQuest = userQuests.find(uq => uq.quest_id === quest.id);
-    return userQuest?.status === 'completed';
+    return userQuest?.status === 'COMPLETED';
   });
 
   return (
