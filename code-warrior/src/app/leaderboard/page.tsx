@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Trophy, Loader2, ArrowLeft } from 'lucide-react';
+import { PixelTrophy } from '@/components/icons/PixelIcon';
 import LeaderboardCard from '@/components/rpg/LeaderboardCard';
 import type { RankTier } from '@/types/database';
 import Link from 'next/link';
