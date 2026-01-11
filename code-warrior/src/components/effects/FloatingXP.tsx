@@ -41,7 +41,12 @@ export default function FloatingXP({ amount, onComplete }: FloatingXPProps) {
         transform: 'translate(-50%, -50%)',
       }}
     >
-      <div className="text-4xl font-pixel text-loot-gold drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">
+      <div
+        className="text-4xl font-pixel text-loot-gold-2 no-smooth"
+        style={{
+          textShadow: '-2px -2px 0 var(--loot-gold-0), 2px -2px 0 var(--loot-gold-0), -2px 2px 0 var(--loot-gold-0), 2px 2px 0 var(--loot-gold-0)'
+        }}
+      >
         +{amount} XP
       </div>
     </motion.div>
