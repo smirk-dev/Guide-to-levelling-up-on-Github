@@ -77,41 +77,33 @@ export default function LeaderboardPage() {
           {/* Back Button */}
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-mana-blue hover:text-loot-gold transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 stroke-[3px]" />
             <span>Back to Dashboard</span>
           </Link>
 
           {/* Title with Trophy */}
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
-              <Trophy className="w-16 h-16 text-loot-gold" />
-              <motion.div
-                className="absolute inset-0 bg-loot-gold/20 rounded-full blur-xl"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
+              <Trophy className="w-16 h-16 text-loot-gold-2 stroke-[3px]" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">
+              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
+                style={{
+                  textShadow: '-2px -2px 0 var(--loot-gold-0), 2px -2px 0 var(--loot-gold-0), -2px 2px 0 var(--loot-gold-0), 2px 2px 0 var(--loot-gold-0)'
+                }}
+              >
                 HALL OF FAME
               </h1>
-              <p className="text-gray-400 mt-2">
+              <p className="text-gray-400 mt-2 font-mono">
                 The mightiest Code Warriors ranked by total XP
               </p>
             </div>
           </div>
 
-          {/* Arcade-style scanlines effect */}
-          <div
-            className="h-1 w-full bg-gradient-to-r from-transparent via-loot-gold to-transparent opacity-50"
-            style={{
-              backgroundSize: '4px 4px',
-              backgroundImage:
-                'repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,215,0,0.3) 2px, rgba(255,215,0,0.3) 4px)',
-            }}
-          />
+          {/* Pixel divider */}
+          <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1" />
         </motion.div>
 
         {/* Error State */}
@@ -119,12 +111,12 @@ export default function LeaderboardPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-critical-red/10 border border-critical-red/50 rounded-lg p-4 mb-6"
+            className="bg-midnight-void-2 border-2 border-critical-red-1 rounded-pixel-sm p-4 mb-6 pixel-perfect"
           >
-            <p className="text-critical-red">{error}</p>
+            <p className="text-critical-red-1 font-mono">{error}</p>
             <button
               onClick={loadLeaderboard}
-              className="mt-2 text-sm text-loot-gold hover:underline"
+              className="mt-2 text-sm text-loot-gold-2 hover:text-loot-gold-3 font-mono"
             >
               Try again
             </button>
