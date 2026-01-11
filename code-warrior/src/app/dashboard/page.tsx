@@ -548,7 +548,7 @@ export default function DashboardPage() {
                   }}
                   className="w-full flex items-center gap-2 px-4 py-3 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth"
                 >
-                  <LogOut className="w-4 h-4 stroke-[3px]" />
+                  <PixelLogout className="text-gray-300" size="md" />
                   LOGOUT
                 </button>
               </div>
