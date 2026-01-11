@@ -104,7 +104,7 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
               style={get3DButtonStyle(canClaim ? 'gold' : 'blue')}
             >
               {canClaim ? 'CLAIM REWARD' : 'VIEW DETAILS'}
-              <ArrowRight className="w-3 h-3 stroke-[3px]" />
+              <span>→</span>
             </motion.button>
           </Link>
         </div>
