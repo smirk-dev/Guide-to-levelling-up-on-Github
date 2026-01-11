@@ -45,7 +45,7 @@ export default function Avatar({ user, size = 'lg' }: AvatarProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-midnight-void-2">
-              <Shield className="w-12 h-12 text-loot-gold-2 stroke-[3px]" />
+              <PixelShield className="text-loot-gold-2" size="lg" />
             </div>
           )}
         </div>
