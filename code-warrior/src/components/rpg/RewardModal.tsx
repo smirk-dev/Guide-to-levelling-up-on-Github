@@ -124,7 +124,7 @@ export default function RewardModal({
                   <div className="bg-midnight-void-2 border-3 border-loot-gold-1 rounded-pixel-sm p-4 pixel-perfect">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Sparkles className="w-6 h-6 text-loot-gold-2 stroke-[3px]" />
+                        <PixelGem className="text-loot-gold-2" size="md" />
                         <span className="font-bold text-lg">Experience Points</span>
                       </div>
                       <motion.span
