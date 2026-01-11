@@ -94,7 +94,7 @@ export default function RewardModal({
                     animate={{ scale: [0, 1.5, 1] }}
                     transition={{ delay: 1.5, duration: 0.5 }}
                   >
-                    <Trophy className="w-16 h-16 text-loot-gold-2 mx-auto mb-4 stroke-[3px]" />
+                    <PixelTrophy className="text-loot-gold-2 mx-auto mb-4" size="lg" />
                   </motion.div>
                 </motion.div>
 
