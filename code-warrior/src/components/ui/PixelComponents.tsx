@@ -1,0 +1,396 @@
+'use client';
+
+import React from 'react';
+import { motion, type Transition } from 'framer-motion';
+
+interface PixelFrameProps {
+  children: React.ReactNode;
+  variant?: 'stone' | 'metal' | 'gold' | 'mana' | 'health' | 'critical';
+  className?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+  animate?: boolean;
+}
+
+export const PixelFrame: React.FC<PixelFrameProps> = ({
+  children,
+  variant = 'stone',
+  className = '',
+  padding = 'md',
+  animate = false,
+}) => {
+  const paddingClasses = {
+    none: '',
+    sm: 'p-2',
+    md: 'p-4',
+    lg: 'p-6',
+  };
+
+  const Component = animate ? motion.div : 'div';
+  const transition: Transition = { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] };
+  const animationProps = animate
+    ? {
+        initial: { opacity: 0, y: 8 },
+        animate: { opacity: 1, y: 0 },
+        transition,
+      }
+    : {};
+
+  return (
+    <Component
+      className={`frame-${variant} ${paddingClasses[padding]} ${className}`}
+      {...animationProps}
+    >
+      {children}
+    </Component>
+  );
+};
+
+interface PixelCardProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'gold';
+  className?: string;
+  onClick?: () => void;
+  hoverable?: boolean;
+}
+
+export const PixelCard: React.FC<PixelCardProps> = ({
+  children,
+  variant = 'default',
+  className = '',
+  onClick,
+  hoverable = false,
+}) => {
+  const baseClass = variant === 'gold' ? 'pixel-card-gold' : 'pixel-card';
+  const hoverClass = hoverable
+    ? 'cursor-pointer transition-transform hover:translate-x-[-2px] hover:translate-y-[-2px]'
+    : '';
+
+  return (
+    <div
+      className={`${baseClass} ${hoverClass} ${className}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
+      {children}
+    </div>
+  );
+};
+
+interface PixelButtonProps {
+  children: React.ReactNode;
+  variant?: 'gold' | 'mana' | 'health' | 'critical' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: () => void;
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+export const PixelButton: React.FC<PixelButtonProps> = ({
+  children,
+  variant = 'gold',
+  size = 'md',
+  disabled = false,
+  loading = false,
+  onClick,
+  className = '',
+  type = 'button',
+}) => {
+  const sizeClasses = {
+    sm: 'px-3 py-2 text-[8px]',
+    md: 'px-6 py-3 text-[10px]',
+    lg: 'px-8 py-4 text-[12px]',
+  };
+
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={`btn-pixel btn-${variant} ${sizeClasses[size]} ${className}`}
+    >
+      {loading ? (
+        <span className="inline-block animate-pixel-spin">⟳</span>
+      ) : (
+        children
+      )}
+    </button>
+  );
+};
+
+interface PixelInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: 'text' | 'email' | 'password' | 'number';
+  className?: string;
+  disabled?: boolean;
+}
+
+export const PixelInput: React.FC<PixelInputProps> = ({
+  value,
+  onChange,
+  placeholder = '',
+  type = 'text',
+  className = '',
+  disabled = false,
+}) => {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      className={`input-pixel w-full ${className}`}
+    />
+  );
+};
+
+interface StatBarProps {
+  label: string;
+  current: number;
+  max: number;
+  variant?: 'health' | 'mana' | 'xp' | 'strength' | 'purple';
+  showLabel?: boolean;
+  showValues?: boolean;
+  className?: string;
+}
+
+export const StatBar: React.FC<StatBarProps> = ({
+  label,
+  current,
+  max,
+  variant = 'health',
+  showLabel = true,
+  showValues = true,
+  className = '',
+}) => {
+  const percentage = Math.min((current / max) * 100, 100);
+
+  return (
+    <div className={`space-y-1 ${className}`}>
+      {showLabel && (
+        <div className="flex justify-between items-center text-[8px] font-pixel text-gray-400">
+          <span>{label}</span>
+          {showValues && (
+            <span className="text-[#ffd700]">
+              {current}/{max}
+            </span>
+          )}
+        </div>
+      )}
+      <div className={`stat-bar stat-bar-${variant}`}>
+        <div
+          className="stat-bar-fill"
+          style={{ width: `${percentage}%` }}
+        />
+        {!showLabel && showValues && (
+          <span className="stat-bar-label">
+            {current}/{max}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+interface PixelProgressProps {
+  value: number;
+  max: number;
+  variant?: 'gold' | 'mana' | 'health' | 'purple';
+  size?: 'sm' | 'md' | 'lg';
+  showText?: boolean;
+  className?: string;
+}
+
+export const PixelProgress: React.FC<PixelProgressProps> = ({
+  value,
+  max,
+  variant = 'gold',
+  size = 'md',
+  showText = false,
+  className = '',
+}) => {
+  const percentage = Math.min((value / max) * 100, 100);
+
+  const sizeClasses = {
+    sm: 'h-3',
+    md: 'h-5',
+    lg: 'h-8',
+  };
+
+  const variantColors = {
+    gold: 'bg-[var(--gold-light)]',
+    mana: 'bg-[var(--mana-light)]',
+    health: 'bg-[var(--health-light)]',
+    purple: 'bg-[var(--xp-light)]',
+  };
+
+  return (
+    <div
+      className={`relative ${sizeClasses[size]} bg-[var(--void-darkest)] border-4 border-[var(--gray-dark)] ${className}`}
+      style={{
+        boxShadow: 'inset 4px 4px 0 rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <div
+        className={`h-full ${variantColors[variant]} transition-[width] duration-300`}
+        style={{
+          width: `${percentage}%`,
+          boxShadow: 'inset 0 -4px 0 rgba(0, 0, 0, 0.2)',
+        }}
+      />
+      {showText && (
+        <span className="absolute inset-0 flex items-center justify-center text-[8px] font-pixel text-white text-outline-dark">
+          {Math.round(percentage)}%
+        </span>
+      )}
+    </div>
+  );
+};
+
+interface PixelDividerProps {
+  variant?: 'gold' | 'mana' | 'gray';
+  className?: string;
+}
+
+export const PixelDivider: React.FC<PixelDividerProps> = ({
+  variant = 'gold',
+  className = '',
+}) => {
+  const colors = {
+    gold: 'border-[var(--gold-medium)]',
+    mana: 'border-[var(--mana-medium)]',
+    gray: 'border-[var(--gray-medium)]',
+  };
+
+  return (
+    <div
+      className={`w-full h-0 border-t-4 border-dashed ${colors[variant]} opacity-50 ${className}`}
+    />
+  );
+};
+
+interface PixelBadgeProps {
+  children: React.ReactNode;
+  variant?: 'gold' | 'mana' | 'health' | 'critical' | 'purple' | 'gray';
+  size?: 'sm' | 'md';
+  className?: string;
+}
+
+export const PixelBadge: React.FC<PixelBadgeProps> = ({
+  children,
+  variant = 'gold',
+  size = 'sm',
+  className = '',
+}) => {
+  const variantColors = {
+    gold: 'bg-[var(--gold-medium)] text-[var(--void-darkest)]',
+    mana: 'bg-[var(--mana-medium)] text-white',
+    health: 'bg-[var(--health-medium)] text-white',
+    critical: 'bg-[var(--critical-medium)] text-white',
+    purple: 'bg-[var(--xp-medium)] text-white',
+    gray: 'bg-[var(--gray-medium)] text-white',
+  };
+
+  const sizeClasses = {
+    sm: 'px-2 py-1 text-[6px]',
+    md: 'px-3 py-2 text-[8px]',
+  };
+
+  return (
+    <span
+      className={`inline-block font-pixel ${variantColors[variant]} ${sizeClasses[size]} ${className}`}
+      style={{
+        boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.4)',
+      }}
+    >
+      {children}
+    </span>
+  );
+};
+
+interface PixelAvatarProps {
+  src: string | null | undefined;
+  alt: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
+  glow?: boolean;
+}
+
+export const PixelAvatar: React.FC<PixelAvatarProps> = ({
+  src,
+  alt,
+  size = 'md',
+  className = '',
+  glow = false,
+}) => {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
+  };
+
+  const glowClass = glow ? 'pixel-avatar-glow' : '';
+
+  return (
+    <div className={`${sizeClasses[size]} ${glowClass} ${className}`}>
+      {src ? (
+        <img
+          src={src}
+          alt={alt}
+          className="w-full h-full pixel-avatar object-cover"
+        />
+      ) : (
+        <div className="w-full h-full pixel-avatar bg-[var(--gray-dark)] flex items-center justify-center">
+          <span className="text-[var(--gray-light)] font-pixel text-xs">?</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface PixelTooltipProps {
+  children: React.ReactNode;
+  content: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+}
+
+export const PixelTooltip: React.FC<PixelTooltipProps> = ({
+  children,
+  content,
+  position = 'top',
+}) => {
+  const [show, setShow] = React.useState(false);
+
+  const positionClasses = {
+    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
+    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  };
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div
+          className={`absolute ${positionClasses[position]} z-50 px-3 py-2 bg-[var(--void-darkest)] border-4 border-[var(--gray-dark)] font-pixel text-[8px] text-white whitespace-nowrap`}
+          style={{
+            boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
