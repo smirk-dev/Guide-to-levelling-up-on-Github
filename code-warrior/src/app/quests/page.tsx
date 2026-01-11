@@ -81,17 +81,17 @@ export default function QuestsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-midnight-void flex items-center justify-center">
+      <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">📜</div>
-          <p className="text-loot-gold font-pixel">LOADING QUESTS...</p>
+          <p className="text-loot-gold-2 font-pixel no-smooth">LOADING QUESTS...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-midnight-void">
+    <div className="min-h-screen bg-midnight-void-0">
       {/* Header with navigation */}
       <div className="border-b-2 border-loot-gold/20 bg-midnight-void/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
