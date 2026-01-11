@@ -439,12 +439,13 @@ export default function DashboardPage() {
             
             <Link href="/quests">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -2 }}
+                whileTap={{ y: 1 }}
                 onMouseEnter={() => soundManager.hover()}
-                className="flex items-center gap-2 px-4 py-2 bg-mana-blue/20 border border-mana-blue/50 text-mana-blue font-pixel text-xs rounded hover:bg-mana-blue/30 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+                style={get3DButtonStyle('blue')}
               >
-                <Scroll className="w-4 h-4" />
+                <Scroll className="w-4 h-4 stroke-[3px]" />
                 QUESTS
               </motion.button>
             </Link>
