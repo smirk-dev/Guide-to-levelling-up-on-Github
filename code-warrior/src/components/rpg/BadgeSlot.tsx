@@ -110,14 +110,14 @@ export default function BadgeSlot({ slotNumber, badge, onUnequip, disabled }: Ba
               delay: slotNumber * 0.5,
             }}
           >
-            <Sparkles className="w-3 h-3 text-loot-gold" />
+            <Sparkles className="w-3 h-3 text-loot-gold-2 stroke-[3px]" />
           </motion.div>
         </>
       ) : (
         <>
           {/* Empty Slot */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <Shield className="w-8 h-8 text-gray-700" />
+            <Shield className="w-8 h-8 text-gray-pixel-0 stroke-[3px]" />
           </div>
 
           {/* Slot Number */}
