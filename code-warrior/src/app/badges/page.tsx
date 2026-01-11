@@ -237,18 +237,25 @@ export default function BadgesPage() {
                 {/* Equipped Indicator */}
                 {badge.equipped && (
                   <motion.div
-                    className="absolute top-4 right-4 bg-loot-gold rounded-full p-1"
+                    className="absolute top-4 right-4 bg-loot-gold-2 border-2 border-loot-gold-4 p-1 pixel-perfect"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
+                    style={{
+                      clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                    }}
                   >
-                    <CheckCircle2 className="w-5 h-5 text-midnight-void" />
+                    <CheckCircle2 className="w-5 h-5 text-midnight-void-0 stroke-[3px]" />
                   </motion.div>
                 )}
 
                 {/* Locked Indicator */}
                 {!badge.owned && (
-                  <div className="absolute top-4 left-4 bg-gray-800 rounded-full p-2">
-                    <Lock className="w-4 h-4 text-gray-500" />
+                  <div className="absolute top-4 left-4 bg-midnight-void-2 border-2 border-gray-pixel-0 p-2 pixel-perfect"
+                    style={{
+                      clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
+                    }}
+                  >
+                    <Lock className="w-4 h-4 text-gray-500 stroke-[3px]" />
                   </div>
                 )}
               </div>
