@@ -157,40 +157,32 @@ export default function BadgesPage() {
           {/* Back Button */}
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-mana-blue hover:text-loot-gold transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 stroke-[3px]" />
             <span>Back to Dashboard</span>
           </Link>
 
           {/* Title */}
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
-              <Shield className="w-16 h-16 text-loot-gold" />
-              <motion.div
-                className="absolute inset-0 bg-loot-gold/20 rounded-full blur-xl"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
+              <Shield className="w-16 h-16 text-loot-gold-2 stroke-[3px]" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">
+              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
+                style={{
+                  textShadow: '-2px -2px 0 var(--loot-gold-0), 2px -2px 0 var(--loot-gold-0), -2px 2px 0 var(--loot-gold-0), 2px 2px 0 var(--loot-gold-0)'
+                }}
+              >
                 BADGE COLLECTION
               </h1>
-              <p className="text-gray-400 mt-2">
+              <p className="text-gray-400 mt-2 font-mono">
                 Equip up to 3 badges to boost your stats ({equippedCount}/3 equipped)
               </p>
             </div>
           </div>
 
-          <div
-            className="h-1 w-full bg-gradient-to-r from-transparent via-loot-gold to-transparent opacity-50"
-            style={{
-              backgroundSize: '4px 4px',
-              backgroundImage:
-                'repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,215,0,0.3) 2px, rgba(255,215,0,0.3) 4px)',
-            }}
-          />
+          <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1" />
         </motion.div>
 
         {/* Error State */}
