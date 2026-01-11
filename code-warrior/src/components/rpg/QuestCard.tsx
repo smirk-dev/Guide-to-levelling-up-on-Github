@@ -81,13 +81,13 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
           {/* Rewards */}
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-loot-gold" />
-              <span className="text-sm font-bold text-loot-gold">
+              <Sparkles className="w-4 h-4 text-loot-gold-2 stroke-[3px]" />
+              <span className="text-sm font-bold text-loot-gold-2">
                 +{quest.xp_reward} XP
               </span>
             </div>
             {quest.badge_reward && (
-              <div className="text-sm text-mana-blue">
+              <div className="text-sm text-mana-blue-2">
                 + Badge Reward
               </div>
             )}
