@@ -94,7 +94,7 @@ export default function RewardModal({
                     animate={{ scale: [0, 1.5, 1] }}
                     transition={{ delay: 1.5, duration: 0.5 }}
                   >
-                    <Trophy className="w-16 h-16 text-loot-gold mx-auto mb-4" />
+                    <Trophy className="w-16 h-16 text-loot-gold-2 mx-auto mb-4 stroke-[3px]" />
                   </motion.div>
                 </motion.div>
 
@@ -105,7 +105,7 @@ export default function RewardModal({
                   transition={{ delay: 0.8 }}
                   className="text-center mb-6"
                 >
-                  <h2 className="text-3xl font-pixel text-loot-gold mb-2">
+                  <h2 className="text-3xl font-pixel text-loot-gold-2 mb-2 no-smooth">
                     QUEST COMPLETE!
                   </h2>
                   <p className="text-gray-300 font-mono text-sm">
