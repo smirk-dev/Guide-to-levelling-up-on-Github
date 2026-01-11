@@ -97,7 +97,7 @@ export function calculateQuestXP(quests: Quest[], userQuests: UserQuest[]): numb
   let totalXP = 0;
 
   for (const userQuest of userQuests) {
-    if (userQuest.status === 'completed' && userQuest.claimed_at) {
+    if (userQuest.status === 'COMPLETED' && userQuest.claimed_at) {
       const quest = quests.find(q => q.id === userQuest.quest_id);
       if (quest) {
         totalXP += quest.xp_reward;
