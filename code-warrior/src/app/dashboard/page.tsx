@@ -472,7 +472,7 @@ export default function DashboardPage() {
               className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth disabled:opacity-50 disabled:cursor-not-allowed"
               style={get3DButtonStyle('gold')}
             >
-              <RefreshCw className={`w-4 h-4 stroke-[3px] ${syncing ? 'animate-spin' : ''}`} />
+              <PixelRefresh className={`text-midnight-void-0 ${syncing ? 'animate-spin' : ''}`} size="md" />
               {syncing ? 'SYNCING...' : 'SYNC STATS'}
             </motion.button>
 
