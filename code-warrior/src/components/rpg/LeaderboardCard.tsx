@@ -131,12 +131,12 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
             <h3 className={`
               font-bold truncate
               ${isTop3 ? 'text-lg' : 'text-base'}
-              ${isGold ? 'text-loot-gold' : isSilver ? 'text-gray-300' : isBronze ? 'text-orange-600' : 'text-white'}
+              ${isGold ? 'text-loot-gold-2' : isSilver ? 'text-gray-300' : isBronze ? 'text-orange-600' : 'text-white'}
             `}>
               {username}
             </h3>
             {isCurrentUser && (
-              <span className="px-2 py-0.5 text-xs bg-mana-blue/20 text-mana-blue rounded-full border border-mana-blue/50">
+              <span className="px-2 py-0.5 text-xs bg-midnight-void-2 text-mana-blue-2 rounded-pixel border-2 border-mana-blue-1 font-pixel no-smooth">
                 YOU
               </span>
             )}
@@ -144,7 +144,7 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
 
           {/* Rank Tier Badge */}
           <div className="flex items-center gap-2 text-sm text-gray-400">
-            <span className="px-2 py-0.5 bg-gray-800 rounded border border-gray-700 font-pixel text-xs">
+            <span className="px-2 py-0.5 bg-midnight-void-2 rounded-pixel border-2 border-gray-pixel-0 font-pixel text-xs no-smooth">
               {rank_tier}
             </span>
             <span>{getRankDisplayName(rank_tier)}</span>
