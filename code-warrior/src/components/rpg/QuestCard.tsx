@@ -13,8 +13,8 @@ interface QuestCardProps {
 }
 
 export default function QuestCard({ quest, userQuest, onClaim, isActive }: QuestCardProps) {
-  const isCompleted = userQuest?.status === 'completed';
-  const isInProgress = userQuest?.status === 'in_progress';
+  const isCompleted = userQuest?.status === 'COMPLETED';
+  const isInProgress = userQuest?.status === 'ACTIVE';
   const canClaim = isCompleted && !userQuest?.claimed_at;
 
   return (
