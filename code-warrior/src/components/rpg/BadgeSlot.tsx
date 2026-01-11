@@ -48,11 +48,14 @@ export default function BadgeSlot({ slotNumber, badge, onUnequip, disabled }: Ba
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: slotNumber * 0.1 }}
       className={`
-        relative aspect-square rounded-lg border-2
-        ${badge ? 'border-loot-gold bg-loot-gold/10' : 'border-dashed border-gray-700 bg-gray-900/30'}
-        backdrop-blur-sm overflow-hidden group
-        ${!disabled && badge ? 'cursor-pointer hover:border-loot-gold/70' : ''}
+        relative aspect-square rounded-pixel border-3 pixel-perfect
+        ${badge ? 'border-loot-gold-2 bg-midnight-void-2' : 'border-dashed border-gray-pixel-0 bg-midnight-void-1'}
+        overflow-hidden group
+        ${!disabled && badge ? 'cursor-pointer hover:border-loot-gold-3' : ''}
       `}
+      style={badge ? {
+        boxShadow: '0 0 0 1px var(--loot-gold-1), 0 0 0 2px var(--loot-gold-0)'
+      } : {}}
       onClick={handleUnequip}
       whileHover={badge && !disabled ? { scale: 1.05 } : {}}
       whileTap={badge && !disabled ? { scale: 0.95 } : {}}
