@@ -141,7 +141,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             </div>
 
             {/* RPG Attributes */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t-2 border-gray-800">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t-3 border-gray-pixel-0">
               <div className="flex items-center gap-3">
                 <Sword className="w-5 h-5 text-critical-red" />
                 <div>
