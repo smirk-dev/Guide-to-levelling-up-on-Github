@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { PixelTrophy } from '@/components/icons/PixelIcon';
 import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 interface RewardModalProps {
