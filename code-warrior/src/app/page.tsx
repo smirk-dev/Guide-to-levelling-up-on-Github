@@ -117,29 +117,62 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <div className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm">
-            <Sword className="w-12 h-12 text-critical-red mx-auto mb-4" />
+          <motion.div 
+            className="relative bg-midnight-void-2 border-4 border-critical-red-1 p-8 pixel-perfect"
+            style={{
+              borderColor: 'var(--critical-red-1) var(--critical-red-0) var(--critical-red-0) var(--critical-red-1)',
+              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
+            }}
+          >
+            <div className="absolute top-2 left-2 w-2 h-2 bg-critical-red-1" />
+            <div className="absolute top-2 right-2 w-2 h-2 bg-critical-red-1" />
+            <div className="absolute bottom-2 left-2 w-2 h-2 bg-critical-red-1" />
+            <div className="absolute bottom-2 right-2 w-2 h-2 bg-critical-red-1" />
+            
+            <PixelSword className="w-12 h-12 text-critical-red-1 mx-auto mb-4" />
             <h3 className="font-pixel text-xs text-loot-gold mb-2">LEVEL UP</h3>
             <p className="font-mono text-sm text-gray-400">
               Turn commits into XP and PRs into powerful attacks
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm">
-            <Star className="w-12 h-12 text-loot-gold mx-auto mb-4" />
+          <motion.div 
+            className="relative bg-midnight-void-2 border-4 border-loot-gold-2 p-8 pixel-perfect"
+            style={{
+              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
+              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
+            }}
+          >
+            <div className="absolute top-2 left-2 w-2 h-2 bg-loot-gold-2" />
+            <div className="absolute top-2 right-2 w-2 h-2 bg-loot-gold-2" />
+            <div className="absolute bottom-2 left-2 w-2 h-2 bg-loot-gold-2" />
+            <div className="absolute bottom-2 right-2 w-2 h-2 bg-loot-gold-2" />
+            
+            <PixelStar className="w-12 h-12 text-loot-gold-2 mx-auto mb-4" />
             <h3 className="font-pixel text-xs text-loot-gold mb-2">EARN RANKS</h3>
             <p className="font-mono text-sm text-gray-400">
               Progress from Novice to Legendary Code Warrior
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm">
-            <Zap className="w-12 h-12 text-mana-blue mx-auto mb-4" />
+          <motion.div 
+            className="relative bg-midnight-void-2 border-4 border-mana-blue-2 p-8 pixel-perfect"
+            style={{
+              borderColor: 'var(--mana-blue-3) var(--mana-blue-0) var(--mana-blue-0) var(--mana-blue-3)',
+              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
+            }}
+          >
+            <div className="absolute top-2 left-2 w-2 h-2 bg-mana-blue-2" />
+            <div className="absolute top-2 right-2 w-2 h-2 bg-mana-blue-2" />
+            <div className="absolute bottom-2 left-2 w-2 h-2 bg-mana-blue-2" />
+            <div className="absolute bottom-2 right-2 w-2 h-2 bg-mana-blue-2" />
+            
+            <PixelZap className="w-12 h-12 text-mana-blue-2 mx-auto mb-4" />
             <h3 className="font-pixel text-xs text-loot-gold mb-2">COMPETE</h3>
             <p className="font-mono text-sm text-gray-400">
               Track your stats and compete on the leaderboard
             </p>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* CTA Button */}
@@ -148,17 +181,21 @@ export default function Home() {
           animate={{ scale: 1 }}
           transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
         >
-          <button
+          <motion.button
             onClick={handleSignIn}
             onMouseEnter={() => soundManager.hover()}
-            className="group relative px-8 py-4 bg-loot-gold text-midnight-void font-pixel text-sm rounded-lg hover:bg-yellow-500 transition-all transform hover:scale-105 shadow-xl"
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 2 }}
+            className="flex items-center gap-3 px-8 py-4 text-midnight-void-0 font-pixel text-sm border-4 rounded-pixel-sm pixel-perfect no-smooth"
+            style={{
+              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
+              backgroundColor: 'var(--loot-gold-2)',
+              boxShadow: 'inset -4px -4px 0 rgba(0, 0, 0, 0.2), 4px 4px 0 rgba(0, 0, 0, 0.5)',
+            }}
           >
-            <div className="flex items-center gap-3">
-              <Github className="w-6 h-6" />
-              START YOUR QUEST
-            </div>
-            <div className="absolute -inset-1 bg-loot-gold/50 rounded-lg blur opacity-0 group-hover:opacity-75 transition-opacity -z-10" />
-          </button>
+            <PixelGithub className="w-6 h-6 text-midnight-void-0" />
+            START YOUR QUEST
+          </motion.button>
           
           <p className="font-mono text-xs text-gray-500 mt-4">
             Sign in with GitHub to begin your journey
@@ -167,7 +204,7 @@ export default function Home() {
 
         {/* Footer info */}
         <motion.div
-          className="mt-16 pt-8 border-t border-gray-800"
+          className="mt-16 pt-8 border-t-4 border-gray-pixel-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
