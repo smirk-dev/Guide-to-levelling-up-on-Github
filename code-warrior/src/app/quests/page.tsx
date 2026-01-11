@@ -93,25 +93,33 @@ export default function QuestsPage() {
   return (
     <div className="min-h-screen bg-midnight-void-0">
       {/* Header with navigation */}
-      <div className="border-b-2 border-loot-gold/20 bg-midnight-void/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b-3 border-loot-gold-1 bg-midnight-void-1 sticky top-0 z-10 pixel-perfect">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 1 }}
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 rounded-lg border-2 border-mana-blue/30 bg-midnight-void/50 hover:bg-midnight-void/70 transition-colors font-mono text-sm"
+            className="px-4 py-2 rounded-pixel border-3 bg-midnight-void-2 border-mana-blue-1 font-mono text-sm pixel-perfect"
+            style={{
+              borderColor: 'var(--mana-blue-2) var(--mana-blue-0) var(--mana-blue-0) var(--mana-blue-2)',
+              boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
+            }}
           >
             ← BACK TO DASHBOARD
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 1 }}
             onClick={async () => {
               await fetch('/api/quests', { method: 'POST' });
               await loadQuests();
             }}
-            className="px-4 py-2 rounded-lg border-2 border-loot-gold/30 bg-loot-gold/10 hover:bg-loot-gold/20 transition-colors font-mono text-sm text-loot-gold"
+            className="px-4 py-2 rounded-pixel border-3 bg-loot-gold-2 border-loot-gold-2 font-mono text-sm text-midnight-void-0 font-pixel no-smooth pixel-perfect"
+            style={{
+              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
+              boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
+            }}
           >
             ⟳ VERIFY PROGRESS
           </motion.button>
