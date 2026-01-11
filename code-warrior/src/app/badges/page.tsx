@@ -255,7 +255,7 @@ export default function BadgesPage() {
                       clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
                     }}
                   >
-                    <Lock className="w-4 h-4 text-gray-500 stroke-[3px]" />
+                    <span className="text-sm">🔒</span>
                   </div>
                 )}
               </div>
@@ -303,7 +303,7 @@ export default function BadgesPage() {
                 >
                   {actionInProgress === badge.id ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-3 h-3 animate-spin stroke-[3px]" />
+                      <span className="inline-block animate-spin">⚙️</span>
                       PROCESSING...
                     </span>
                   ) : badge.equipped ? (
