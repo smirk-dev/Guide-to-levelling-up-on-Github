@@ -162,3 +162,33 @@ export function getStatBarColorClass(color: 'health' | 'mana' | 'xp'): string {
 
   return colorMap[color];
 }
+
+/**
+ * Get button pressed state CSS
+ * Returns transform/position adjustments for pixel art button press effect
+ */
+export function getButtonPressedState(isPressed: boolean): React.CSSProperties {
+  if (isPressed) {
+    return {
+      transform: 'translate(2px, 2px)',
+      boxShadow: 'inset 2px 2px 0 rgba(0, 0, 0, 0.3), inset -2px -2px 0 rgba(255, 255, 255, 0.1)',
+    };
+  }
+  return {
+    transform: 'translate(0, 0)',
+  };
+}
+
+/**
+ * Get input field recessed pixel slot styling
+ * Creates appearance of a sunken control panel slot
+ */
+export function getPixelInputStyle(): React.CSSProperties {
+  return {
+    borderWidth: '4px',
+    borderColor: 'var(--midnight-void-3) var(--midnight-void-0) var(--midnight-void-0) var(--midnight-void-3)',
+    boxShadow: 'inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -1px -1px 0 rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'var(--midnight-void-1)',
+    outline: 'none',
+  };
+}
