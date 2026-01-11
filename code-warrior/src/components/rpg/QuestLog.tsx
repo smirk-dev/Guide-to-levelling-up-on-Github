@@ -76,14 +76,14 @@ export default function QuestLog({ quests, userQuests, onClaimQuest }: QuestLogP
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Scroll className="w-5 h-5 text-mana-blue" />
+                        <PixelScroll className="text-mana-blue" size="sm" />
                         <span className="font-bold text-lg">{quest.title}</span>
                       </div>
                       <motion.div
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-400">▼</span>
                       </motion.div>
                     </div>
                   </motion.button>
@@ -134,14 +134,14 @@ export default function QuestLog({ quests, userQuests, onClaimQuest }: QuestLogP
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Scroll className="w-5 h-5 text-health-green" />
+                        <PixelScroll className="text-health-green" size="sm" />
                         <span className="font-bold text-lg line-through opacity-75">{quest.title}</span>
                       </div>
                       <motion.div
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-400">▼</span>
                       </motion.div>
                     </div>
                   </motion.button>
