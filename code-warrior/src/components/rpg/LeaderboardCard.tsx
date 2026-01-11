@@ -154,12 +154,12 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
         {/* XP Display */}
         <div className="text-right">
           <div className={`
-            font-pixel text-lg
-            ${isGold ? 'text-loot-gold' : isSilver ? 'text-gray-300' : isBronze ? 'text-orange-600' : 'text-white'}
+            font-pixel text-lg no-smooth
+            ${isGold ? 'text-loot-gold-2' : isSilver ? 'text-gray-300' : isBronze ? 'text-orange-600' : 'text-white'}
           `}>
             {xp.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500">XP</div>
+          <div className="text-xs text-gray-500 font-mono">XP</div>
         </div>
       </div>
 
