@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { PixelTrophy } from '@/components/icons/PixelIcon';
+import { PixelTrophy, PixelGem } from '@/components/icons/PixelIcon';
 import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 interface RewardModalProps {
