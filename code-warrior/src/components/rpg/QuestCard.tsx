@@ -133,7 +133,7 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
           {/* Completion Status */}
           {isCompleted && userQuest?.claimed_at && (
             <div className="flex items-center gap-2 text-health-green-1 text-sm">
-              <CheckCircle2 className="w-4 h-4 stroke-[3px]" />
+              <PixelCheckmark className="text-health-green-1" size="sm" />
               <span>Claimed on {new Date(userQuest.claimed_at).toLocaleDateString()}</span>
             </div>
           )}
