@@ -100,11 +100,15 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
                 <span>Progress</span>
                 <span>{userQuest.progress || 0} / {quest.criteria_threshold}</span>
               </div>
-              <div className="h-2 bg-midnight-void rounded-full overflow-hidden border border-mana-blue/30">
+              <div className="h-3 bg-midnight-void-2 rounded-pixel overflow-hidden border-2 border-mana-blue-1 pixel-perfect">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${((userQuest.progress || 0) / quest.criteria_threshold) * 100}%` }}
-                  className="h-full bg-gradient-to-r from-mana-blue to-loot-gold"
+                  className="h-full"
+                  style={{
+                    backgroundImage: 'repeating-linear-gradient(to right, var(--mana-blue-2) 0px, var(--mana-blue-2) 8px, var(--loot-gold-2) 8px, var(--loot-gold-2) 16px)',
+                    boxShadow: 'inset 0 -2px 0 var(--mana-blue-0)'
+                  }}
                 />
               </div>
             </div>
@@ -113,19 +117,14 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
           {/* Claim Button */}
           {canClaim && onClaim && (
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 1 }}
               onClick={onClaim}
-              className="
-                w-full px-6 py-3 rounded-lg font-bold
-                bg-gradient-to-r from-loot-gold to-yellow-600
-                text-midnight-void
-                hover:shadow-[0_0_20px_rgba(255,215,0,0.5)]
-                transition-shadow
-              "
+              className="w-full px-6 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+              style={get3DButtonStyle('gold')}
             >
               <span className="flex items-center justify-center gap-2">
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="w-5 h-5 stroke-[3px]" />
                 CLAIM REWARD
               </span>
             </motion.button>
