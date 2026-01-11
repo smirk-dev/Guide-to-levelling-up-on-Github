@@ -256,7 +256,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-gray-800/50 border border-loot-gold/30 rounded p-3 text-center"
+                    className="bg-midnight-void-2 border-2 border-loot-gold-1 rounded-pixel p-3 text-center"
                   >
                     <div className="text-2xl mb-1">🏆</div>
                     <p className="font-pixel text-xs text-loot-gold">{achievement.name}</p>
