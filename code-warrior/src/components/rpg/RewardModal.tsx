@@ -39,7 +39,7 @@ export default function RewardModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-midnight-void-0/90 z-50 flex items-center justify-center p-4"
           >
             {/* Modal */}
             <motion.div
@@ -51,13 +51,19 @@ export default function RewardModal({
               className="relative max-w-md w-full"
             >
               {/* Chest Container */}
-              <div className="relative bg-gradient-to-b from-loot-gold/20 to-midnight-void border-4 border-loot-gold rounded-lg p-8 shadow-[0_0_50px_rgba(255,215,0,0.3)]">
+              <div className="relative bg-midnight-void-1 border-4 border-loot-gold-2 rounded-pixel-sm p-8 pixel-perfect shadow-pixel-lg">
+                {/* Pixel corner decorations */}
+                <div className="absolute top-2 left-2 w-3 h-3 bg-loot-gold-3" />
+                <div className="absolute top-2 right-2 w-3 h-3 bg-loot-gold-3" />
+                <div className="absolute bottom-2 left-2 w-3 h-3 bg-loot-gold-3" />
+                <div className="absolute bottom-2 right-2 w-3 h-3 bg-loot-gold-3" />
+
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 p-2 rounded-lg bg-midnight-void/50 hover:bg-midnight-void/70 transition-colors"
+                  className="absolute top-4 right-4 p-2 rounded-pixel bg-midnight-void-2 border-2 border-gray-pixel-0 hover:border-critical-red-1 transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-400 stroke-[3px]" />
                 </button>
 
                 {/* Chest Opening Animation */}
