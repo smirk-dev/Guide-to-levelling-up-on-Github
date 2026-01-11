@@ -100,7 +100,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             {/* Health Bar */}
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
-                <Heart className="w-4 h-4 text-health-green" />
+                <PixelHeart className="text-health-green" size="sm" />
                 <span className="font-pixel text-xs text-health-green">HEALTH (Commits)</span>
               </div>
               <StatBar
