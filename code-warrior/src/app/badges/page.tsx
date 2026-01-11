@@ -159,14 +159,14 @@ export default function BadgesPage() {
             href="/dashboard"
             className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
           >
-            <ArrowLeft className="w-4 h-4 stroke-[3px]" />
+            <span>←</span>
             <span>Back to Dashboard</span>
           </Link>
 
           {/* Title */}
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
-              <Shield className="w-16 h-16 text-loot-gold-2 stroke-[3px]" />
+              <PixelShield className="text-loot-gold-2" size="lg" />
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
