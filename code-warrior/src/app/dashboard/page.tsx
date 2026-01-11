@@ -11,7 +11,7 @@ import { RPGStats } from '@/types/database';
 import CharacterSheet from '@/components/rpg/CharacterSheet';
 import FloatingXP from '@/components/effects/FloatingXP';
 import Confetti from '@/components/effects/Confetti';
-import { RefreshCw, LogOut, Menu, X, Scroll, Trophy } from 'lucide-react';
+import { PixelRefresh, PixelLogout, PixelScroll, PixelTrophy } from '@/components/icons/PixelIcon';
 import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { soundManager } from '@/lib/sound';
