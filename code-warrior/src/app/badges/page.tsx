@@ -190,12 +190,12 @@ export default function BadgesPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-critical-red/10 border border-critical-red/50 rounded-lg p-4 mb-6"
+            className="bg-midnight-void-2 border-2 border-critical-red-1 rounded-pixel-sm p-4 mb-6 pixel-perfect"
           >
-            <p className="text-critical-red">{error}</p>
+            <p className="text-critical-red-1 font-mono">{error}</p>
             <button
               onClick={loadInventory}
-              className="mt-2 text-sm text-loot-gold hover:underline"
+              className="mt-2 text-sm text-loot-gold-2 hover:text-loot-gold-3 font-mono"
             >
               Try again
             </button>
@@ -210,15 +210,19 @@ export default function BadgesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
               className={`
-                relative p-6 rounded-lg border-2 backdrop-blur-sm
+                relative p-6 rounded-pixel-sm border-3 pixel-perfect
                 ${badge.owned
                   ? badge.equipped
-                    ? 'border-loot-gold bg-loot-gold/10'
-                    : 'border-mana-blue/50 bg-gray-900/50'
-                  : 'border-gray-700 bg-gray-900/30 opacity-60'
+                    ? 'border-loot-gold-2 bg-midnight-void-2'
+                    : 'border-mana-blue-1 bg-midnight-void-1'
+                  : 'border-gray-pixel-0 bg-midnight-void-1 opacity-60'
                 }
               `}
+              style={badge.equipped ? {
+                boxShadow: '0 0 0 2px var(--loot-gold-1), 0 0 0 4px var(--loot-gold-0)'
+              } : {}}
             >
               {/* Badge Icon */}
               <div className="text-center mb-4">
