@@ -138,7 +138,7 @@ export default function BadgesPage() {
     return (
       <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-loot-gold-2 animate-spin mx-auto mb-4 stroke-[3px]" />
+          <div className="text-4xl mb-4 animate-spin inline-block">⚙️</div>
           <p className="text-gray-400 font-mono">Loading Badge Collection...</p>
         </div>
       </div>
