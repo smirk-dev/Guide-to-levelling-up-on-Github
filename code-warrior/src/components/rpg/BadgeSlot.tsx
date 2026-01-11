@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, X, Sparkles } from 'lucide-react';
 import type { Badge } from '@/types/database';
+import { PixelGem, PixelShield } from '@/components/icons/PixelIcon';
 import { soundManager } from '@/lib/sound';
 
 interface BadgeSlotProps {
@@ -83,7 +83,7 @@ export default function BadgeSlot({ slotNumber, badge, onUnequip, disabled }: Ba
               whileHover={{ opacity: 1 }}
               className="absolute top-1 right-1 bg-critical-red-1 rounded-pixel p-1 border border-critical-red-0"
             >
-              <X className="w-3 h-3 text-white stroke-[3px]" />
+              <span className="text-white font-bold text-sm">✕</span>
             </motion.div>
           )}
 
