@@ -78,7 +78,7 @@ export function updateQuestProgress(
     const { completed, progress } = checkQuestCompletion(quest, stats, userQuest);
 
     // Only add to updates if there's a change
-    if (!userQuest || userQuest.progress !== progress || userQuest.status !== (completed ? 'completed' : 'in_progress')) {
+    if (!userQuest || userQuest.progress !== progress || userQuest.status !== (completed ? 'COMPLETED' : 'ACTIVE')) {
       updates.push({
         questId: quest.id,
         progress,
