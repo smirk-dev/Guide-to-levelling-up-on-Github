@@ -74,7 +74,7 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
           <div className="mb-3">
             <div className="flex justify-between text-xs text-gray-400 mb-1">
               <span>Progress</span>
-              <span>{progress} / {quest.criteria_value}</span>
+              <span>{progress} / {quest.criteria_threshold}</span>
             </div>
             <div className="h-3 bg-midnight-void-2 rounded-pixel overflow-hidden border-2 border-mana-blue-1 pixel-perfect">
               <motion.div
