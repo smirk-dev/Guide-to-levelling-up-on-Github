@@ -1,39 +1,31 @@
-import type { Metadata } from "next";
-import { Inter, Fira_Code, Press_Start_2P } from "next/font/google";
-import { Providers } from "./providers";
-import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const firaCode = Fira_Code({
-  variable: "--font-fira-code",
-  subsets: ["latin"],
-});
-
-const pressStart2P = Press_Start_2P({
-  variable: "--font-press-start",
-  weight: "400",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: "Code Warrior - GitHub RPG",
-  description: "Transform your GitHub activity into an epic RPG adventure",
+  title: 'Code Warrior | Level Up Your GitHub Game',
+  description: 'Transform your GitHub contributions into an epic RPG adventure. Earn XP, complete quests, collect badges, and climb the leaderboard!',
+  keywords: ['GitHub', 'gamification', 'RPG', 'developer', 'coding', 'pixel art', 'retro gaming'],
+  authors: [{ name: 'Code Warrior' }],
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${firaCode.variable} ${pressStart2P.variable} antialiased`}
-      >
+    <html lang="en" className="bg-[#0a0a0f]">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-pixel min-h-screen antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
