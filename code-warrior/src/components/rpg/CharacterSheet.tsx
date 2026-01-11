@@ -244,7 +244,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
           {githubAchievements && githubAchievements.length > 0 && (
             <div>
               <h3 className="font-pixel text-xl text-loot-gold mb-4 flex items-center gap-2">
-                <Award className="w-5 h-5" />
+                <PixelTrophy className="text-loot-gold" size="md" />
                 GITHUB ACHIEVEMENTS
               </h3>
 
