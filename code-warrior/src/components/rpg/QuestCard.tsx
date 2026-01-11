@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Scroll, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import type { Quest, UserQuest } from '@/types/database';
 import { get3DButtonStyle } from '@/lib/pixel-utils';
+import { PixelScroll, PixelCheckmark, PixelGem } from '@/components/icons/PixelIcon';
 
 interface QuestCardProps {
   quest: Quest;
@@ -40,9 +40,9 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
           ${isCompleted ? 'bg-midnight-void-2 border-health-green-1' : 'bg-midnight-void-2 border-mana-blue-2'}
         `}>
           {isCompleted ? (
-            <CheckCircle2 className="w-6 h-6 text-health-green-1 stroke-[3px]" />
+            <PixelCheckmark className="text-health-green-1" size="md" />
           ) : (
-            <Scroll className="w-6 h-6 text-mana-blue-2 stroke-[3px]" />
+            <PixelScroll className="text-mana-blue-2" size="md" />
           )}
         </div>
 
@@ -81,7 +81,7 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
           {/* Rewards */}
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-loot-gold-2 stroke-[3px]" />
+              <PixelGem className="text-loot-gold-2" size="sm" />
               <span className="text-sm font-bold text-loot-gold-2">
                 +{quest.xp_reward} XP
               </span>
@@ -124,7 +124,7 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
               style={get3DButtonStyle('gold')}
             >
               <span className="flex items-center justify-center gap-2">
-                <Sparkles className="w-5 h-5 stroke-[3px]" />
+                <PixelGem className="text-midnight-void-0" size="md" />
                 CLAIM REWARD
               </span>
             </motion.button>
