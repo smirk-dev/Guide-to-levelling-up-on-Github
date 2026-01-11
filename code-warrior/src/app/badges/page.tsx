@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Shield, Loader2, ArrowLeft, Lock, CheckCircle2 } from 'lucide-react';
+import { PixelShield, PixelCheckmark } from '@/components/icons/PixelIcon';
 import type { Badge } from '@/types/database';
 import Link from 'next/link';
 import { soundManager } from '@/lib/sound';
