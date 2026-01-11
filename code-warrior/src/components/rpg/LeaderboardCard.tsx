@@ -86,9 +86,9 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
             <span className="font-pixel text-xs text-midnight-void-0 relative z-10 no-smooth">
               {rank}
             </span>
-            {RankIcon && (
-              <div className="absolute -top-1 -right-1">
-                <RankIcon className="w-4 h-4 text-midnight-void-0 stroke-[3px]" />
+            {RankIconEmoji && (
+              <div className="absolute -top-1 -right-1 text-sm">
+                {RankIconEmoji}
               </div>
             )}
           </div>
