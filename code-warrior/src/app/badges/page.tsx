@@ -342,7 +342,7 @@ export default function BadgesPage() {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4 stroke-[3px]" />
+            <PixelShield className="text-gray-600 mx-auto mb-4" size="lg" />
             <p className="text-gray-400 font-mono">No badges available yet.</p>
             <p className="text-sm text-gray-500 mt-2 font-mono">
               Complete quests to earn badges!
