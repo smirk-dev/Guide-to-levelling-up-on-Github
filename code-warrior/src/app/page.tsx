@@ -4,7 +4,7 @@ import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Sword, Zap, Star } from 'lucide-react';
+import { PixelSword, PixelStar, PixelZap, PixelGithub } from '@/components/icons/PixelIcon';
 import { soundManager } from '@/lib/sound';
 
 export default function Home() {
