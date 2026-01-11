@@ -422,7 +422,7 @@ export default function DashboardPage() {
             onMouseEnter={() => soundManager.hover()}
             className="lg:hidden p-2 text-loot-gold text-2xl"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : '📦'}
+            {mobileMenuOpen ? '✕' : '📦'}
           </button>
 
           {/* Desktop Navigation */}
