@@ -160,15 +160,8 @@ export default function LeaderboardPage() {
             transition={{ delay: 0.5 }}
             className="mt-8 text-center"
           >
-            <div
-              className="h-1 w-full bg-gradient-to-r from-transparent via-loot-gold to-transparent opacity-50 mb-4"
-              style={{
-                backgroundSize: '4px 4px',
-                backgroundImage:
-                  'repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,215,0,0.3) 2px, rgba(255,215,0,0.3) 4px)',
-              }}
-            />
-            <p className="text-sm text-gray-500 font-pixel">
+            <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1 mb-4" />
+            <p className="text-sm text-gray-500 font-pixel no-smooth">
               {leaderboard.length} WARRIORS RANKED
             </p>
           </motion.div>
