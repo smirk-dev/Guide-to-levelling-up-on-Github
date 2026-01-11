@@ -121,3 +121,36 @@ body {
     0 calc(100% - 4px), 0 4px
   );
 }
+
+/* Pixel Art Input Fields - Recessed slot styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+  border-width: 4px;
+  border-style: solid;
+  border-color: var(--midnight-void-3) var(--midnight-void-0) var(--midnight-void-0) var(--midnight-void-3);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -1px -1px 0 rgba(255, 255, 255, 0.05);
+  background-color: var(--midnight-void-1);
+  color: var(--foreground);
+  font-family: var(--font-fira-code), monospace;
+  padding: 6px 8px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--mana-blue-2) var(--mana-blue-0) var(--mana-blue-0) var(--mana-blue-2);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -1px -1px 0 rgba(88, 166, 255, 0.2);
+}
+
+/* Pixel button pressed animation */
+button:active,
+button[data-pressed="true"] {
+  transform: translate(2px, 2px);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.3) !important;
+}
