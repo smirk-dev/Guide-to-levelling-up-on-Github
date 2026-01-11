@@ -85,7 +85,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
         {/* CENTER COLUMN: The Stats */}
         <motion.div
-          className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm space-y-6"
+          className="bg-midnight-void-1 border-3 border-gray-pixel-0 rounded-pixel-sm p-6 pixel-perfect space-y-6"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
