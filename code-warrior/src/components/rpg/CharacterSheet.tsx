@@ -142,28 +142,28 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             {/* RPG Attributes */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t-3 border-gray-pixel-0">
               <div className="flex items-center gap-3">
-                <Sword className="w-5 h-5 text-critical-red" />
+                <PixelSword className="text-critical-red" size="md" />
                 <div>
                   <p className="text-xs text-gray-400">Strength (PRs)</p>
                   <p className="font-pixel text-lg text-critical-red">{stats.strength}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Star className="w-5 h-5 text-loot-gold" />
+                <PixelStar className="text-loot-gold" size="md" />
                 <div>
                   <p className="text-xs text-gray-400">Charisma (Stars)</p>
                   <p className="font-pixel text-lg text-loot-gold">{stats.charisma}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Brain className="w-5 h-5 text-mana-blue" />
+                <PixelShield className="text-mana-blue" size="md" />
                 <div>
                   <p className="text-xs text-gray-400">Wisdom (Issues)</p>
                   <p className="font-pixel text-lg text-mana-blue">{stats.wisdom}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-health-green" />
+                <PixelGem className="text-health-green" size="md" />
                 <div>
                   <p className="text-xs text-gray-400">Total XP</p>
                   <p className="font-pixel text-lg text-health-green">{user.xp}</p>
