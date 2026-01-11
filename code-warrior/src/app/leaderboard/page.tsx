@@ -1,172 +1,169 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { PixelTrophy } from '@/components/icons/PixelIcon';
-import LeaderboardCard from '@/components/rpg/LeaderboardCard';
-import type { RankTier } from '@/types/database';
-import Link from 'next/link';
+import {
+  PageLayout,
+  LeaderboardTable,
+  PixelFrame,
+  PixelBadge,
+  LoadingScreen,
+  IconTrophy,
+  IconRank,
+} from '@/components';
+import type { User } from '@/types/database';
 
-interface LeaderboardEntry {
-  id: string;
-  rank: number;
-  username: string;
-  avatar_url: string;
-  xp: number;
-  rank_tier: RankTier;
+interface LeaderboardData {
+  users: User[];
+  currentUserRank?: number;
 }
 
 export default function LeaderboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
-    } else if (status === 'authenticated') {
-      loadLeaderboard();
     }
   }, [status, router]);
 
-  const loadLeaderboard = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch leaderboard data
+  const { data, isLoading } = useQuery<LeaderboardData>({
+    queryKey: ['leaderboard'],
+    queryFn: async () => {
+      const res = await fetch('/api/leaderboard');
+      if (!res.ok) throw new Error('Failed to fetch leaderboard');
+      return res.json();
+    },
+    enabled: status === 'authenticated',
+    refetchInterval: 60000, // Refresh every minute
+  });
 
-      const response = await fetch('/api/leaderboard');
-      const data = await response.json();
-
-      if (response.ok) {
-        setLeaderboard(data.leaderboard || []);
-      } else {
-        setError(data.error || 'Failed to load leaderboard');
-      }
-    } catch (err) {
-      console.error('Error loading leaderboard:', err);
-      setError('Failed to load leaderboard');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (status === 'loading' || loading) {
-    return (
-      <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-spin inline-block">⚙️</div>
-          <p className="text-gray-400 font-mono">Loading Hall of Fame...</p>
-        </div>
-      </div>
-    );
+  if (status === 'loading' || isLoading) {
+    return <LoadingScreen message="LOADING LEADERBOARD" />;
   }
 
+  if (!session || !data) {
+    return <LoadingScreen message="LOADING RANKINGS" />;
+  }
+
+  // Find current user in the leaderboard
+  const currentUserIndex = data.users.findIndex(
+    (u) => u.username === session.user?.name
+  );
+  const currentUserRank = currentUserIndex >= 0 ? currentUserIndex + 1 : null;
+  const currentUser = currentUserIndex >= 0 ? data.users[currentUserIndex] : null;
+
+  // Get rank distribution stats
+  const rankCounts = data.users.reduce((acc, user) => {
+    acc[user.rank_tier] = (acc[user.rank_tier] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
-    <div className="min-h-screen bg-midnight-void-0 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
+    <PageLayout
+      title="LEADERBOARD"
+      subtitle="Top warriors ranked by XP"
+    >
+      {/* Current User Rank */}
+      {currentUser && currentUserRank && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 md:mb-10"
         >
-          {/* Back Button */}
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-mana-blue-2 hover:text-loot-gold-2 transition-colors mb-6 font-mono"
-          >
-            <span>←</span>
-            <span>Back to Dashboard</span>
-          </Link>
-
-          {/* Title with Trophy */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative">
-              <PixelTrophy className="text-loot-gold-2" size="lg" />
+          <PixelFrame variant="mana" padding="lg">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4 md:gap-5">
+                <IconRank size={36} color="#58a6ff" />
+                <div>
+                  <p className="font-pixel text-[10px] md:text-[11px] text-[var(--mana-light)] mb-1">
+                    YOUR RANKING
+                  </p>
+                  <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-highlight)]">
+                    Keep pushing to climb higher!
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-pixel-heading text-[24px] md:text-[28px] text-[var(--gold-light)] mb-1">
+                  #{currentUserRank}
+                </p>
+                <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)]">
+                  of {data.users.length} warriors
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
-                style={{
-                  textShadow: '-2px -2px 0 var(--loot-gold-0), 2px -2px 0 var(--loot-gold-0), -2px 2px 0 var(--loot-gold-0), 2px 2px 0 var(--loot-gold-0)'
-                }}
-              >
-                HALL OF FAME
-              </h1>
-              <p className="text-gray-400 mt-2 font-mono">
-                The mightiest Code Warriors ranked by total XP
-              </p>
-            </div>
-          </div>
-
-          {/* Pixel divider */}
-          <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1" />
+          </PixelFrame>
         </motion.div>
+      )}
 
-        {/* Error State */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-midnight-void-2 border-2 border-critical-red-1 rounded-pixel-sm p-4 mb-6 pixel-perfect"
-          >
-            <p className="text-critical-red-1 font-mono">{error}</p>
-            <button
-              onClick={loadLeaderboard}
-              className="mt-2 text-sm text-loot-gold-2 hover:text-loot-gold-3 font-mono"
-            >
-              Try again
-            </button>
-          </motion.div>
-        )}
-
-        {/* Leaderboard List */}
-        {!error && (
-          <div className="space-y-4">
-            {leaderboard.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-12"
-              >
-                <PixelTrophy className="text-gray-600 mx-auto mb-4" size="lg" />
-                <p className="text-gray-400 font-mono">
-                  No warriors have claimed their place yet.
+      {/* Rank Distribution */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-8 md:mb-10"
+      >
+        <PixelFrame variant="stone" padding="lg">
+          <p className="font-pixel text-[9px] md:text-[10px] text-[var(--gray-highlight)] mb-4 text-center">
+            RANK DISTRIBUTION
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
+            {['SSS', 'SS', 'S', 'AAA', 'AA', 'A', 'B', 'C'].map((rank) => (
+              <div key={rank} className="text-center min-w-[50px]">
+                <PixelBadge
+                  variant={
+                    rank === 'SSS'
+                      ? 'gold'
+                      : rank === 'SS' || rank === 'S'
+                      ? 'purple'
+                      : rank.startsWith('A')
+                      ? 'mana'
+                      : 'gray'
+                  }
+                  size="sm"
+                >
+                  {rank}
+                </PixelBadge>
+                <p className="font-pixel text-[10px] md:text-[11px] text-white mt-2">
+                  {rankCounts[rank] || 0}
                 </p>
-                <p className="text-sm text-gray-500 mt-2 font-mono">
-                  Be the first to sync your GitHub stats!
-                </p>
-              </motion.div>
-            ) : (
-              leaderboard.map((entry) => (
-                <LeaderboardCard
-                  key={entry.id}
-                  entry={entry}
-                  isCurrentUser={session?.user?.username === entry.username}
-                />
-              ))
-            )}
+              </div>
+            ))}
           </div>
-        )}
+        </PixelFrame>
+      </motion.div>
 
-        {/* Footer Stats */}
-        {leaderboard.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-8 text-center"
-          >
-            <div className="h-1 w-full bg-midnight-void-2 border-t-2 border-b-2 border-loot-gold-1 mb-4" />
-            <p className="text-sm text-gray-500 font-pixel no-smooth">
-              {leaderboard.length} WARRIORS RANKED
-            </p>
-          </motion.div>
-        )}
-      </div>
-    </div>
+      {/* Leaderboard Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8"
+      >
+        <LeaderboardTable
+          users={data.users}
+          currentUserId={currentUser?.id}
+        />
+      </motion.div>
+
+      {/* Footer info */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-10 text-center"
+      >
+        <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)]">
+          Rankings update in real-time as warriors sync their GitHub stats
+        </p>
+      </motion.div>
+    </PageLayout>
   );
 }
