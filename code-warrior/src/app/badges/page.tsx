@@ -262,14 +262,14 @@ export default function BadgesPage() {
 
               {/* Badge Info */}
               <div className="text-center mb-4">
-                <h3 className={`font-pixel text-lg mb-2 ${badge.owned ? 'text-white' : 'text-gray-600'}`}>
+                <h3 className={`font-pixel text-lg mb-2 no-smooth ${badge.owned ? 'text-white' : 'text-gray-600'}`}>
                   {badge.name}
                 </h3>
-                <p className={`text-sm mb-2 ${badge.owned ? 'text-loot-gold' : 'text-gray-600'}`}>
+                <p className={`text-sm mb-2 font-mono ${badge.owned ? 'text-loot-gold-2' : 'text-gray-600'}`}>
                   {getStatBoostText(badge.stat_boost)}
                 </p>
                 {badge.earned_at && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 font-mono">
                     Earned {new Date(badge.earned_at).toLocaleDateString()}
                   </p>
                 )}
