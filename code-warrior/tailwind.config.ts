@@ -101,7 +101,6 @@ const config: Config = {
     function({ addUtilities }: any) {
       addUtilities({
         '.pixel-perfect': {
-          'image-rendering': 'crisp-edges',
           'image-rendering': 'pixelated',
         },
         '.no-smooth': {
