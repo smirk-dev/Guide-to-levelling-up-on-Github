@@ -73,7 +73,7 @@ export function updateQuestProgress(
     const userQuest = userQuests.find(uq => uq.quest_id === quest.id);
     
     // Skip if quest is already completed
-    if (userQuest?.status === 'completed') continue;
+    if (userQuest?.status === 'COMPLETED') continue;
 
     const { completed, progress } = checkQuestCompletion(quest, stats, userQuest);
 
