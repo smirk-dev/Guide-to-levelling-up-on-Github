@@ -109,23 +109,20 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
       <div className="flex items-center gap-4 ml-6">
         {/* Avatar */}
         <div className={`
-          relative w-16 h-16 rounded-full overflow-hidden
-          ${isTop3 ? 'ring-2' : 'ring-1'}
-          ${isGold ? 'ring-loot-gold' : isSilver ? 'ring-gray-300' : isBronze ? 'ring-orange-600' : 'ring-gray-700'}
-        `}>
+          relative w-16 h-16 overflow-hidden pixel-perfect
+          ${isTop3 ? 'border-3' : 'border-2'}
+          ${isGold ? 'border-loot-gold-2' : isSilver ? 'border-gray-300' : isBronze ? 'border-orange-600' : 'border-gray-pixel-0'}
+        `}
+        style={{
+          clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)'
+        }}
+        >
           <Image
             src={avatar_url}
             alt={username}
             fill
-            className="object-cover"
+            className="object-cover pixel-perfect"
           />
-          {isTop3 && (
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          )}
         </div>
 
         {/* User Info */}
