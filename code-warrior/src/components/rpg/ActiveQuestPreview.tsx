@@ -16,11 +16,11 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
     return (
       <div className="mb-6">
         <h4 className="font-pixel text-sm text-loot-gold-2 mb-3 flex items-center gap-2">
-          <Scroll className="w-4 h-4 stroke-[3px]" />
+          <PixelScroll className="text-loot-gold-2" size="sm" />
           MAIN QUEST
         </h4>
         <div className="bg-midnight-void-1 border-2 border-dashed border-gray-pixel-0 rounded-pixel-sm p-6 text-center pixel-perfect">
-          <Scroll className="w-12 h-12 text-gray-pixel-0 mx-auto mb-2 stroke-[3px]" />
+          <PixelScroll className="text-gray-pixel-0 mx-auto mb-2" size="lg" />
           <p className="text-gray-500 text-sm font-mono mb-4">No active quest</p>
           <Link href="/quests">
             <motion.button
