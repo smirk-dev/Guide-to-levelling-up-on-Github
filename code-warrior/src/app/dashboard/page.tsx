@@ -523,7 +523,7 @@ export default function DashboardPage() {
                     className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
                     style={get3DButtonStyle('gold')}
                   >
-                    <Trophy className="w-4 h-4 stroke-[3px]" />
+                    <PixelTrophy className="text-midnight-void-0" size="md" />
                     HALL OF FAME
                   </button>
                 </Link>
