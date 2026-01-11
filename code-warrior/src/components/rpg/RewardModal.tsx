@@ -121,17 +121,17 @@ export default function RewardModal({
                   className="space-y-4"
                 >
                   {/* XP Reward */}
-                  <div className="bg-midnight-void/50 border-2 border-loot-gold/30 rounded-lg p-4">
+                  <div className="bg-midnight-void-2 border-3 border-loot-gold-1 rounded-pixel-sm p-4 pixel-perfect">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Sparkles className="w-6 h-6 text-loot-gold" />
+                        <Sparkles className="w-6 h-6 text-loot-gold-2 stroke-[3px]" />
                         <span className="font-bold text-lg">Experience Points</span>
                       </div>
                       <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: [0, 1.3, 1] }}
                         transition={{ delay: 1.4, duration: 0.4 }}
-                        className="text-2xl font-pixel text-loot-gold"
+                        className="text-2xl font-pixel text-loot-gold-2 no-smooth"
                       >
                         +{xpGained} XP
                       </motion.span>
@@ -140,10 +140,10 @@ export default function RewardModal({
 
                   {/* Badge Reward */}
                   {badgeAwarded && (
-                    <div className="bg-midnight-void/50 border-2 border-mana-blue/30 rounded-lg p-4">
+                    <div className="bg-midnight-void-2 border-3 border-mana-blue-1 rounded-pixel-sm p-4 pixel-perfect">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Trophy className="w-6 h-6 text-mana-blue" />
+                          <Trophy className="w-6 h-6 text-mana-blue-2 stroke-[3px]" />
                           <span className="font-bold text-lg">New Badge Unlocked!</span>
                         </div>
                         <motion.span
@@ -164,16 +164,11 @@ export default function RewardModal({
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 1.8 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 1 }}
                   onClick={onClose}
-                  className="
-                    w-full mt-6 px-6 py-3 rounded-lg font-bold
-                    bg-gradient-to-r from-loot-gold to-yellow-600
-                    text-midnight-void
-                    hover:shadow-[0_0_20px_rgba(255,215,0,0.5)]
-                    transition-shadow
-                  "
+                  className="w-full mt-6 px-6 py-3 text-midnight-void-0 font-pixel text-sm border-4 rounded-pixel-sm pixel-perfect no-smooth"
+                  style={get3DButtonStyle('gold')}
                 >
                   CONTINUE
                 </motion.button>
