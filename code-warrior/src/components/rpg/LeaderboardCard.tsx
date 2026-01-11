@@ -55,7 +55,7 @@ export default function LeaderboardCard({ entry, isCurrentUser }: LeaderboardCar
     : 'bg-midnight-void-1';
 
   // Rank icon
-  const RankIcon = isGold ? Crown : isSilver ? Medal : isBronze ? Trophy : null;
+  const RankIconEmoji = isGold ? '👑' : isSilver ? '🥈' : isBronze ? '🥉' : null;
 
   return (
     <motion.div
