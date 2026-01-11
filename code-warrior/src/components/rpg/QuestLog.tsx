@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Scroll } from 'lucide-react';
+import { PixelScroll } from '@/components/icons/PixelIcon';
 import QuestCard from './QuestCard';
 import type { Quest, UserQuest } from '@/types/database';
 
@@ -45,11 +45,11 @@ export default function QuestLog({ quests, userQuests, onClaimQuest }: QuestLogP
           animate={{ opacity: 1, y: 0 }}
           className="inline-flex items-center gap-3 mb-4"
         >
-          <Scroll className="w-8 h-8 text-loot-gold" />
+          <PixelScroll className="text-loot-gold" size="md" />
           <h1 className="text-4xl font-pixel text-loot-gold">
             QUEST LOG
           </h1>
-          <Scroll className="w-8 h-8 text-loot-gold" />
+          <PixelScroll className="text-loot-gold" size="md" />
         </motion.div>
         <p className="text-gray-400 font-mono">
           Complete quests to gain XP and unlock badges
