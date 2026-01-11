@@ -12,7 +12,8 @@ export default function Confetti({ trigger }: ConfettiProps) {
 
   useEffect(() => {
     if (trigger) {
-      const colors = ['#ffd700', '#58a6ff', '#2ea043', '#da3633'];
+      // Pixel palette colors
+      const colors = ['var(--loot-gold-2)', 'var(--mana-blue-2)', 'var(--health-green-1)', 'var(--critical-red-1)'];
       const newParticles = Array.from({ length: 50 }, (_, i) => ({
         id: Date.now() + i,
         x: (Math.random() - 0.5) * 400,
@@ -50,8 +51,11 @@ export default function Confetti({ trigger }: ConfettiProps) {
             duration: 2,
             ease: 'easeOut',
           }}
-          className="absolute w-4 h-4 rounded-full"
-          style={{ backgroundColor: particle.color }}
+          className="absolute w-4 h-4 pixel-perfect"
+          style={{
+            backgroundColor: particle.color,
+            boxShadow: '1px 1px 0 rgba(0,0,0,0.5)'
+          }}
         />
       ))}
     </div>
