@@ -195,14 +195,15 @@ export default function RewardModal({
                         duration: 1.5,
                         delay: Math.random() * 0.5,
                       }}
-                      className="absolute w-3 h-3 rounded-full"
+                      className="absolute w-3 h-3 pixel-perfect"
                       style={{
                         backgroundColor: [
-                          '#ffd700',
-                          '#58a6ff',
-                          '#2ea043',
-                          '#da3633',
+                          'var(--loot-gold-2)',
+                          'var(--mana-blue-2)',
+                          'var(--health-green-1)',
+                          'var(--critical-red-1)',
                         ][Math.floor(Math.random() * 4)],
+                        boxShadow: '1px 1px 0 rgba(0,0,0,0.5)',
                       }}
                     />
                   ))}
