@@ -452,37 +452,43 @@ export default function DashboardPage() {
 
             <Link href="/leaderboard">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -2 }}
+                whileTap={{ y: 1 }}
                 onMouseEnter={() => soundManager.hover()}
-                className="flex items-center gap-2 px-4 py-2 bg-loot-gold/20 border border-loot-gold/50 text-loot-gold font-pixel text-xs rounded hover:bg-loot-gold/30 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+                style={get3DButtonStyle('gold')}
               >
-                <Trophy className="w-4 h-4" />
+                <Trophy className="w-4 h-4 stroke-[3px]" />
                 HALL OF FAME
               </motion.button>
             </Link>
 
-            <button
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ y: syncing ? 0 : 1 }}
               onClick={handleSync}
               onMouseEnter={() => soundManager.hover()}
               disabled={syncing}
-              className="flex items-center gap-2 px-4 py-2 bg-loot-gold text-midnight-void font-pixel text-xs rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+              style={get3DButtonStyle('gold')}
             >
-              <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 stroke-[3px] ${syncing ? 'animate-spin' : ''}`} />
               {syncing ? 'SYNCING...' : 'SYNC STATS'}
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 1 }}
               onClick={() => {
                 soundManager.click();
                 signOut({ callbackUrl: '/' });
               }}
               onMouseEnter={() => soundManager.hover()}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 font-pixel text-xs rounded hover:bg-critical-red hover:text-white transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth hover:border-critical-red-1 hover:text-critical-red-1 transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 stroke-[3px]" />
               LOGOUT
-            </button>
+            </motion.button>
           </div>
         </div>
 
