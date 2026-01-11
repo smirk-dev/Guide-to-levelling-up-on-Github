@@ -1,8 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d1117;
+  --foreground: #ededed;
+
+  /* 16-bit Pixel Art Color Palette */
+  --midnight-void-0: #000000;
+  --midnight-void-1: #0d1117;
+  --midnight-void-2: #161b22;
+  --midnight-void-3: #21262d;
+
+  --loot-gold-0: #8b7500;
+  --loot-gold-1: #b8a000;
+  --loot-gold-2: #ffd700;
+  --loot-gold-3: #ffed4e;
+  --loot-gold-4: #fffacd;
+
+  --mana-blue-0: #1e3a5f;
+  --mana-blue-1: #2e4a6f;
+  --mana-blue-2: #58a6ff;
+  --mana-blue-3: #79c0ff;
+
+  --health-green-0: #1b5e2f;
+  --health-green-1: #2ea043;
+  --health-green-2: #3fb950;
+
+  --critical-red-0: #a32828;
+  --critical-red-1: #da3633;
+
+  --gray-pixel-0: #30363d;
+  --gray-pixel-1: #484f58;
 }
 
 @theme inline {
@@ -12,15 +39,85 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Pixel-perfect rendering for all elements */
+* {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 body {
-  background: var(--background);
+  background: var(--midnight-void-1);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-fira-code), monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Pixel-perfect font rendering for retro fonts */
+.font-pixel {
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+  font-smooth: never;
+}
+
+/* Utility classes for pixel art styling */
+.pixel-border-3d-raised {
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4);
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.pixel-border-3d-pressed {
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--loot-gold-0) var(--loot-gold-4) var(--loot-gold-4) var(--loot-gold-0);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.pixel-dither-bg {
+  background-image:
+    repeating-conic-gradient(
+      var(--midnight-void-1) 0% 25%,
+      var(--midnight-void-2) 25% 50%
+    );
+  background-size: 4px 4px;
+}
+
+.pixel-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+}
+
+/* Remove backdrop blur (not pixel art style) */
+.backdrop-blur-sm,
+.backdrop-blur {
+  backdrop-filter: none !important;
+}
+
+/* Override smooth rounded corners for pixel aesthetic */
+.rounded-lg {
+  border-radius: 4px;
+}
+
+.rounded {
+  border-radius: 2px;
+}
+
+.rounded-full {
+  border-radius: 0;
+  clip-path: polygon(
+    4px 0, calc(100% - 4px) 0,
+    100% 4px, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%,
+    0 calc(100% - 4px), 0 4px
+  );
 }
