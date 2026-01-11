@@ -1,219 +1,374 @@
 'use client';
 
-import { useSession, signIn } from 'next-auth/react';
+import React from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { PixelSword, PixelStar, PixelZap, PixelGithub } from '@/components/icons/PixelIcon';
-import { soundManager } from '@/lib/sound';
+import {
+  PixelFrame,
+  PixelButton,
+  PixelBadge,
+  IconSword,
+  IconGitHub,
+  IconXP,
+  IconScroll,
+  IconBadge,
+  IconLeaderboard,
+  IconHeart,
+  IconMana,
+  IconStar,
+  IconCommit,
+  IconPullRequest,
+  IconRank,
+} from '@/components';
 
-export default function Home() {
+export default function LandingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [poweringUp, setPoweringUp] = useState(false);
 
-  useEffect(() => {
-    if (status === 'authenticated') {
+  // Redirect authenticated users to dashboard
+  React.useEffect(() => {
+    if (session) {
       router.push('/dashboard');
     }
-  }, [status, router]);
+  }, [session, router]);
+
+  const features = [
+    {
+      icon: <IconXP size={32} color="#ffd700" />,
+      title: 'EARN XP',
+      description: 'Every commit, PR, and review earns you experience points',
+    },
+    {
+      icon: <IconScroll size={32} color="#b8960f" />,
+      title: 'COMPLETE QUESTS',
+      description: 'Take on challenges to boost your stats and rewards',
+    },
+    {
+      icon: <IconBadge size={32} color="#a371f7" />,
+      title: 'COLLECT BADGES',
+      description: 'Unlock and equip badges for powerful stat boosts',
+    },
+    {
+      icon: <IconLeaderboard size={32} color="#ffd700" />,
+      title: 'CLIMB RANKS',
+      description: 'Compete on the leaderboard from C to legendary SSS rank',
+    },
+  ];
+
+  const stats = [
+    { icon: <IconHeart size={24} color="#da3633" />, label: 'HEALTH', source: 'Commits' },
+    { icon: <IconMana size={24} color="#58a6ff" />, label: 'MANA', source: 'Reviews' },
+    { icon: <IconSword size={24} color="#da3633" />, label: 'STRENGTH', source: 'PRs' },
+    { icon: <IconStar size={24} color="#ffd700" />, label: 'CHARISMA', source: 'Stars' },
+  ];
 
   const handleSignIn = () => {
-    setPoweringUp(true);
-    soundManager.syncStart();
-    setTimeout(() => {
-      signIn('github', { callbackUrl: '/dashboard' });
-    }, 1000);
+    signIn('github', { callbackUrl: '/dashboard' });
   };
 
-  if (status === 'loading' || poweringUp) {
+  if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-midnight-void flex items-center justify-center relative overflow-hidden">
-        {/* CRT Power-Up Effect */}
+      <div className="min-h-screen bg-[var(--void-darkest)] flex items-center justify-center">
         <motion.div
-          className="absolute inset-0 bg-loot-gold/10"
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={{ 
-            scaleY: [0, 1, 1],
-            opacity: [0, 0.5, 0],
-          }}
-          transition={{ 
-            duration: 1.5,
-            times: [0, 0.5, 1],
-          }}
-          style={{ transformOrigin: 'center' }}
-        />
-        
-        {/* Scanlines */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 0.7] }}
-          transition={{ duration: 1 }}
-        />
-
-        <motion.div
-          className="font-pixel text-loot-gold text-xl z-10"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         >
-          {poweringUp ? 'POWERING UP...' : 'LOADING...'}
+          <IconStar size={48} color="#ffd700" />
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-midnight-void text-white flex items-center justify-center p-8 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-20 left-20 w-64 h-64 bg-loot-gold/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-20 w-96 h-96 bg-mana-blue/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.5, 0.3, 0.5],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-starfield overflow-hidden">
+      {/* Scanline overlay */}
+      <div className="fixed inset-0 pointer-events-none bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)] z-50" />
 
-      {/* Main Content */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center">
-        {/* Title with pixel art style */}
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="font-pixel text-4xl md:text-6xl text-loot-gold mb-4 drop-shadow-lg">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+        {/* Floating pixel decorations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-[var(--gold-light)] opacity-30"
+              initial={{
+                x: Math.random() * 100 + '%',
+                y: Math.random() * 100 + '%',
+              }}
+              animate={{
+                y: ['-10%', '110%'],
+              }}
+              transition={{
+                duration: 10 + Math.random() * 10,
+                repeat: Infinity,
+                delay: Math.random() * 5,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 text-center max-w-4xl mx-auto">
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', damping: 10, delay: 0.2 }}
+            className="mb-8"
+          >
+            <IconSword size={96} color="#ffd700" className="mx-auto mb-4" />
+          </motion.div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="font-pixel-heading text-[24px] md:text-[40px] text-[var(--gold-light)] mb-4"
+          >
             CODE WARRIOR
-          </h1>
-          <p className="font-pixel text-sm md:text-base text-mana-blue mb-8">
-            TRANSFORM YOUR GITHUB INTO AN RPG
-          </p>
-        </motion.div>
+          </motion.h1>
 
-        {/* Feature cards */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          <motion.div 
-            className="relative bg-midnight-void-2 border-4 border-critical-red-1 p-8 pixel-perfect"
-            style={{
-              borderColor: 'var(--critical-red-1) var(--critical-red-0) var(--critical-red-0) var(--critical-red-1)',
-              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
-            }}
+          {/* Tagline */}
+          <motion.p
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="font-pixel text-[12px] md:text-[14px] text-[var(--gray-highlight)] mb-8 leading-relaxed"
           >
-            <div className="absolute top-2 left-2 w-2 h-2 bg-critical-red-1" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-critical-red-1" />
-            <div className="absolute bottom-2 left-2 w-2 h-2 bg-critical-red-1" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 bg-critical-red-1" />
-            
-            <PixelSword className="w-12 h-12 text-critical-red-1 mx-auto mb-4" />
-            <h3 className="font-pixel text-xs text-loot-gold mb-2">LEVEL UP</h3>
-            <p className="font-mono text-sm text-gray-400">
-              Turn commits into XP and PRs into powerful attacks
-            </p>
+            TRANSFORM YOUR GITHUB CONTRIBUTIONS<br />
+            INTO AN EPIC RPG ADVENTURE
+          </motion.p>
+
+          {/* Rank badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="flex flex-wrap justify-center gap-2 mb-12"
+          >
+            {['C', 'B', 'A', 'AA', 'AAA', 'S', 'SS', 'SSS'].map((rank, i) => (
+              <motion.div
+                key={rank}
+                whileHover={{ scale: 1.1, y: -4 }}
+                transition={{ type: 'spring', damping: 10 }}
+              >
+                <PixelBadge
+                  variant={
+                    rank === 'SSS'
+                      ? 'gold'
+                      : rank === 'SS' || rank === 'S'
+                      ? 'purple'
+                      : 'gray'
+                  }
+                  size="md"
+                >
+                  {rank}
+                </PixelBadge>
+              </motion.div>
+            ))}
           </motion.div>
 
-          <motion.div 
-            className="relative bg-midnight-void-2 border-4 border-loot-gold-2 p-8 pixel-perfect"
-            style={{
-              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
-              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
-            }}
+          {/* CTA Button */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', damping: 10, delay: 1 }}
           >
-            <div className="absolute top-2 left-2 w-2 h-2 bg-loot-gold-2" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-loot-gold-2" />
-            <div className="absolute bottom-2 left-2 w-2 h-2 bg-loot-gold-2" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 bg-loot-gold-2" />
-            
-            <PixelStar className="w-12 h-12 text-loot-gold-2 mx-auto mb-4" />
-            <h3 className="font-pixel text-xs text-loot-gold mb-2">EARN RANKS</h3>
-            <p className="font-mono text-sm text-gray-400">
-              Progress from Novice to Legendary Code Warrior
-            </p>
+            <button
+              onClick={handleSignIn}
+              className="btn-pixel btn-gold text-[12px] md:text-[14px] px-8 py-4 inline-flex items-center gap-4"
+            >
+              <IconGitHub size={24} color="#0a0a0f" />
+              SIGN IN WITH GITHUB
+            </button>
           </motion.div>
 
-          <motion.div 
-            className="relative bg-midnight-void-2 border-4 border-mana-blue-2 p-8 pixel-perfect"
-            style={{
-              borderColor: 'var(--mana-blue-3) var(--mana-blue-0) var(--mana-blue-0) var(--mana-blue-3)',
-              boxShadow: 'inset -3px -3px 0 rgba(0,0,0,0.3), 3px 3px 0 rgba(0,0,0,0.5)'
-            }}
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, 10, 0] }}
+            transition={{ opacity: { delay: 1.5 }, y: { duration: 1, repeat: Infinity } }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
           >
-            <div className="absolute top-2 left-2 w-2 h-2 bg-mana-blue-2" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-mana-blue-2" />
-            <div className="absolute bottom-2 left-2 w-2 h-2 bg-mana-blue-2" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 bg-mana-blue-2" />
-            
-            <PixelZap className="w-12 h-12 text-mana-blue-2 mx-auto mb-4" />
-            <h3 className="font-pixel text-xs text-loot-gold mb-2">COMPETE</h3>
-            <p className="font-mono text-sm text-gray-400">
-              Track your stats and compete on the leaderboard
-            </p>
+            <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+              SCROLL DOWN
+            </span>
           </motion.div>
-        </motion.div>
+        </div>
+      </section>
 
-        {/* CTA Button */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-        >
-          <motion.button
-            onClick={handleSignIn}
-            onMouseEnter={() => soundManager.hover()}
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 2 }}
-            className="flex items-center gap-3 px-8 py-4 text-midnight-void-0 font-pixel text-sm border-4 rounded-pixel-sm pixel-perfect no-smooth"
-            style={{
-              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
-              backgroundColor: 'var(--loot-gold-2)',
-              boxShadow: 'inset -4px -4px 0 rgba(0, 0, 0, 0.2), 4px 4px 0 rgba(0, 0, 0, 0.5)',
-            }}
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-[var(--void-darker)]">
+        <div className="max-w-6xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
           >
-            <PixelGithub className="w-6 h-6 text-midnight-void-0" />
-            START YOUR QUEST
-          </motion.button>
-          
-          <p className="font-mono text-xs text-gray-500 mt-4">
-            Sign in with GitHub to begin your journey
-          </p>
-        </motion.div>
+            YOUR CODING JOURNEY AWAITS
+          </motion.h2>
 
-        {/* Footer info */}
-        <motion.div
-          className="mt-16 pt-8 border-t-4 border-gray-pixel-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          <p className="font-mono text-xs text-gray-600">
-            Built with Next.js • Powered by GitHub API • Stored in Supabase
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <PixelFrame variant="stone" padding="lg" className="h-full">
+                  <div className="text-center">
+                    <div className="mb-4">{feature.icon}</div>
+                    <h3 className="font-pixel text-[12px] text-[var(--gold-light)] mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)] leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </PixelFrame>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-4 bg-tech-grid">
+        <div className="max-w-4xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--mana-light)] text-center mb-4"
+          >
+            RPG STATS SYSTEM
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center mb-12"
+          >
+            YOUR GITHUB ACTIVITY SHAPES YOUR CHARACTER
+          </motion.p>
+
+          <PixelFrame variant="mana" padding="lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {stats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="mb-2">{stat.icon}</div>
+                  <h3 className="font-pixel text-[10px] text-white mb-1">
+                    {stat.label}
+                  </h3>
+                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                    from {stat.source}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </PixelFrame>
+        </div>
+      </section>
+
+      {/* How it Works Section */}
+      <section className="py-20 px-4 bg-[var(--void-dark)]">
+        <div className="max-w-4xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
+          >
+            HOW IT WORKS
+          </motion.h2>
+
+          <div className="space-y-6">
+            {[
+              { num: '01', title: 'CONNECT GITHUB', desc: 'Sign in with your GitHub account to link your activity' },
+              { num: '02', title: 'SYNC STATS', desc: 'We analyze your commits, PRs, reviews, and stars' },
+              { num: '03', title: 'EARN XP', desc: 'Every contribution earns experience points and stats' },
+              { num: '04', title: 'LEVEL UP', desc: 'Complete quests and climb from C rank to legendary SSS' },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <PixelFrame variant="stone" padding="md">
+                  <div className="flex items-center gap-6">
+                    <div className="font-pixel-heading text-[24px] text-[var(--gold-dark)]">
+                      {step.num}
+                    </div>
+                    <div>
+                      <h3 className="font-pixel text-[12px] text-[var(--gold-light)] mb-1">
+                        {step.title}
+                      </h3>
+                      <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </div>
+                </PixelFrame>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-[var(--void-darkest)]">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <PixelFrame variant="gold" padding="lg">
+              <IconRank size={48} color="#ffd700" className="mx-auto mb-6" />
+              <h2 className="font-pixel-heading text-[14px] md:text-[18px] text-[var(--gold-light)] mb-4">
+                BEGIN YOUR QUEST
+              </h2>
+              <p className="font-pixel text-[10px] text-[var(--gray-highlight)] mb-8">
+                Join thousands of developers leveling up their coding journey
+              </p>
+              <button
+                onClick={handleSignIn}
+                className="btn-pixel btn-gold text-[12px] px-8 py-4 inline-flex items-center gap-4"
+              >
+                <IconGitHub size={20} color="#0a0a0f" />
+                START YOUR ADVENTURE
+              </button>
+            </PixelFrame>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-4 bg-[var(--void-darkest)] border-t-4 border-[var(--gray-dark)]">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="font-pixel text-[8px] text-[var(--gray-medium)]">
+            BUILT WITH ♥ FOR GITHUB WARRIORS
           </p>
-        </motion.div>
-      </div>
+          <p className="font-pixel text-[6px] text-[var(--gray-dark)] mt-2">
+            © 2024 CODE WARRIOR. ALL RIGHTS RESERVED.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
