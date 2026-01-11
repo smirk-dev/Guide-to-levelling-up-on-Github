@@ -34,7 +34,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
         
         {/* LEFT COLUMN: The Hero */}
         <motion.div
-          className="bg-gray-900/50 border-2 border-gray-800 rounded-lg p-6 backdrop-blur-sm"
+          className="bg-midnight-void-1 border-3 border-gray-pixel-0 rounded-pixel-sm p-6 pixel-perfect"
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
