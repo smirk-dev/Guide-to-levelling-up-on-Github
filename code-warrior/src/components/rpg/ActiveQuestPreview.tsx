@@ -45,7 +45,7 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
   return (
     <div className="mb-6">
       <h4 className="font-pixel text-sm text-loot-gold-2 mb-3 flex items-center gap-2">
-        <Scroll className="w-4 h-4 stroke-[3px]" />
+        <PixelScroll className="text-loot-gold-2" size="sm" />
         MAIN QUEST
       </h4>
 
