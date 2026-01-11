@@ -16,6 +16,7 @@ import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { soundManager } from '@/lib/sound';
 import Link from 'next/link';
+import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
