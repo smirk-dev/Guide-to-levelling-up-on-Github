@@ -445,7 +445,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
                 style={get3DButtonStyle('blue')}
               >
-                <Scroll className="w-4 h-4 stroke-[3px]" />
+                <PixelScroll className="text-midnight-void-0" size="md" />
                 QUESTS
               </motion.button>
             </Link>
