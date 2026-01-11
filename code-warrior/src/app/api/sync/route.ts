@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
     );
     console.log('GitHub stats calculated:', { 
       totalCommits: githubStats.totalCommits, 
-      pullRequests: githubStats.pullRequests,
-      publicRepos: githubStats.publicRepos 
+      totalPRs: githubStats.totalPRs,
+      totalRepos: githubStats.totalRepos 
     });
 
     // 4. Calculate RPG stats
