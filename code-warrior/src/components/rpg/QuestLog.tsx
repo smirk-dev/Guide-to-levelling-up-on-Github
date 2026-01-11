@@ -175,7 +175,7 @@ export default function QuestLog({ quests, userQuests, onClaimQuest }: QuestLogP
       {/* Empty State */}
       {activeQuests.length === 0 && completedQuests.length === 0 && (
         <div className="text-center py-12">
-          <Scroll className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <PixelScroll className="text-gray-600 mx-auto mb-4" size="lg" />
           <p className="text-gray-500 font-mono">No quests available yet...</p>
         </div>
       )}
