@@ -412,7 +412,7 @@ export default function DashboardPage() {
       <Confetti trigger={showConfetti} />
 
       {/* Top Action Bar - Desktop */}
-      <div className="fixed top-0 left-0 right-0 bg-gray-900/95 border-b-2 border-gray-800 backdrop-blur-sm z-50">
+      <div className="fixed top-0 left-0 right-0 bg-midnight-void-1 border-b-3 border-gray-pixel-0 z-50 pixel-perfect">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <h1 className="font-pixel text-xs md:text-sm text-loot-gold">CODE WARRIOR</h1>
           
