@@ -36,24 +36,24 @@ export default function QuestCard({ quest, userQuest, onClaim, isActive }: Quest
       <div className="flex items-start gap-4">
         {/* Quest Icon */}
         <div className={`
-          p-3 rounded-lg 
-          ${isCompleted ? 'bg-health-green/20' : 'bg-mana-blue/20'}
+          p-3 rounded-pixel border-2 pixel-perfect
+          ${isCompleted ? 'bg-midnight-void-2 border-health-green-1' : 'bg-midnight-void-2 border-mana-blue-2'}
         `}>
           {isCompleted ? (
-            <CheckCircle2 className="w-6 h-6 text-health-green" />
+            <CheckCircle2 className="w-6 h-6 text-health-green-1 stroke-[3px]" />
           ) : (
-            <Scroll className="w-6 h-6 text-mana-blue" />
+            <Scroll className="w-6 h-6 text-mana-blue-2 stroke-[3px]" />
           )}
         </div>
 
         {/* Quest Content */}
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-bold text-loot-gold">
+            <h3 className="text-lg font-bold text-loot-gold-2">
               {quest.title}
             </h3>
             {isActive && (
-              <span className="px-2 py-1 text-xs font-bold bg-loot-gold text-midnight-void rounded">
+              <span className="px-2 py-1 text-xs font-bold bg-loot-gold-2 text-midnight-void-0 rounded-pixel border border-loot-gold-1 font-pixel">
                 ACTIVE
               </span>
             )}
