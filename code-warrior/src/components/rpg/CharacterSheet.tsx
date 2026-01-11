@@ -184,14 +184,14 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
           {githubStats && (
             <div>
               <h3 className="font-pixel text-xl text-mana-blue mb-4 flex items-center gap-2">
-                <Code className="w-5 h-5" />
+                <PixelCode className="text-mana-blue" size="md" />
                 GITHUB STATS
               </h3>
               
               <div className="space-y-3">
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-loot-gold" />
+                    <PixelStar className="text-loot-gold" size="sm" />
                     <span className="text-sm text-gray-300">Stars Received</span>
                   </div>
                   <span className="font-pixel text-lg text-loot-gold">{githubStats.totalStars}</span>
@@ -199,7 +199,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <GitPullRequest className="w-4 h-4 text-critical-red" />
+                    <PixelSword className="text-critical-red" size="sm" />
                     <span className="text-sm text-gray-300">Pull Requests</span>
                   </div>
                   <span className="font-pixel text-lg text-critical-red">{githubStats.totalPRs}</span>
@@ -207,7 +207,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <GitCommit className="w-4 h-4 text-health-green" />
+                    <PixelCheckmark className="text-health-green" size="sm" />
                     <span className="text-sm text-gray-300">Commits</span>
                   </div>
                   <span className="font-pixel text-lg text-health-green">{githubStats.totalCommits}</span>
@@ -215,7 +215,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-mana-blue" />
+                    <PixelGem className="text-mana-blue" size="sm" />
                     <span className="text-sm text-gray-300">Issues Opened</span>
                   </div>
                   <span className="font-pixel text-lg text-mana-blue">{githubStats.totalIssues}</span>
@@ -223,7 +223,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-mana-blue" />
+                    <PixelGem className="text-mana-blue" size="sm" />
                     <span className="text-sm text-gray-300">Code Reviews</span>
                   </div>
                   <span className="font-pixel text-lg text-mana-blue">{githubStats.totalReviews}</span>
@@ -231,7 +231,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
 
                 <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <GitBranch className="w-4 h-4 text-loot-gold" />
+                    <PixelShield className="text-loot-gold" size="sm" />
                     <span className="text-sm text-gray-300">Public Repos</span>
                   </div>
                   <span className="font-pixel text-lg text-loot-gold">{githubStats.totalRepos}</span>
