@@ -1,133 +1,272 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
-import type { Badge } from '@/types/database';
-import { PixelGem, PixelShield } from '@/components/icons/PixelIcon';
-import { soundManager } from '@/lib/sound';
+import { PixelFrame, PixelButton, PixelBadge, PixelTooltip } from '../ui/PixelComponents';
+import { IconBadge, IconShield, IconCheck, IconLock } from '../icons/PixelIcons';
+import type { Badge, UserBadge } from '@/types/database';
 
 interface BadgeSlotProps {
-  slotNumber: number;
-  badge?: Badge | null;
-  onUnequip?: (badgeId: string) => void;
-  disabled?: boolean;
+  badge: Badge;
+  userBadge?: UserBadge | null;
+  onEquip?: () => void;
+  onUnequip?: () => void;
+  loading?: boolean;
+  className?: string;
 }
 
-export default function BadgeSlot({ slotNumber, badge, onUnequip, disabled }: BadgeSlotProps) {
-  const handleUnequip = () => {
-    if (badge && onUnequip && !disabled) {
-      soundManager.click();
-      onUnequip(badge.id);
-    }
-  };
+export const BadgeSlot: React.FC<BadgeSlotProps> = ({
+  badge,
+  userBadge,
+  onEquip,
+  onUnequip,
+  loading = false,
+  className = '',
+}) => {
+  const isOwned = !!userBadge;
+  const isEquipped = userBadge?.equipped ?? false;
+  const statBoost = badge.stat_boost as Record<string, number> | null;
 
-  // Map icon slugs to emoji/icons
-  const getIconForBadge = (iconSlug: string) => {
-    const icons: Record<string, string> = {
-      sword: '⚔️',
-      scroll: '📜',
-      shark: '🦈',
-      yolo: '🎲',
-      shield: '🛡️',
-      crown: '👑',
-      star: '⭐',
-    };
-    return icons[iconSlug] || '🏆';
-  };
-
-  // Get stat boost display text
-  const getStatBoostText = (statBoost: Record<string, number> | null) => {
+  const getBoostText = () => {
     if (!statBoost) return null;
     return Object.entries(statBoost)
-      .map(([stat, value]) => `${stat.charAt(0).toUpperCase() + stat.slice(1)} +${value}`)
+      .map(([stat, value]) => `+${value} ${stat.toUpperCase()}`)
       .join(', ');
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: slotNumber * 0.1 }}
-      className={`
-        relative aspect-square rounded-pixel border-3 pixel-perfect
-        ${badge ? 'border-loot-gold-2 bg-midnight-void-2' : 'border-dashed border-gray-pixel-0 bg-midnight-void-1'}
-        overflow-hidden group
-        ${!disabled && badge ? 'cursor-pointer hover:border-loot-gold-3' : ''}
-      `}
-      style={badge ? {
-        boxShadow: '0 0 0 1px var(--loot-gold-1), 0 0 0 2px var(--loot-gold-0)'
-      } : {}}
-      onClick={handleUnequip}
-      whileHover={badge && !disabled ? { scale: 1.05 } : {}}
-      whileTap={badge && !disabled ? { scale: 0.95 } : {}}
-      onMouseEnter={() => badge && !disabled && soundManager.hover()}
+      transition={{ duration: 0.2 }}
+      className={className}
     >
-      {badge ? (
-        <>
+      <PixelFrame
+        variant={isEquipped ? 'gold' : isOwned ? 'mana' : 'stone'}
+        padding="md"
+      >
+        <div className="relative">
           {/* Badge Icon */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              className="text-4xl"
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+          <div className="flex items-center justify-center mb-3">
+            <div
+              className={`w-16 h-16 flex items-center justify-center ${
+                isOwned ? '' : 'opacity-40 grayscale'
+              }`}
+              style={{
+                filter: isEquipped
+                  ? 'drop-shadow(0 0 8px var(--gold-light))'
+                  : undefined,
+              }}
             >
-              {getIconForBadge(badge.icon_slug)}
-            </motion.div>
+              {isOwned ? (
+                <IconBadge size={48} color={isEquipped ? '#ffd700' : '#a371f7'} />
+              ) : (
+                <IconLock size={48} color="#484848" />
+              )}
+            </div>
+
+            {/* Equipped indicator */}
+            {isEquipped && (
+              <div className="absolute top-0 right-0">
+                <PixelBadge variant="gold" size="sm">
+                  <IconShield size={10} color="#0a0a0f" />
+                </PixelBadge>
+              </div>
+            )}
           </div>
 
-          {/* Pixel Glow Effect - removed smooth blur */}
+          {/* Badge Name */}
+          <h3
+            className={`font-pixel text-[10px] text-center mb-2 ${
+              isOwned ? 'text-white' : 'text-[var(--gray-medium)]'
+            }`}
+          >
+            {badge.name}
+          </h3>
 
-          {/* Unequip Button (shows on hover) */}
-          {!disabled && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
-              className="absolute top-1 right-1 bg-critical-red-1 rounded-pixel p-1 border border-critical-red-0"
-            >
-              <span className="text-white font-bold text-sm">✕</span>
-            </motion.div>
-          )}
-
-          {/* Stat Boost Tooltip (shows on hover) */}
-          {badge.stat_boost && (
-            <div className="absolute bottom-0 left-0 right-0 bg-midnight-void-0 border-t-2 border-loot-gold-1 p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="font-pixel text-loot-gold-2 truncate">{badge.name}</div>
-              <div className="text-gray-400 text-[10px] truncate">
-                {getStatBoostText(badge.stat_boost)}
-              </div>
+          {/* Stat Boost */}
+          {statBoost && (
+            <div className="text-center mb-3">
+              <span className="font-pixel text-[7px] text-[var(--health-light)]">
+                {getBoostText()}
+              </span>
             </div>
           )}
 
-          {/* Sparkle Effect */}
-          <motion.div
-            className="absolute top-1 left-1"
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0.5, 1, 0.5],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              delay: slotNumber * 0.5,
-            }}
-          >
-            <PixelGem className="text-loot-gold-2" size="sm" />
-          </motion.div>
-        </>
-      ) : (
-        <>
-          {/* Empty Slot */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <PixelShield className="text-gray-pixel-0" size="md" />
+          {/* Status/Actions */}
+          <div className="flex justify-center">
+            {!isOwned && (
+              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+                LOCKED
+              </span>
+            )}
+            {isOwned && !isEquipped && onEquip && (
+              <PixelButton
+                variant="mana"
+                size="sm"
+                onClick={onEquip}
+                loading={loading}
+              >
+                EQUIP
+              </PixelButton>
+            )}
+            {isOwned && isEquipped && onUnequip && (
+              <PixelButton
+                variant="ghost"
+                size="sm"
+                onClick={onUnequip}
+                loading={loading}
+              >
+                UNEQUIP
+              </PixelButton>
+            )}
           </div>
 
-          {/* Slot Number */}
-          <div className="absolute bottom-2 right-2">
-            <span className="font-pixel text-xs text-gray-600">
-              {slotNumber}
-            </span>
-          </div>
-        </>
-      )}
+          {/* Earned date */}
+          {userBadge?.earned_at && (
+            <div className="text-center mt-2">
+              <span className="font-pixel text-[6px] text-[var(--gray-medium)]">
+                EARNED {new Date(userBadge.earned_at).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+        </div>
+      </PixelFrame>
     </motion.div>
   );
+};
+
+interface BadgeGridProps {
+  badges: Badge[];
+  userBadges: UserBadge[];
+  onEquipBadge: (badgeId: string) => void;
+  onUnequipBadge: (badgeId: string) => void;
+  loadingBadgeId?: string | null;
+  className?: string;
 }
+
+export const BadgeGrid: React.FC<BadgeGridProps> = ({
+  badges,
+  userBadges,
+  onEquipBadge,
+  onUnequipBadge,
+  loadingBadgeId,
+  className = '',
+}) => {
+  const getUserBadge = (badgeId: string) =>
+    userBadges.find((ub) => ub.badge_id === badgeId) || null;
+
+  // Sort: equipped first, then owned, then locked
+  const sortedBadges = [...badges].sort((a, b) => {
+    const ubA = getUserBadge(a.id);
+    const ubB = getUserBadge(b.id);
+
+    if (ubA?.equipped && !ubB?.equipped) return -1;
+    if (!ubA?.equipped && ubB?.equipped) return 1;
+    if (ubA && !ubB) return -1;
+    if (!ubA && ubB) return 1;
+    return 0;
+  });
+
+  const equippedCount = userBadges.filter((ub) => ub.equipped).length;
+  const maxEquipped = 3; // Can equip up to 3 badges
+
+  return (
+    <div className={className}>
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 md:mb-10">
+        <div className="flex items-center gap-3 md:gap-4">
+          <IconBadge size={32} color="#a371f7" />
+          <h2 className="font-pixel-heading text-[16px] md:text-[18px] text-[var(--xp-light)]">
+            BADGE ARMORY
+          </h2>
+        </div>
+        <PixelBadge variant="purple" size="md">
+          {equippedCount}/{maxEquipped} EQUIPPED
+        </PixelBadge>
+      </div>
+
+      {/* Equipped Section */}
+      <div className="mb-10 md:mb-12">
+        <h3 className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)] mb-5">
+          EQUIPPED BADGES
+        </h3>
+        <div className="grid grid-cols-3 gap-4 md:gap-6">
+          {[0, 1, 2].map((slot) => {
+            const equippedBadge = sortedBadges.find(
+              (b, i) =>
+                getUserBadge(b.id)?.equipped &&
+                userBadges.filter((ub) => ub.equipped).indexOf(getUserBadge(b.id)!) === slot
+            );
+            const badge = equippedBadge
+              ? badges.find((b) => getUserBadge(b.id)?.equipped)
+              : null;
+
+            if (equippedBadge) {
+              return (
+                <BadgeSlot
+                  key={equippedBadge.id}
+                  badge={equippedBadge}
+                  userBadge={getUserBadge(equippedBadge.id)}
+                  onUnequip={() => onUnequipBadge(equippedBadge.id)}
+                  loading={loadingBadgeId === equippedBadge.id}
+                />
+              );
+            }
+
+            return (
+              <PixelFrame key={slot} variant="stone" padding="lg">
+                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto flex items-center justify-center opacity-30">
+                  <IconShield size={48} color="#484848" />
+                </div>
+                <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] text-center mt-3">
+                  EMPTY SLOT
+                </p>
+              </PixelFrame>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* All Badges Grid */}
+      <div>
+        <h3 className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)] mb-5">
+          ALL BADGES ({userBadges.length}/{badges.length} UNLOCKED)
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+          {sortedBadges.map((badge, index) => (
+            <motion.div
+              key={badge.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <BadgeSlot
+                badge={badge}
+                userBadge={getUserBadge(badge.id)}
+                onEquip={
+                  equippedCount < maxEquipped
+                    ? () => onEquipBadge(badge.id)
+                    : undefined
+                }
+                onUnequip={() => onUnequipBadge(badge.id)}
+                loading={loadingBadgeId === badge.id}
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {badges.length === 0 && (
+          <PixelFrame variant="stone" padding="lg">
+            <div className="text-center py-8">
+              <IconBadge size={48} color="#484848" className="mx-auto mb-4" />
+              <p className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)]">
+                No badges available yet.
+              </p>
+            </div>
+          </PixelFrame>
+        )}
+      </div>
+    </div>
+  );
+};
