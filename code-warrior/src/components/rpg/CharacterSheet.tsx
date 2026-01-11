@@ -190,7 +190,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
               </h3>
               
               <div className="space-y-3">
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-loot-gold" />
                     <span className="text-sm text-gray-300">Stars Received</span>
@@ -198,7 +198,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   <span className="font-pixel text-lg text-loot-gold">{githubStats.totalStars}</span>
                 </div>
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <GitPullRequest className="w-4 h-4 text-critical-red" />
                     <span className="text-sm text-gray-300">Pull Requests</span>
@@ -206,7 +206,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   <span className="font-pixel text-lg text-critical-red">{githubStats.totalPRs}</span>
                 </div>
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <GitCommit className="w-4 h-4 text-health-green" />
                     <span className="text-sm text-gray-300">Commits</span>
@@ -214,7 +214,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   <span className="font-pixel text-lg text-health-green">{githubStats.totalCommits}</span>
                 </div>
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-mana-blue" />
                     <span className="text-sm text-gray-300">Issues Opened</span>
@@ -222,7 +222,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   <span className="font-pixel text-lg text-mana-blue">{githubStats.totalIssues}</span>
                 </div>
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-mana-blue" />
                     <span className="text-sm text-gray-300">Code Reviews</span>
@@ -230,7 +230,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   <span className="font-pixel text-lg text-mana-blue">{githubStats.totalReviews}</span>
                 </div>
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded p-3 flex justify-between items-center">
+                <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3 flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <GitBranch className="w-4 h-4 text-loot-gold" />
                     <span className="text-sm text-gray-300">Public Repos</span>
@@ -274,19 +274,19 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
           </h3>
           
           <div className="space-y-3">
-            <div className="bg-gray-800/50 border border-gray-700 rounded p-3">
+            <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3">
               <p className="text-xs text-gray-400 mb-1">Achievement Unlocked</p>
               <p className="font-mono text-sm text-loot-gold">Code Warrior Initiated</p>
             </div>
             
-            <div className="bg-gray-800/50 border border-gray-700 rounded p-3">
+            <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3">
               <p className="text-xs text-gray-400 mb-1">Last Synced</p>
               <p className="font-mono text-sm text-mana-blue">
                 {new Date(user.last_synced_at).toLocaleString()}
               </p>
             </div>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded p-3">
+            <div className="bg-midnight-void-2 border-2 border-gray-pixel-0 rounded-pixel p-3">
               <p className="text-xs text-gray-400 mb-1">Joined</p>
               <p className="font-mono text-sm text-health-green">
                 {new Date(user.created_at).toLocaleDateString()}
