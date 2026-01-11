@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Scroll, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Quest, UserQuest } from '@/types/database';
+import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 interface ActiveQuestPreviewProps {
   quest?: Quest;
@@ -14,18 +15,19 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
   if (!quest) {
     return (
       <div className="mb-6">
-        <h4 className="font-pixel text-sm text-loot-gold mb-3 flex items-center gap-2">
-          <Scroll className="w-4 h-4" />
+        <h4 className="font-pixel text-sm text-loot-gold-2 mb-3 flex items-center gap-2">
+          <Scroll className="w-4 h-4 stroke-[3px]" />
           MAIN QUEST
         </h4>
-        <div className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-6 text-center">
-          <Scroll className="w-12 h-12 text-gray-600 mx-auto mb-2" />
+        <div className="bg-midnight-void-1 border-2 border-dashed border-gray-pixel-0 rounded-pixel-sm p-6 text-center pixel-perfect">
+          <Scroll className="w-12 h-12 text-gray-pixel-0 mx-auto mb-2 stroke-[3px]" />
           <p className="text-gray-500 text-sm font-mono mb-4">No active quest</p>
           <Link href="/quests">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 rounded-lg border-2 border-mana-blue/30 bg-mana-blue/10 hover:bg-mana-blue/20 transition-colors font-mono text-sm text-mana-blue"
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 1 }}
+              className="px-4 py-2 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+              style={get3DButtonStyle('blue')}
             >
               VIEW ALL QUESTS
             </motion.button>
@@ -42,23 +44,23 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
 
   return (
     <div className="mb-6">
-      <h4 className="font-pixel text-sm text-loot-gold mb-3 flex items-center gap-2">
-        <Scroll className="w-4 h-4" />
+      <h4 className="font-pixel text-sm text-loot-gold-2 mb-3 flex items-center gap-2">
+        <Scroll className="w-4 h-4 stroke-[3px]" />
         MAIN QUEST
       </h4>
-      
+
       <motion.div
         className={`
-          border-2 rounded-lg p-4 backdrop-blur-sm
-          ${canClaim 
-            ? 'border-loot-gold bg-loot-gold/20 animate-pulse' 
-            : 'border-mana-blue/30 bg-gray-800/30'
+          border-3 rounded-pixel-sm p-4 pixel-perfect
+          ${canClaim
+            ? 'border-loot-gold-2 bg-midnight-void-2 animate-pulse'
+            : 'border-mana-blue-1 bg-midnight-void-1'
           }
         `}
         whileHover={{ scale: 1.02 }}
       >
         {/* Quest Title */}
-        <h5 className="font-bold text-lg text-loot-gold mb-2">
+        <h5 className="font-bold text-lg text-loot-gold-2 mb-2">
           {quest.title}
         </h5>
 
@@ -74,11 +76,15 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
               <span>Progress</span>
               <span>{progress} / {quest.criteria_value}</span>
             </div>
-            <div className="h-2 bg-midnight-void rounded-full overflow-hidden border border-mana-blue/30">
+            <div className="h-3 bg-midnight-void-2 rounded-pixel overflow-hidden border-2 border-mana-blue-1 pixel-perfect">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
-                className="h-full bg-gradient-to-r from-mana-blue to-loot-gold"
+                className="h-full"
+                style={{
+                  backgroundImage: 'repeating-linear-gradient(to right, var(--mana-blue-2) 0px, var(--mana-blue-2) 8px, var(--loot-gold-2) 8px, var(--loot-gold-2) 16px)',
+                  boxShadow: 'inset 0 -2px 0 var(--mana-blue-0)'
+                }}
               />
             </div>
           </div>
@@ -86,24 +92,25 @@ export default function ActiveQuestPreview({ quest, userQuest }: ActiveQuestPrev
 
         {/* Reward */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-loot-gold">
+          <span className="text-sm font-bold text-loot-gold-2">
             +{quest.xp_reward} XP
           </span>
 
           <Link href="/quests">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-3 py-1 rounded-lg border border-mana-blue/30 bg-mana-blue/10 hover:bg-mana-blue/20 transition-colors text-xs font-mono"
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 1 }}
+              className="flex items-center gap-2 px-3 py-1 text-midnight-void-0 font-pixel text-[10px] border-3 rounded-pixel pixel-perfect no-smooth"
+              style={get3DButtonStyle(canClaim ? 'gold' : 'blue')}
             >
               {canClaim ? 'CLAIM REWARD' : 'VIEW DETAILS'}
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 stroke-[3px]" />
             </motion.button>
           </Link>
         </div>
 
         {isCompleted && userQuest?.claimed_at && (
-          <div className="mt-3 pt-3 border-t border-health-green/30 text-xs text-health-green flex items-center gap-2">
+          <div className="mt-3 pt-3 border-t-2 border-health-green-1 text-xs text-health-green-1 flex items-center gap-2">
             ✓ Claimed on {new Date(userQuest.claimed_at).toLocaleDateString()}
           </div>
         )}

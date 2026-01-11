@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { get3DButtonStyle } from '@/lib/pixel-utils';
 
 interface RewardModalProps {
   isOpen: boolean;
