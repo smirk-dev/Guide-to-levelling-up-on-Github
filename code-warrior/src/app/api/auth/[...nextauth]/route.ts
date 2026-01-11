@@ -53,14 +53,16 @@ export const authOptions: NextAuthOptions = {
       // Add GitHub data to session for easier access
       if (token.sub) {
         session.user.id = token.sub;
+        console.log('[NextAuth] Session ID set to:', token.sub);
       }
       if (token.username) {
-        session.user.username = token.username;
+        (session.user as any).username = token.username;
       }
       // Pass access token to session for API calls
       if (token.accessToken) {
         (session as any).accessToken = token.accessToken;
       }
+      console.log('[NextAuth] Session callback returning:', { userId: session.user.id, username: (session.user as any).username });
       return session;
     },
     async jwt({ token, account, profile }) {
