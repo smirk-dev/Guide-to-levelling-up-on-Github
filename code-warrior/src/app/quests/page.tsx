@@ -1,150 +1,246 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import QuestLog from '@/components/rpg/QuestLog';
-import RewardModal from '@/components/rpg/RewardModal';
-import type { Quest, UserQuest } from '@/types/database';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import {
+  PageLayout,
+  QuestLog,
+  PixelFrame,
+  PixelBadge,
+  LoadingScreen,
+  Toast,
+  QuestCompleteModal,
+  FloatingXP,
+  IconScroll,
+} from '@/components';
+import { soundManager } from '@/lib/sound';
+import type { Quest, UserQuest } from '@/types/database';
+
+interface QuestsData {
+  quests: Quest[];
+  userQuests: UserQuest[];
+}
 
 export default function QuestsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [quests, setQuests] = useState<Quest[]>([]);
-  const [userQuests, setUserQuests] = useState<UserQuest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showRewardModal, setShowRewardModal] = useState(false);
-  const [rewardData, setRewardData] = useState<{
-    xpGained: number;
-    questTitle: string;
-    badgeAwarded: boolean;
-  } | null>(null);
+  const queryClient = useQueryClient();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
+  const [floatingXP, setFloatingXP] = useState<{ amount: number; key: number } | null>(null);
+  const [claimedQuest, setClaimedQuest] = useState<{ title: string; xp: number } | null>(null);
+  const [loadingQuestId, setLoadingQuestId] = useState<string | null>(null);
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
-    } else if (status === 'authenticated') {
-      loadQuests();
     }
   }, [status, router]);
 
-  const loadQuests = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/quests');
-      const data = await response.json();
+  // Fetch quests data
+  const { data, isLoading, refetch } = useQuery<QuestsData>({
+    queryKey: ['quests'],
+    queryFn: async () => {
+      const res = await fetch('/api/quests');
+      if (!res.ok) throw new Error('Failed to fetch quests');
+      return res.json();
+    },
+    enabled: status === 'authenticated',
+  });
 
-      if (response.ok) {
-        setQuests(data.quests || []);
-        setUserQuests(data.userQuests || []);
+  // Sync mutation
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/sync', { method: 'POST' });
+      if (!res.ok) throw new Error('Sync failed');
+      return res.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] });
+      soundManager.xpGain();
+
+      if (result.xpGained > 0) {
+        setFloatingXP({ amount: result.xpGained, key: Date.now() });
       }
-    } catch (error) {
-      console.error('Error loading quests:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleClaimQuest = async (questId: string) => {
-    try {
-      const quest = quests.find(q => q.id === questId);
-      if (!quest) return;
+      setToast({
+        message: 'Quest progress updated!',
+        type: 'success',
+        visible: true,
+      });
+    },
+    onError: () => {
+      soundManager.error();
+      setToast({
+        message: 'Failed to sync progress',
+        type: 'error',
+        visible: true,
+      });
+    },
+  });
 
-      const response = await fetch('/api/quests/claim', {
+  // Claim quest mutation
+  const claimMutation = useMutation({
+    mutationFn: async (questId: string) => {
+      setLoadingQuestId(questId);
+      const res = await fetch('/api/quests/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questId }),
       });
+      if (!res.ok) throw new Error('Claim failed');
+      return res.json();
+    },
+    onSuccess: (result, questId) => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] });
+      soundManager.questComplete();
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Show reward modal
-        setRewardData({
-          xpGained: data.xpGained,
-          questTitle: quest.title,
-          badgeAwarded: data.badgeAwarded || false,
-        });
-        setShowRewardModal(true);
-
-        // Reload quests to update UI
-        await loadQuests();
-      } else {
-        alert(data.error || 'Failed to claim quest');
+      const quest = data?.quests.find((q) => q.id === questId);
+      if (quest) {
+        setClaimedQuest({ title: quest.title, xp: quest.xp_reward });
+        setFloatingXP({ amount: quest.xp_reward, key: Date.now() });
       }
-    } catch (error) {
-      console.error('Error claiming quest:', error);
-      alert('Failed to claim quest');
-    }
-  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-midnight-void-0 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4 animate-bounce">📜</div>
-          <p className="text-loot-gold-2 font-pixel no-smooth">LOADING QUESTS...</p>
-        </div>
-      </div>
-    );
+      setLoadingQuestId(null);
+    },
+    onError: () => {
+      soundManager.error();
+      setToast({
+        message: 'Failed to claim quest reward',
+        type: 'error',
+        visible: true,
+      });
+      setLoadingQuestId(null);
+    },
+  });
+
+  if (status === 'loading' || isLoading) {
+    return <LoadingScreen message="LOADING QUESTS" />;
   }
 
+  if (!session || !data) {
+    return <LoadingScreen message="LOADING QUEST DATA" />;
+  }
+
+  // Calculate quest statistics
+  const totalQuests = data.quests.length;
+  const completedQuests = data.userQuests.filter((uq) => uq.status === 'COMPLETED').length;
+  const activeQuests = data.userQuests.filter((uq) => uq.status === 'ACTIVE').length;
+  const claimableQuests = data.userQuests.filter(
+    (uq) => uq.status === 'COMPLETED' && !uq.claimed_at
+  ).length;
+
   return (
-    <div className="min-h-screen bg-midnight-void-0">
-      {/* Header with navigation */}
-      <div className="border-b-3 border-loot-gold-1 bg-midnight-void-1 sticky top-0 z-10 pixel-perfect">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 1 }}
-            onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 rounded-pixel border-3 bg-midnight-void-2 border-mana-blue-1 font-mono text-sm pixel-perfect"
-            style={{
-              borderColor: 'var(--mana-blue-2) var(--mana-blue-0) var(--mana-blue-0) var(--mana-blue-2)',
-              boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
-            }}
-          >
-            ← BACK TO DASHBOARD
-          </motion.button>
+    <PageLayout
+      title="QUESTS"
+      subtitle="Complete challenges to earn XP and rewards"
+      onSync={() => syncMutation.mutate()}
+      syncing={syncMutation.isPending}
+    >
+      {/* Toast */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.visible}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
 
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 1 }}
-            onClick={async () => {
-              await fetch('/api/quests', { method: 'POST' });
-              await loadQuests();
-            }}
-            className="px-4 py-2 rounded-pixel border-3 bg-loot-gold-2 border-loot-gold-2 font-mono text-sm text-midnight-void-0 font-pixel no-smooth pixel-perfect"
-            style={{
-              borderColor: 'var(--loot-gold-4) var(--loot-gold-0) var(--loot-gold-0) var(--loot-gold-4)',
-              boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.5)'
-            }}
-          >
-            ⟳ VERIFY PROGRESS
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Quest Log */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <QuestLog
-          quests={quests}
-          userQuests={userQuests}
-          onClaimQuest={handleClaimQuest}
-        />
-      </div>
-
-      {/* Reward Modal */}
-      {rewardData && (
-        <RewardModal
-          isOpen={showRewardModal}
-          onClose={() => setShowRewardModal(false)}
-          xpGained={rewardData.xpGained}
-          questTitle={rewardData.questTitle}
-          badgeAwarded={rewardData.badgeAwarded}
+      {/* Floating XP */}
+      {floatingXP && (
+        <FloatingXP
+          key={floatingXP.key}
+          amount={floatingXP.amount}
+          x={50}
+          y={30}
+          onComplete={() => setFloatingXP(null)}
         />
       )}
-    </div>
+
+      {/* Quest Complete Modal */}
+      <QuestCompleteModal
+        isOpen={!!claimedQuest}
+        questTitle={claimedQuest?.title || ''}
+        xpReward={claimedQuest?.xp || 0}
+        onClose={() => setClaimedQuest(null)}
+      />
+
+      {/* Quest Stats Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 md:mb-12"
+      >
+        <PixelFrame variant="mana" padding="lg">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
+            <div className="text-center min-w-[80px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-white mb-2">
+                {totalQuests}
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                TOTAL QUESTS
+              </p>
+            </div>
+            <div className="text-center min-w-[80px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-[var(--mana-light)] mb-2">
+                {activeQuests}
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                IN PROGRESS
+              </p>
+            </div>
+            <div className="text-center min-w-[80px]">
+              <p className="font-pixel-heading text-[20px] md:text-[24px] text-[var(--health-light)] mb-2">
+                {completedQuests}
+              </p>
+              <p className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)]">
+                COMPLETED
+              </p>
+            </div>
+            {claimableQuests > 0 && (
+              <div className="text-center">
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                >
+                  <PixelBadge variant="gold" size="md">
+                    {claimableQuests} READY TO CLAIM!
+                  </PixelBadge>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        </PixelFrame>
+      </motion.div>
+
+      {/* Quest Log */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8"
+      >
+        <QuestLog
+          quests={data.quests}
+          userQuests={data.userQuests}
+          onClaimQuest={(questId) => claimMutation.mutate(questId)}
+          loadingQuestId={loadingQuestId}
+        />
+      </motion.div>
+
+      {/* Sync hint */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-12 text-center"
+      >
+        <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)]">
+          💡 Sync your GitHub data to update quest progress
+        </p>
+      </motion.div>
+    </PageLayout>
   );
 }
