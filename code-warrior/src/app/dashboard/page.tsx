@@ -499,7 +499,7 @@ export default function DashboardPage() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden border-t border-gray-800 bg-gray-900 overflow-hidden"
+              className="lg:hidden border-t-2 border-gray-pixel-0 bg-midnight-void-1 overflow-hidden"
             >
               <div className="p-4 space-y-2">
                 {syncMessage && (
@@ -507,17 +507,23 @@ export default function DashboardPage() {
                     {syncMessage}
                   </div>
                 )}
-                
+
                 <Link href="/quests" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full flex items-center gap-2 px-4 py-3 bg-mana-blue/20 border border-mana-blue/50 text-mana-blue font-pixel text-xs rounded">
-                    <Scroll className="w-4 h-4" />
+                  <button
+                    className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+                    style={get3DButtonStyle('blue')}
+                  >
+                    <Scroll className="w-4 h-4 stroke-[3px]" />
                     QUESTS
                   </button>
                 </Link>
 
                 <Link href="/leaderboard" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full flex items-center gap-2 px-4 py-3 bg-loot-gold/20 border border-loot-gold/50 text-loot-gold font-pixel text-xs rounded">
-                    <Trophy className="w-4 h-4" />
+                  <button
+                    className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth"
+                    style={get3DButtonStyle('gold')}
+                  >
+                    <Trophy className="w-4 h-4 stroke-[3px]" />
                     HALL OF FAME
                   </button>
                 </Link>
@@ -528,9 +534,10 @@ export default function DashboardPage() {
                     setMobileMenuOpen(false);
                   }}
                   disabled={syncing}
-                  className="w-full flex items-center gap-2 px-4 py-3 bg-loot-gold text-midnight-void font-pixel text-xs rounded disabled:opacity-50"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-midnight-void-0 font-pixel text-xs border-4 rounded-pixel-sm pixel-perfect no-smooth disabled:opacity-50"
+                  style={get3DButtonStyle('gold')}
                 >
-                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 stroke-[3px] ${syncing ? 'animate-spin' : ''}`} />
                   {syncing ? 'SYNCING...' : 'SYNC STATS'}
                 </button>
 
@@ -539,9 +546,9 @@ export default function DashboardPage() {
                     soundManager.click();
                     signOut({ callbackUrl: '/' });
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-3 bg-gray-800 text-gray-300 font-pixel text-xs rounded"
+                  className="w-full flex items-center gap-2 px-4 py-3 bg-midnight-void-2 border-3 border-gray-pixel-1 text-gray-300 font-pixel text-xs rounded-pixel-sm pixel-perfect no-smooth"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 stroke-[3px]" />
                   LOGOUT
                 </button>
               </div>
