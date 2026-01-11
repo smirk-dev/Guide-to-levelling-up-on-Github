@@ -231,7 +231,7 @@ export default function BadgesPage() {
                   animate={badge.equipped ? { rotate: [0, 5, -5, 0] } : {}}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {badge.owned ? getIconForBadge(badge.icon_slug) : <Lock className="w-16 h-16 text-gray-600 stroke-[3px]" />}
+                  {badge.owned ? getIconForBadge(badge.icon_slug) : <span className="text-4xl">🔒</span>}
                 </motion.div>
 
                 {/* Equipped Indicator */}
@@ -244,7 +244,7 @@ export default function BadgesPage() {
                       clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
                     }}
                   >
-                    <CheckCircle2 className="w-5 h-5 text-midnight-void-0 stroke-[3px]" />
+                    <PixelCheckmark className="text-midnight-void-0" size="md" />
                   </motion.div>
                 )}
 
