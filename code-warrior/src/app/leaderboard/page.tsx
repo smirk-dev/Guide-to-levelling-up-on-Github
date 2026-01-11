@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
           {/* Title with Trophy */}
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
-              <Trophy className="w-16 h-16 text-loot-gold-2 stroke-[3px]" />
+              <PixelTrophy className="text-loot-gold-2" size="lg" />
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-pixel text-loot-gold-2 no-smooth"
@@ -132,7 +132,7 @@ export default function LeaderboardPage() {
                 animate={{ opacity: 1 }}
                 className="text-center py-12"
               >
-                <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4 stroke-[3px]" />
+                <PixelTrophy className="text-gray-600 mx-auto mb-4" size="lg" />
                 <p className="text-gray-400 font-mono">
                   No warriors have claimed their place yet.
                 </p>
