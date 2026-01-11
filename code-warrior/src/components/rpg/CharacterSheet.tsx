@@ -53,7 +53,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
           <div className="mt-8">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-pixel text-xs text-loot-gold flex items-center gap-2">
-                <Star className="w-4 h-4" />
+                <PixelStar className="text-loot-gold" size="sm" />
                 EQUIPPED BADGES
               </h4>
               <Link href="/badges">
@@ -63,7 +63,6 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
                   className="flex items-center gap-1 text-xs text-mana-blue hover:text-loot-gold transition-colors"
                 >
                   View All
-                  <ArrowRight className="w-3 h-3" />
                 </motion.button>
               </Link>
             </div>
