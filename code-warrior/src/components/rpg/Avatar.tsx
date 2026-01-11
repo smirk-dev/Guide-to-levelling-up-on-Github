@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { User } from '@/types/database';
-import { Shield } from 'lucide-react';
+import { PixelShield } from '@/components/icons/PixelIcon';
 
 interface AvatarProps {
   user: User;
