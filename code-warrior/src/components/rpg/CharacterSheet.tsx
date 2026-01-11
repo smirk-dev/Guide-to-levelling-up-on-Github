@@ -114,7 +114,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             {/* Mana Bar */}
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-mana-blue" />
+                <PixelGem className="text-mana-blue" size="sm" />
                 <span className="font-pixel text-xs text-mana-blue">MANA (Reviews)</span>
               </div>
               <StatBar
@@ -128,7 +128,7 @@ export default function CharacterSheet({ user, stats, githubStats, activeQuest, 
             {/* XP Progress */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <Star className="w-4 h-4 text-loot-gold" />
+                <PixelStar className="text-loot-gold" size="sm" />
                 <span className="font-pixel text-xs text-loot-gold">EXPERIENCE</span>
               </div>
               <StatBar
