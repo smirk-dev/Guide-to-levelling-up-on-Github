@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Trophy, Crown, Medal } from 'lucide-react';
+import { PixelTrophy } from '@/components/icons/PixelIcon';
 import type { RankTier } from '@/types/database';
 import { getRankDisplayName } from '@/lib/game-logic';
 
