@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PixelFrame, PixelButton, PixelBadge, PixelProgress } from '../ui/PixelComponents';
-import { IconScroll, IconXP, IconCheck, IconClock, IconLock, IconCommit, IconPullRequest, IconIssue, IconReview, IconStar } from '../icons/PixelIcons';
+import { IconScroll, IconXP, IconCheck, IconClock, IconLock, IconCommit, IconPullRequest, IconIssue, IconReview, IconStar, IconPlus, IconMinus } from '../icons/PixelIcons';
+import { soundManager } from '@/lib/sound';
 import type { Quest, UserQuest, QuestStatus } from '@/types/database';
 
 interface QuestCardProps {
@@ -69,6 +70,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
   loading = false,
   className = '',
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const progress = userQuest?.progress ?? 0;
   const isCompleted = userQuest?.status === 'COMPLETED';
   const isActive = userQuest?.status === 'ACTIVE';
@@ -77,6 +79,11 @@ export const QuestCard: React.FC<QuestCardProps> = ({
 
   const canClaim = isCompleted && !isClaimed;
   const canStart = !userQuest || (!isActive && !isCompleted);
+
+  const handleToggleExpand = () => {
+    soundManager.click();
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <motion.div
@@ -91,35 +98,92 @@ export const QuestCard: React.FC<QuestCardProps> = ({
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             {getCriteriaIcon(quest.criteria_type)}
             <h3 className="font-pixel text-[10px] text-white">{quest.title}</h3>
           </div>
-          {getStatusBadge(userQuest?.status)}
+          <div className="flex items-center gap-2">
+            {getStatusBadge(userQuest?.status)}
+            <button
+              onClick={handleToggleExpand}
+              onMouseEnter={() => soundManager.hover()}
+              className="p-1 hover:bg-[var(--void-light)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-light)]"
+              aria-label={isExpanded ? 'Collapse' : 'Expand'}
+            >
+              {isExpanded ? (
+                <IconMinus size={12} color="#8b949e" />
+              ) : (
+                <IconPlus size={12} color="#8b949e" />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Description */}
-        <p className="font-pixel text-[8px] text-[var(--gray-highlight)] mb-4 leading-relaxed">
-          {quest.description}
-        </p>
+        {/* Description - Accordion */}
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <p className="font-pixel text-[8px] text-[var(--gray-highlight)] mb-4 leading-relaxed">
+                {quest.description}
+              </p>
+              <div className="mb-4 p-3 bg-[var(--void-darkest)] border-2 border-[var(--gray-dark)]">
+                <p className="font-pixel text-[7px] text-[var(--mana-light)] mb-1">
+                  OBJECTIVE:
+                </p>
+                <p className="font-pixel text-[8px] text-white">
+                  {quest.criteria_type.replace(/_/g, ' ').toUpperCase()}: {quest.criteria_threshold}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Progress Bar */}
         {isActive && (
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
-              <span className="font-pixel text-[6px] text-[var(--gray-light)]">
+              <span className="font-pixel text-[7px] text-[var(--gray-light)]">
                 PROGRESS
               </span>
-              <span className="font-pixel text-[6px] text-[var(--mana-light)]">
+              <span className="font-pixel text-[7px] text-[var(--mana-light)]">
                 {progress}/{quest.criteria_threshold}
               </span>
             </div>
-            <PixelProgress
-              value={progress}
-              max={quest.criteria_threshold}
-              variant="mana"
-              size="sm"
-            />
+
+            <div className="relative">
+              {/* Milestone markers */}
+              <div className="absolute top-0 h-full flex justify-between w-full pointer-events-none z-10">
+                {[25, 50, 75].map((milestone) => (
+                  <div
+                    key={milestone}
+                    className="relative h-full"
+                    style={{ left: `${milestone}%`, transform: 'translateX(-50%)' }}
+                  >
+                    <div
+                      className={`h-full w-[2px] transition-colors duration-300 ${
+                        progressPercentage >= milestone
+                          ? 'bg-[var(--mana-highlight)]'
+                          : 'bg-[var(--gray-dark)]'
+                      }`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <PixelProgress
+                value={progress}
+                max={quest.criteria_threshold}
+                variant="mana"
+                size="sm"
+                className={progressPercentage >= 90 ? 'animate-pixel-pulse' : ''}
+              />
+            </div>
           </div>
         )}
 
@@ -219,13 +283,23 @@ export const QuestLog: React.FC<QuestLogProps> = ({
 
         {quests.length === 0 && (
           <PixelFrame variant="stone" padding="lg">
-            <div className="text-center">
-              <IconScroll size={48} color="#484848" className="mx-auto mb-4" />
-              <p className="font-pixel text-[10px] text-[var(--gray-highlight)]">
-                No quests available at this time.
-              </p>
-              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mt-2">
-                Check back later for new adventures!
+            <div className="text-center py-8">
+              <motion.div
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="mb-4"
+              >
+                <IconScroll size={64} color="#484848" className="mx-auto" />
+              </motion.div>
+
+              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+                NO QUESTS AVAILABLE
+              </h3>
+              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+                The quest board is empty. Check back later for new adventures, or sync your GitHub activity to unlock quests!
               </p>
             </div>
           </PixelFrame>
