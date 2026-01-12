@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { PixelFrame, PixelButton, PixelAvatar, PixelBadge } from '../ui/PixelComponents';
+import { soundManager } from '@/lib/sound';
 import {
   IconDashboard,
   IconQuest,
@@ -29,11 +30,13 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive }) => {
   return (
     <Link href={href}>
       <div
-        className={`flex items-center gap-3 px-6 py-4 transition-all ${
+        className={`flex items-center gap-3 px-6 py-4 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--gold-light)] ${
           isActive
             ? 'bg-[var(--gold-dark)] border-l-4 border-[var(--gold-light)]'
             : 'hover:bg-[var(--void-light)] border-l-4 border-transparent'
         }`}
+        onClick={() => soundManager.click()}
+        onMouseEnter={() => soundManager.hover()}
       >
         {icon}
         <span
@@ -223,6 +226,8 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   onSync,
   syncing,
 }) => {
+  const pathname = usePathname();
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar - Desktop */}
@@ -238,7 +243,16 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           onSync={onSync}
           syncing={syncing}
         />
-        <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">{children}</div>
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto"
+        >
+          {children}
+        </motion.div>
       </main>
     </div>
   );
