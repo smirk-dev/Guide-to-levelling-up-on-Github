@@ -2,8 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { DndContext, closestCenter, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import { PixelFrame, PixelButton, PixelBadge, PixelTooltip } from '../ui/PixelComponents';
-import { IconBadge, IconShield, IconCheck, IconLock } from '../icons/PixelIcons';
+import { IconBadge, IconShield, IconCheck, IconLock, IconHeart, IconMana, IconSword, IconStar, IconReview } from '../icons/PixelIcons';
+import { soundManager } from '@/lib/sound';
 import type { Badge, UserBadge } from '@/types/database';
 
 interface BadgeSlotProps {
@@ -13,6 +15,8 @@ interface BadgeSlotProps {
   onUnequip?: () => void;
   loading?: boolean;
   className?: string;
+  draggable?: boolean;
+  isDropTarget?: boolean;
 }
 
 export const BadgeSlot: React.FC<BadgeSlotProps> = ({
@@ -22,10 +26,18 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
   onUnequip,
   loading = false,
   className = '',
+  draggable = false,
+  isDropTarget = false,
 }) => {
   const isOwned = !!userBadge;
   const isEquipped = userBadge?.equipped ?? false;
   const statBoost = badge.stat_boost as Record<string, number> | null;
+
+  const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({
+    id: `badge-${badge.id}`,
+    data: { badge, userBadge },
+    disabled: !draggable || !isOwned || loading,
+  });
 
   const getBoostText = () => {
     if (!statBoost) return null;
@@ -34,12 +46,38 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
       .join(', ');
   };
 
+  const getStatIcon = (stat: string) => {
+    switch (stat.toLowerCase()) {
+      case 'health':
+      case 'hp':
+        return <IconHeart size={12} color="#2ea043" />;
+      case 'mana':
+      case 'mp':
+        return <IconMana size={12} color="#58a6ff" />;
+      case 'strength':
+        return <IconSword size={12} color="#f85149" />;
+      case 'charisma':
+        return <IconStar size={12} color="#ffd700" />;
+      case 'wisdom':
+        return <IconReview size={12} color="#a371f7" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <motion.div
+      ref={draggable ? setDragRef : undefined}
+      {...(draggable ? attributes : {})}
+      {...(draggable ? listeners : {})}
       initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={{
+        opacity: isDragging ? 0.5 : 1,
+        scale: isDragging ? 1.05 : 1,
+      }}
       transition={{ duration: 0.2 }}
       className={className}
+      style={{ cursor: draggable && isOwned && !loading ? 'grab' : 'default' }}
     >
       <PixelFrame
         variant={isEquipped ? 'gold' : isOwned ? 'mana' : 'stone'}
@@ -86,10 +124,20 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
 
           {/* Stat Boost */}
           {statBoost && (
-            <div className="text-center mb-3">
-              <span className="font-pixel text-[7px] text-[var(--health-light)]">
-                {getBoostText()}
-              </span>
+            <div className="flex flex-wrap gap-1 justify-center mb-3">
+              {Object.entries(statBoost).map(([stat, value]) => (
+                <PixelTooltip
+                  key={stat}
+                  content={`${stat.charAt(0).toUpperCase() + stat.slice(1)} +${value}`}
+                >
+                  <PixelBadge variant="health" size="sm">
+                    <div className="flex items-center gap-1">
+                      {getStatIcon(stat)}
+                      <span className="text-[6px]">+{value}</span>
+                    </div>
+                  </PixelBadge>
+                </PixelTooltip>
+              ))}
             </div>
           )}
 
@@ -104,7 +152,10 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
               <PixelButton
                 variant="mana"
                 size="sm"
-                onClick={onEquip}
+                onClick={() => {
+                  soundManager.xpGain();
+                  onEquip();
+                }}
                 loading={loading}
               >
                 EQUIP
@@ -114,7 +165,10 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
               <PixelButton
                 variant="ghost"
                 size="sm"
-                onClick={onUnequip}
+                onClick={() => {
+                  soundManager.click();
+                  onUnequip();
+                }}
                 loading={loading}
               >
                 UNEQUIP
@@ -156,6 +210,34 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
   const getUserBadge = (badgeId: string) =>
     userBadges.find((ub) => ub.badge_id === badgeId) || null;
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      soundManager.error();
+      return;
+    }
+
+    // Extract badge info from dragged item
+    const draggedBadge = active.data.current?.badge as Badge;
+    const draggedUserBadge = active.data.current?.userBadge as UserBadge | undefined;
+
+    // Check if dropped on an equip slot
+    if (over.id.toString().startsWith('equip-slot-')) {
+      if (draggedUserBadge && !draggedUserBadge.equipped && equippedCount < maxEquipped) {
+        soundManager.xpGain();
+        onEquipBadge(draggedBadge.id);
+      } else {
+        soundManager.error();
+      }
+    }
+    // Check if dropped on unequip area
+    else if (over.id === 'unequip-area' && draggedUserBadge?.equipped) {
+      soundManager.click();
+      onUnequipBadge(draggedBadge.id);
+    }
+  };
+
   // Sort: equipped first, then owned, then locked
   const sortedBadges = [...badges].sort((a, b) => {
     const ubA = getUserBadge(a.id);
@@ -172,7 +254,8 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
   const maxEquipped = 3; // Can equip up to 3 badges
 
   return (
-    <div className={className}>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <div className={className}>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8 md:mb-10">
         <div className="flex items-center gap-3 md:gap-4">
@@ -189,10 +272,24 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
       {/* Equipped Section */}
       <div className="mb-10 md:mb-12">
         <h3 className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)] mb-5">
-          EQUIPPED BADGES
+          EQUIPPED BADGES ({equippedCount}/{maxEquipped})
         </h3>
         <div className="grid grid-cols-3 gap-4 md:gap-6">
           {[0, 1, 2].map((slot) => {
+            const EquipSlotDropzone: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+              const { setNodeRef, isOver } = useDroppable({
+                id: `equip-slot-${slot}`,
+              });
+
+              return (
+                <div
+                  ref={setNodeRef}
+                  className={`relative ${isOver ? 'ring-4 ring-[var(--gold-light)] animate-pixel-pulse' : ''}`}
+                >
+                  {children}
+                </div>
+              );
+            };
             const equippedBadge = sortedBadges.find(
               (b, i) =>
                 getUserBadge(b.id)?.equipped &&
@@ -204,25 +301,29 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
 
             if (equippedBadge) {
               return (
-                <BadgeSlot
-                  key={equippedBadge.id}
-                  badge={equippedBadge}
-                  userBadge={getUserBadge(equippedBadge.id)}
-                  onUnequip={() => onUnequipBadge(equippedBadge.id)}
-                  loading={loadingBadgeId === equippedBadge.id}
-                />
+                <EquipSlotDropzone key={equippedBadge.id}>
+                  <BadgeSlot
+                    badge={equippedBadge}
+                    userBadge={getUserBadge(equippedBadge.id)}
+                    onUnequip={() => onUnequipBadge(equippedBadge.id)}
+                    loading={loadingBadgeId === equippedBadge.id}
+                    draggable={true}
+                  />
+                </EquipSlotDropzone>
               );
             }
 
             return (
-              <PixelFrame key={slot} variant="stone" padding="lg">
-                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto flex items-center justify-center opacity-30">
-                  <IconShield size={48} color="#484848" />
-                </div>
-                <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] text-center mt-3">
-                  EMPTY SLOT
-                </p>
-              </PixelFrame>
+              <EquipSlotDropzone key={slot}>
+                <PixelFrame variant="stone" padding="lg" className="inventory-slot">
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto flex items-center justify-center opacity-30">
+                    <IconShield size={48} color="#484848" />
+                  </div>
+                  <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] text-center mt-3">
+                    DROP HERE
+                  </p>
+                </PixelFrame>
+              </EquipSlotDropzone>
             );
           })}
         </div>
@@ -251,6 +352,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
                 }
                 onUnequip={() => onUnequipBadge(badge.id)}
                 loading={loadingBadgeId === badge.id}
+                draggable={true}
               />
             </motion.div>
           ))}
@@ -259,14 +361,28 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
         {badges.length === 0 && (
           <PixelFrame variant="stone" padding="lg">
             <div className="text-center py-8">
-              <IconBadge size={48} color="#484848" className="mx-auto mb-4" />
-              <p className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)]">
-                No badges available yet.
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 10, -10, 0],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="mb-4"
+              >
+                <IconBadge size={64} color="#484848" className="mx-auto" />
+              </motion.div>
+
+              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+                NO BADGES EARNED
+              </h3>
+              <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+                Complete quests to earn badges! Each badge grants special stat boosts to power up your warrior.
               </p>
             </div>
           </PixelFrame>
         )}
       </div>
-    </div>
+      </div>
+    </DndContext>
   );
 };
