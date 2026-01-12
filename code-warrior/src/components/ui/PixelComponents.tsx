@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, type Transition } from 'framer-motion';
+import { soundManager } from '@/lib/sound';
 
 interface PixelFrameProps {
   children: React.ReactNode;
@@ -64,13 +65,36 @@ export const PixelCard: React.FC<PixelCardProps> = ({
   const hoverClass = hoverable
     ? 'cursor-pointer transition-transform hover:translate-x-[-2px] hover:translate-y-[-2px]'
     : '';
+  const focusClass = onClick
+    ? 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--gold-light)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--void-darkest)]'
+    : '';
+
+  const handleClick = () => {
+    if (onClick) {
+      soundManager.click();
+      onClick();
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (hoverable) {
+      soundManager.hover();
+    }
+  };
 
   return (
     <div
-      className={`${baseClass} ${hoverClass} ${className}`}
-      onClick={onClick}
+      className={`${baseClass} ${hoverClass} ${focusClass} ${className}`}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
       {children}
     </div>
@@ -104,12 +128,20 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
     lg: 'px-8 py-4 text-[12px]',
   };
 
+  const handleClick = () => {
+    if (onClick && !disabled && !loading) {
+      soundManager.click();
+      onClick();
+    }
+  };
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
+      onMouseEnter={() => !disabled && soundManager.hover()}
       disabled={disabled || loading}
-      className={`btn-pixel btn-${variant} ${sizeClasses[size]} ${className}`}
+      className={`btn-pixel btn-${variant} ${sizeClasses[size]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--void-darkest)] focus-visible:ring-[var(--mana-light)] ${className}`}
     >
       {loading ? (
         <span className="inline-block animate-pixel-spin">⟳</span>
@@ -392,5 +424,73 @@ export const PixelTooltip: React.FC<PixelTooltipProps> = ({
         </div>
       )}
     </div>
+  );
+};
+
+interface SkeletonCardProps {
+  variant?: 'quest' | 'badge' | 'leaderboard' | 'character';
+  className?: string;
+}
+
+export const SkeletonCard: React.FC<SkeletonCardProps> = ({
+  variant = 'quest',
+  className = '',
+}) => {
+  return (
+    <PixelFrame variant="stone" padding="lg" className={className}>
+      <div className="animate-pixel-pulse">
+        {variant === 'quest' && (
+          <>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-5 h-5 bg-[var(--gray-dark)]" />
+              <div className="h-4 bg-[var(--gray-dark)] w-3/4" />
+            </div>
+            <div className="h-3 bg-[var(--gray-dark)] w-full mb-2" />
+            <div className="h-3 bg-[var(--gray-dark)] w-5/6 mb-4" />
+            <div className="h-2 bg-[var(--gray-darkest)] w-full mb-4" />
+            <div className="flex justify-between items-center">
+              <div className="h-4 bg-[var(--gray-dark)] w-20" />
+              <div className="h-8 bg-[var(--gray-dark)] w-16" />
+            </div>
+          </>
+        )}
+        {variant === 'badge' && (
+          <>
+            <div className="w-16 h-16 bg-[var(--gray-dark)] mx-auto mb-3" />
+            <div className="h-3 bg-[var(--gray-dark)] w-3/4 mx-auto mb-2" />
+            <div className="h-2 bg-[var(--gray-dark)] w-1/2 mx-auto mb-3" />
+            <div className="h-8 bg-[var(--gray-dark)] w-full" />
+          </>
+        )}
+        {variant === 'leaderboard' && (
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-[var(--gray-dark)]" />
+            <div className="w-12 h-12 bg-[var(--gray-dark)] rounded-full" />
+            <div className="flex-1">
+              <div className="h-3 bg-[var(--gray-dark)] w-32 mb-2" />
+              <div className="h-2 bg-[var(--gray-dark)] w-24" />
+            </div>
+            <div className="h-4 bg-[var(--gray-dark)] w-20" />
+          </div>
+        )}
+        {variant === 'character' && (
+          <>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-20 h-20 bg-[var(--gray-dark)] rounded-full" />
+              <div className="flex-1">
+                <div className="h-4 bg-[var(--gray-dark)] w-32 mb-2" />
+                <div className="h-3 bg-[var(--gray-dark)] w-24" />
+              </div>
+            </div>
+            <div className="h-6 bg-[var(--gray-dark)] w-full mb-4" />
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-4 bg-[var(--gray-dark)] w-full" />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </PixelFrame>
   );
 };
