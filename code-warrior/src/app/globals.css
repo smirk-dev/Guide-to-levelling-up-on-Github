@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Pixel Cursor */
+body {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="0" y="0" width="8" height="8" fill="%23ffd700"/><rect x="2" y="2" width="4" height="4" fill="%23000"/></svg>') 8 8, auto;
+}
+
+button, a, [role="button"], .clickable {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="0" width="8" height="12" fill="%2358a6ff"/><rect x="6" y="2" width="4" height="8" fill="%23fff"/></svg>') 8 8, pointer;
+}
+
+input, textarea {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="7" y="0" width="2" height="16" fill="%23ffd700"/></svg>') 8 8, text;
+}
+
 /* ============================================
    16-BIT PIXEL ART DESIGN SYSTEM
    Code Warrior - Retro Gaming UI
@@ -706,8 +719,100 @@ body {
   51%, 100% { opacity: 0; }
 }
 
+/* Screen shake (for major achievements) */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-4px, 2px); }
+  20% { transform: translate(4px, -2px); }
+  30% { transform: translate(-4px, -2px); }
+  40% { transform: translate(4px, 2px); }
+  50% { transform: translate(-4px, -2px); }
+  60% { transform: translate(4px, 2px); }
+  70% { transform: translate(-4px, -2px); }
+  80% { transform: translate(4px, 2px); }
+  90% { transform: translate(-4px, -2px); }
+}
+
+.animate-screen-shake {
+  animation: screen-shake 0.4s steps(10) forwards;
+}
+
 .animate-blink {
   animation: blink 1s steps(1) infinite;
+}
+
+/* ==========================
+   RPG INVENTORY SYSTEM
+   ========================== */
+
+.inventory-slot {
+  background: var(--void-darkest);
+  border: 4px solid var(--gray-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  transition: all 0.2s steps(2);
+}
+
+.inventory-slot::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 2px dashed var(--gray-darkest);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.inventory-slot-occupied {
+  border-color: var(--gold-medium);
+  box-shadow:
+    inset 2px 2px 0 var(--gold-light),
+    0 0 0 2px var(--gold-dark),
+    0 4px 0 var(--gold-darkest);
+}
+
+.inventory-slot-rare {
+  border-color: var(--mana-medium);
+  box-shadow:
+    inset 2px 2px 0 var(--mana-light),
+    0 0 0 2px var(--mana-dark),
+    0 0 8px var(--mana-light);
+}
+
+.inventory-slot-epic {
+  border-color: var(--xp-medium);
+  box-shadow:
+    inset 2px 2px 0 var(--xp-light),
+    0 0 0 2px var(--xp-dark),
+    0 0 12px var(--xp-light);
+}
+
+/* ==========================
+   PERFORMANCE MODE
+   ========================== */
+
+body.performance-mode {
+  /* Disable resource-intensive effects */
+}
+
+body.performance-mode * {
+  /* Simplify animations */
+  animation-duration: 0.1s !important;
+  transition-duration: 0.1s !important;
+}
+
+body.performance-mode::before {
+  /* Disable scanline overlay */
+  display: none !important;
+}
+
+body.performance-mode .animate-pixel-pulse,
+body.performance-mode .animate-sparkle,
+body.performance-mode .pixel-avatar-glow {
+  /* Disable non-essential animations */
+  animation: none !important;
+  box-shadow: none !important;
 }
 
 /* ============================================
