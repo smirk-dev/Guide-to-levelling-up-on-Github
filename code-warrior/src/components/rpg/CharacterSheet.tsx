@@ -69,7 +69,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         <div className="flex items-center gap-4 mb-6">
           <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
           <div className="flex-1">
-            <h3 className="font-pixel text-[14px] text-white mb-1 text-outline-dark">
+            <h3 className="font-pixel text-[12px] text-white mb-1 text-outline-dark">
               {username}
             </h3>
             <div className="flex items-center gap-2 mb-2">
