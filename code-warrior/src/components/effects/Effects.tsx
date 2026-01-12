@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconXP, IconStar, IconCheck } from '../icons/PixelIcons';
+import { IconXP, IconStar, IconCheck, IconChest } from '../icons/PixelIcons';
+import { soundManager } from '@/lib/sound';
 
 interface FloatingXPProps {
   amount: number;
@@ -280,6 +281,170 @@ export const QuestCompleteModal: React.FC<QuestCompleteModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+};
+
+interface ChestOpeningModalProps {
+  isOpen: boolean;
+  questTitle: string;
+  xpReward: number;
+  onAnimationComplete: () => void;
+}
+
+export const ChestOpeningModal: React.FC<ChestOpeningModalProps> = ({
+  isOpen,
+  questTitle,
+  xpReward,
+  onAnimationComplete,
+}) => {
+  const [stage, setStage] = useState<'shake' | 'open' | 'complete'>('shake');
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStage('shake');
+      return;
+    }
+
+    // Stage 1: Shake (1 second)
+    soundManager.click();
+    const shakeTimer = setTimeout(() => {
+      setStage('open');
+    }, 1000);
+
+    // Stage 2: Open (0.5 seconds)
+    const openTimer = setTimeout(() => {
+      soundManager.questComplete();
+      setStage('complete');
+    }, 1500);
+
+    // Stage 3: Complete and trigger callback
+    const completeTimer = setTimeout(() => {
+      onAnimationComplete();
+    }, 2000);
+
+    return () => {
+      clearTimeout(shakeTimer);
+      clearTimeout(openTimer);
+      clearTimeout(completeTimer);
+    };
+  }, [isOpen, onAnimationComplete]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && stage !== 'complete' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 pointer-events-none"
+        >
+          {/* Shake Stage */}
+          {stage === 'shake' && (
+            <motion.div
+              animate={{
+                rotate: [-3, 3, -3, 3, -3, 3, 0],
+                scale: [1, 1.05, 1, 1.05, 1, 1.05, 1],
+              }}
+              transition={{ duration: 1, times: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1] }}
+            >
+              <IconChest size={128} color="#8b7000" />
+            </motion.div>
+          )}
+
+          {/* Open Stage */}
+          {stage === 'open' && (
+            <div className="relative">
+              {/* Chest bursting open */}
+              <motion.div
+                initial={{ scale: 1 }}
+                animate={{ scale: [1, 1.3, 0.8, 0] }}
+                transition={{ duration: 0.5, times: [0, 0.3, 0.7, 1] }}
+              >
+                <IconChest size={128} color="#ffd700" />
+              </motion.div>
+
+              {/* Light burst effect */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [0, 2, 3], opacity: [0, 1, 0] }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                <div
+                  className="w-32 h-32 rounded-full"
+                  style={{
+                    background:
+                      'radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%)',
+                  }}
+                />
+              </motion.div>
+
+              {/* Particle burst */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i / 12) * 360;
+                const x = Math.cos((angle * Math.PI) / 180) * 100;
+                const y = Math.sin((angle * Math.PI) / 180) * 100;
+
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ x: 0, y: 0, opacity: 1 }}
+                    animate={{ x, y, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="absolute top-1/2 left-1/2 w-3 h-3 bg-[var(--gold-light)]"
+                    style={{ marginLeft: '-6px', marginTop: '-6px' }}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+interface CRTStartupProps {
+  onComplete: () => void;
+}
+
+export const CRTStartup: React.FC<CRTStartupProps> = ({ onComplete }) => {
+  useEffect(() => {
+    soundManager.syncStart();
+    const timer = setTimeout(() => {
+      soundManager.syncComplete();
+      onComplete();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <motion.div
+      initial={{ clipPath: 'inset(50% 0)', opacity: 0 }}
+      animate={{ clipPath: 'inset(0% 0)', opacity: 1 }}
+      exit={{ clipPath: 'inset(50% 0)', opacity: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      className="fixed inset-0 bg-[var(--void-darkest)] z-50 pointer-events-none"
+    >
+      {/* Vertical scan lines */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px)',
+        }}
+      />
+
+      {/* Center glow expanding */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: [0, 2, 1], opacity: [0, 0.5, 0] }}
+        transition={{ duration: 0.8 }}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div className="w-2 h-2 bg-[var(--mana-light)] blur-xl" />
+      </motion.div>
+    </motion.div>
   );
 };
 
