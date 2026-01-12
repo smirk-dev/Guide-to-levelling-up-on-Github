@@ -23,28 +23,28 @@ const getPositionStyles = (position: number) => {
       return {
         frame: 'gold' as const,
         color: 'var(--gold-light)',
-        medal: '🥇',
+        icon: <IconTrophy size={32} color="#ffd700" />,
         glow: true,
       };
     case 2:
       return {
         frame: 'metal' as const,
         color: '#c0c0c0',
-        medal: '🥈',
+        icon: <IconTrophy size={28} color="#c0c0c0" />,
         glow: false,
       };
     case 3:
       return {
         frame: 'stone' as const,
         color: '#cd7f32',
-        medal: '🥉',
+        icon: <IconTrophy size={24} color="#cd7f32" />,
         glow: false,
       };
     default:
       return {
         frame: 'stone' as const,
         color: 'var(--gray-highlight)',
-        medal: null,
+        icon: null,
         glow: false,
       };
   }
@@ -55,7 +55,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   isCurrentUser = false,
   className = '',
 }) => {
-  const { frame, color, medal, glow } = getPositionStyles(user.position);
+  const { frame, color, icon, glow } = getPositionStyles(user.position);
   const rankName = getRankDisplayName(user.rank_tier);
 
   return (
@@ -72,10 +72,14 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         <div className="flex items-center gap-4">
           {/* Position */}
           <div
-            className="w-12 h-12 flex items-center justify-center font-pixel-heading text-[16px]"
+            className="w-12 h-12 flex items-center justify-center"
             style={{ color }}
           >
-            {medal || `#${user.position}`}
+            {icon || (
+              <span className="font-pixel-heading text-[16px]">
+                #{user.position}
+              </span>
+            )}
           </div>
 
           {/* Avatar */}
@@ -236,13 +240,23 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
         {users.length === 0 && (
           <PixelFrame variant="stone" padding="lg">
-            <div className="text-center">
-              <IconTrophy size={48} color="#484848" className="mx-auto mb-4" />
-              <p className="font-pixel text-[10px] text-[var(--gray-highlight)]">
-                No warriors on the leaderboard yet.
-              </p>
-              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mt-2">
-                Be the first to claim your glory!
+            <div className="text-center py-8">
+              <motion.div
+                animate={{
+                  y: [0, -12, 0],
+                  rotate: [0, 15, -15, 0],
+                }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="mb-4"
+              >
+                <IconTrophy size={64} color="#484848" className="mx-auto" />
+              </motion.div>
+
+              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+                LEADERBOARD EMPTY
+              </h3>
+              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+                No warriors have claimed their position yet. Be the first legendary code warrior to rise to the top!
               </p>
             </div>
           </PixelFrame>
