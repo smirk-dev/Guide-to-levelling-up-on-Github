@@ -316,6 +316,10 @@ export default function DashboardPage() {
   const claimableQuests = data.userQuests.filter(
     (uq) => uq.status === 'COMPLETED' && !uq.claimed_at
   ).length;
+  
+  // Check if user has ever synced
+  const hasNeverSynced = !user.last_synced_at;
+  const repoCount = user.github_stats?.repos ?? 0;
 
   return (
     <PageLayout
@@ -359,6 +363,31 @@ export default function DashboardPage() {
 
         {/* Right Column - Quick Stats & Active Quests */}
         <div className="w-full space-y-6">
+          {/* First Sync Banner */}
+          {hasNeverSynced && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PixelFrame variant="mana" padding="lg">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <IconSync size={28} color="#58a6ff" className="flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-pixel text-[12px] text-[var(--mana-light)] mb-1">
+                        Welcome, Warrior!
+                      </p>
+                      <p className="font-pixel text-[9px] text-[var(--gray-highlight)] leading-relaxed">
+                        Click the Sync button above to load your GitHub stats and start your adventure!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </PixelFrame>
+            </motion.div>
+          )}
+
           {/* Quick Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -401,12 +430,17 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-7 h-7 flex items-center justify-center">
                     <p className="font-pixel-heading text-[20px] text-[var(--mana-light)]">
-                      {user.github_stats?.repos ?? 0}
+                      {repoCount}
                     </p>
                   </div>
                   <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center leading-tight">
                     Repos
                   </p>
+                  {hasNeverSynced && repoCount === 0 && (
+                    <p className="font-pixel text-[7px] text-[var(--gray-medium)] text-center leading-tight">
+                      Click Sync ↑
+                    </p>
+                  )}
                 </div>
               </div>
             </PixelFrame>
