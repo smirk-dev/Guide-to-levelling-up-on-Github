@@ -1,4 +1,4 @@
-﻿-- Migration: Add github_stats column to users table
+-- Migration: Add github_stats column to users table
 -- Date: 2026-01-13
 -- Purpose: Store GitHub metrics for RPG stat calculations
 
