@@ -76,7 +76,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             style={{ color }}
           >
             {icon || (
-              <span className="font-pixel-heading text-[16px]">
+              <span className="font-pixel-heading text-[var(--font-lg)]">
                 #{user.position}
               </span>
             )}
@@ -93,7 +93,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-pixel text-[10px] text-white truncate">
+              <h3 className="font-pixel text-[var(--font-sm)] text-white truncate">
                 {user.username}
               </h3>
               {isCurrentUser && (
@@ -103,7 +103,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             <div className="flex items-center gap-2 mt-1">
               <IconRank size={12} color={color} />
               <span
-                className="font-pixel text-[8px]"
+                className="font-pixel text-[var(--font-xs)]"
                 style={{ color }}
               >
                 {rankName}
@@ -118,7 +118,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           <div className="text-right">
             <div className="flex items-center gap-1 justify-end">
               <IconXP size={14} color="#ffd700" />
-              <span className="font-pixel text-[10px] text-[var(--gold-light)]">
+              <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
                 {user.xp.toLocaleString()}
               </span>
             </div>
@@ -148,7 +148,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <IconTrophy size={32} color="#ffd700" />
-        <h2 className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
+        <h2 className="font-pixel-heading text-[var(--font-lg)] text-[var(--gold-light)]">
           LEADERBOARD
         </h2>
       </div>
@@ -173,7 +173,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 2
               </span>
             </div>
-            <span className="font-pixel text-[8px] text-[#c0c0c0]">
+            <span className="font-pixel text-[var(--font-xs)] text-[#c0c0c0]">
               {users[1]?.username}
             </span>
           </motion.div>
@@ -199,7 +199,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 1
               </span>
             </div>
-            <span className="font-pixel text-[10px] text-[var(--gold-light)]">
+            <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
               {users[0]?.username}
             </span>
           </motion.div>
@@ -221,7 +221,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 3
               </span>
             </div>
-            <span className="font-pixel text-[8px] text-[#cd7f32]">
+            <span className="font-pixel text-[var(--font-xs)] text-[#cd7f32]">
               {users[2]?.username}
             </span>
           </motion.div>
@@ -252,10 +252,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 <IconTrophy size={64} color="#484848" className="mx-auto" />
               </motion.div>
 
-              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--gray-highlight)] mb-2">
                 LEADERBOARD EMPTY
               </h3>
-              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
                 No warriors have claimed their position yet. Be the first legendary code warrior to rise to the top!
               </p>
             </div>
