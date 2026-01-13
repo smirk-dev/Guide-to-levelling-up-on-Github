@@ -299,6 +299,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
               ? badges.find((b) => getUserBadge(b.id)?.equipped)
               : null;
 
+
             if (equippedBadge) {
               return (
                 <EquipSlotDropzone key={equippedBadge.id}>
