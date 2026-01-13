@@ -1,0 +1,105 @@
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { PixelFrame, VerticalStatBar } from '../ui/PixelComponents';
+import { PixelTooltip } from '../ui/PixelComponents';
+import type { RPGStats } from '@/types/database';
+
+interface BattleStatsPanelProps {
+  stats: RPGStats;
+  className?: string;
+}
+
+const STAT_TOOLTIPS = {
+  health: 'Based on your commit activity',
+  mana: 'Based on issues and reviews',
+  strength: 'Based on your pull requests',
+  charisma: 'Based on repository stars',
+  wisdom: 'Based on community engagement',
+};
+
+export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
+  stats,
+  className = '',
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+      className={className}
+    >
+      <PixelFrame variant="stone" padding="lg">
+        <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-4 text-center">
+          Battle Stats
+        </h3>
+
+        {/* 5-column grid of vertical stat bars - classic FF style */}
+        <div className="flex justify-center items-end gap-4">
+          <PixelTooltip content={STAT_TOOLTIPS.health} position="top">
+            <VerticalStatBar
+              label="HP"
+              value={stats.health}
+              max={100}
+              variant="health"
+              height="lg"
+            />
+          </PixelTooltip>
+
+          <PixelTooltip content={STAT_TOOLTIPS.mana} position="top">
+            <VerticalStatBar
+              label="MP"
+              value={stats.mana}
+              max={100}
+              variant="mana"
+              height="lg"
+            />
+          </PixelTooltip>
+
+          <PixelTooltip content={STAT_TOOLTIPS.strength} position="top">
+            <VerticalStatBar
+              label="STR"
+              value={stats.strength}
+              max={100}
+              variant="strength"
+              height="lg"
+            />
+          </PixelTooltip>
+
+          <PixelTooltip content={STAT_TOOLTIPS.charisma} position="top">
+            <VerticalStatBar
+              label="CHA"
+              value={stats.charisma}
+              max={100}
+              variant="charisma"
+              height="lg"
+            />
+          </PixelTooltip>
+
+          <PixelTooltip content={STAT_TOOLTIPS.wisdom} position="top">
+            <VerticalStatBar
+              label="WIS"
+              value={stats.wisdom}
+              max={100}
+              variant="wisdom"
+              height="lg"
+            />
+          </PixelTooltip>
+        </div>
+
+        {/* Optional: Show total power level */}
+        <div className="mt-4 pt-4 border-t-2 border-dashed border-[var(--gray-dark)]">
+          <div className="flex justify-between items-center">
+            <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
+              Power Level
+            </span>
+            <span className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
+              {Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}
+            </span>
+          </div>
+        </div>
+      </PixelFrame>
+    </motion.div>
+  );
+};
