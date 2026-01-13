@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
               <div className="flex items-center gap-4 md:gap-5">
                 <IconRank size={36} color="#58a6ff" />
                 <div>
-                  <p className="font-pixel text-[10px] md:text-[11px] text-[var(--mana-light)] mb-1">
+                  <p className="font-pixel text-[var(--font-sm)] md:text-[11px] text-[var(--mana-light)] mb-1">
                     YOUR RANKING
                   </p>
                   <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-highlight)]">
@@ -111,7 +111,7 @@ export default function LeaderboardPage() {
         className="mb-8 md:mb-10"
       >
         <PixelFrame variant="stone" padding="lg">
-          <p className="font-pixel text-[9px] md:text-[10px] text-[var(--gray-highlight)] mb-4 text-center">
+          <p className="font-pixel text-[9px] md:text-[var(--font-sm)] text-[var(--gray-highlight)] mb-4 text-center">
             RANK DISTRIBUTION
           </p>
           <div className="flex flex-wrap justify-center gap-4 md:gap-5">
@@ -131,7 +131,7 @@ export default function LeaderboardPage() {
                 >
                   {rank}
                 </PixelBadge>
-                <p className="font-pixel text-[10px] md:text-[11px] text-white mt-2">
+                <p className="font-pixel text-[var(--font-sm)] md:text-[11px] text-white mt-2">
                   {rankCounts[rank] || 0}
                 </p>
               </div>
