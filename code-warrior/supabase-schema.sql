@@ -18,7 +18,30 @@ CREATE TABLE users (
   avatar_url TEXT,
   xp INTEGER DEFAULT 0 NOT NULL,
   rank_tier rank_tier DEFAULT 'C' NOT NULL,
-  github_stats JSONB DEFAULT '{}'::jsonb, -- Stores GitHub metrics for RPG stat calculation
+  -- Stores GitHub metrics, contributions, and calculated badges in the following structure:
+  -- {
+  --   "stars": number,
+  --   "repos": number,
+  --   "commits": number,
+  --   "prs": number,
+  --   "issues": number,
+  --   "reviews": number,
+  --   "contributions": [
+  --     {"date": "2024-01-01", "count": 5, "level": 0-4},
+  --     ...
+  --   ],
+  --   "badges": [
+  --     {
+  --       "id": "pull-shark-x1",
+  --       "name": "Pull Shark",
+  --       "tier": "x1" | "x2" | "x3" | "x4" | null,
+  --       "description": "...",
+  --       "unlockedAt": "2024-01-01T..."
+  --     },
+  --     ...
+  --   ]
+  -- }
+  github_stats JSONB DEFAULT '{"stars": 0, "repos": 0, "commits": 0, "prs": 0, "issues": 0, "reviews": 0, "contributions": [], "badges": []}'::jsonb,
   last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT NULL, -- Allow NULL for first-time users
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
