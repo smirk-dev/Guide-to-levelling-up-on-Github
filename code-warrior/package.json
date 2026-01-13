@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:types": "supabase gen types typescript --project-id $PROJECT_REF > src/types/supabase.ts",
+    "db:types": "supabase gen types typescript --project-id hrmjvfpsaadttxjjwssf > src/types/supabase.ts",
     "db:push": "supabase db push",
     "db:pull": "supabase db pull",
     "db:migration": "supabase migration new",
