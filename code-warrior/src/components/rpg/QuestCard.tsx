@@ -100,7 +100,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-2 flex-1">
             {getCriteriaIcon(quest.criteria_type)}
-            <h3 className="font-pixel text-[10px] text-white">{quest.title}</h3>
+            <h3 className="font-pixel text-[var(--font-sm)] text-white">{quest.title}</h3>
           </div>
           <div className="flex items-center gap-2">
             {getStatusBadge(userQuest?.status)}
@@ -129,14 +129,14 @@ export const QuestCard: React.FC<QuestCardProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="overflow-hidden"
             >
-              <p className="font-pixel text-[8px] text-[var(--gray-highlight)] mb-4 leading-relaxed">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-4 leading-relaxed">
                 {quest.description}
               </p>
               <div className="mb-4 p-3 bg-[var(--void-darkest)] border-2 border-[var(--gray-dark)]">
                 <p className="font-pixel text-[7px] text-[var(--mana-light)] mb-1">
                   OBJECTIVE:
                 </p>
-                <p className="font-pixel text-[8px] text-white">
+                <p className="font-pixel text-[var(--font-xs)] text-white">
                   {quest.criteria_type.replace(/_/g, ' ').toUpperCase()}: {quest.criteria_threshold}
                 </p>
               </div>
@@ -192,7 +192,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
           {/* XP Reward */}
           <div className="flex items-center gap-2">
             <IconXP size={16} color="#ffd700" />
-            <span className="font-pixel text-[10px] text-[var(--gold-light)]">
+            <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
               +{quest.xp_reward} XP
             </span>
           </div>
@@ -210,7 +210,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
               </PixelButton>
             )}
             {isClaimed && (
-              <span className="font-pixel text-[8px] text-[var(--health-light)]">
+              <span className="font-pixel text-[var(--font-xs)] text-[var(--health-light)]">
                 ✓ CLAIMED
               </span>
             )}
@@ -295,10 +295,10 @@ export const QuestLog: React.FC<QuestLogProps> = ({
                 <IconScroll size={64} color="#484848" className="mx-auto" />
               </motion.div>
 
-              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--gray-highlight)] mb-2">
                 NO QUESTS AVAILABLE
               </h3>
-              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
                 The quest board is empty. Check back later for new adventures, or sync your GitHub activity to unlock quests!
               </p>
             </div>
