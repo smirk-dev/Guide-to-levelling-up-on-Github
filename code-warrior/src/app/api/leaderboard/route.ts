@@ -27,7 +27,7 @@ export async function GET() {
     }));
 
     return NextResponse.json({
-      leaderboard: rankedUsers,
+      users: rankedUsers,
       totalUsers: rankedUsers.length,
     });
   } catch (error) {
