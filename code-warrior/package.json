@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:types": "supabase gen types typescript --project-id $PROJECT_REF > src/types/supabase.ts",
+    "db:push": "supabase db push",
+    "db:pull": "supabase db pull",
+    "db:migration": "supabase migration new",
+    "db:status": "supabase status"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
