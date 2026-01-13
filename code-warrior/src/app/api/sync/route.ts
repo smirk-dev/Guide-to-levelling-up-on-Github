@@ -160,6 +160,8 @@ export async function POST(request: NextRequest) {
           prs: githubStats.totalPRs,
           issues: githubStats.totalIssues,
           reviews: githubStats.totalReviews,
+          contributions, // Year-long contribution calendar
+          badges, // Calculated GitHub achievement badges
         },
         last_synced_at: now.toISOString(),
       })
