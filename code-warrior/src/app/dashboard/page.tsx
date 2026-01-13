@@ -212,12 +212,12 @@ export default function DashboardPage() {
 
   const user = data.user;
   const rpgStats = calculateRPGStats({
-    totalStars: 0, // We'd need GitHub stats here
-    totalRepos: 0,
-    totalCommits: 0,
-    totalPRs: 0,
-    totalIssues: 0,
-    totalReviews: 0,
+    totalStars: user.github_stats?.stars ?? 0,
+    totalRepos: user.github_stats?.repos ?? 0,
+    totalCommits: user.github_stats?.commits ?? 0,
+    totalPRs: user.github_stats?.prs ?? 0,
+    totalIssues: user.github_stats?.issues ?? 0,
+    totalReviews: user.github_stats?.reviews ?? 0,
   });
 
   // Calculate level from XP
@@ -277,7 +277,7 @@ export default function DashboardPage() {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 max-w-7xl mx-auto">
         {/* Left Column - Character Sheet */}
         <div className="lg:col-span-1 space-y-4">
           <CharacterSheet
@@ -300,25 +300,25 @@ export default function DashboardPage() {
             transition={{ delay: 0.2 }}
           >
             <PixelFrame variant="mana" padding="lg">
-              <h3 className="font-pixel text-[12px] text-[var(--mana-light)] mb-4">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--mana-light)] mb-4">
                 QUICK STATS
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 <div className="text-center">
                   <IconXP size={24} color="#ffd700" className="mx-auto mb-2" />
-                  <p className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
+                  <p className="font-pixel-heading text-[var(--font-lg)] text-[var(--gold-light)]">
                     {user.xp.toLocaleString()}
                   </p>
-                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                     TOTAL XP
                   </p>
                 </div>
                 <div className="text-center">
                   <IconScroll size={24} color="#2ea043" className="mx-auto mb-2" />
-                  <p className="font-pixel-heading text-[16px] text-[var(--health-light)]">
+                  <p className="font-pixel-heading text-[var(--font-lg)] text-[var(--health-light)]">
                     {completedQuests}
                   </p>
-                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                     QUESTS DONE
                   </p>
                 </div>
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                   <p className="font-pixel-heading text-[24px] text-white mb-2">
                     {level}
                   </p>
-                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                     LEVEL
                   </p>
                 </div>
@@ -334,7 +334,7 @@ export default function DashboardPage() {
                   <p className="font-pixel-heading text-[24px] text-[var(--gold-light)] mb-2">
                     {user.rank_tier}
                   </p>
-                  <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                     RANK
                   </p>
                 </div>
@@ -354,10 +354,10 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <IconScroll size={24} color="#ffd700" />
                     <div>
-                      <p className="font-pixel text-[10px] text-[var(--gold-light)]">
+                      <p className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
                         REWARDS AVAILABLE!
                       </p>
-                      <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                      <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)]">
                         {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready to claim
                       </p>
                     </div>
@@ -377,12 +377,12 @@ export default function DashboardPage() {
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-pixel text-[12px] text-[var(--gold-light)]">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--gold-light)]">
                 ACTIVE QUESTS
               </h3>
               <a
                 href="/quests"
-                className="font-pixel text-[8px] text-[var(--mana-light)] hover:underline"
+                className="font-pixel text-[var(--font-xs)] text-[var(--mana-light)] hover:underline"
               >
                 VIEW ALL →
               </a>
@@ -407,7 +407,7 @@ export default function DashboardPage() {
 
               {activeQuests.length === 0 && (
                 <PixelFrame variant="stone" padding="md">
-                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center">
+                  <p className="font-pixel text-[var(--font-sm)] text-[var(--gray-highlight)] text-center">
                     No active quests. Sync your GitHub to start new adventures!
                   </p>
                 </PixelFrame>
@@ -423,7 +423,7 @@ export default function DashboardPage() {
               transition={{ delay: 0.6 }}
               className="text-center"
             >
-              <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                 LAST SYNCED: {new Date(user.last_synced_at).toLocaleString()}
               </p>
             </motion.div>
