@@ -378,26 +378,31 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <PixelFrame variant="gold" padding="md">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <IconScroll size={24} color="#ffd700" />
-                      <div>
-                        <p className="font-pixel text-[11px] text-[var(--gold-light)]">
-                          Rewards Available!
-                        </p>
-                        <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
-                          {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready
-                        </p>
+                <div 
+                  className="cursor-pointer hover:scale-105 transition-transform"
+                  onClick={() => router.push('/quests')}
+                >
+                  <PixelFrame variant="gold" padding="md">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <IconScroll size={24} color="#ffd700" />
+                        <div>
+                          <p className="font-pixel text-[11px] text-[var(--gold-light)]">
+                            Rewards Available!
+                          </p>
+                          <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                            {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready
+                          </p>
+                        </div>
                       </div>
+                      <PixelBadge variant="gold">{claimableQuests}</PixelBadge>
                     </div>
-                    <PixelBadge variant="gold">{claimableQuests}</PixelBadge>
-                  </div>
-                </PixelFrame>
+                  </PixelFrame>
+                </div>
               </motion.div>
             )}
 
-            {/* Active Quests */}
+            {/* Active Quests Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -469,10 +474,41 @@ export default function DashboardPage() {
           >
             <p className="font-pixel text-[9px] text-[var(--gray-medium)]">
               Last synced: {new Date(user.last_synced_at).toLocaleString()}
-            </p>
-          </motion.div>
-        )}
-      </div>
-    </div>
-  );
-}
+             </p>
+           </motion.div>
+         )}
+
+         {/* Rank Progression Info */}
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.7 }}
+           className="mt-8"
+         >
+           <PixelFrame variant="stone" padding="md">
+             <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-3 text-center">
+               RANK PROGRESSION
+             </h3>
+             <div className="grid grid-cols-4 md:grid-cols-8 gap-2 text-center">
+               {['C', 'B', 'A', 'AA', 'AAA', 'S', 'SS', 'SSS'].map((rank, idx) => {
+                 const thresholds = [0, 1000, 3000, 6000, 10000, 15000, 25000, 50000];
+                 const isCurrent = rank === user.rank_tier;
+                 return (
+                   <div key={rank} className={`${isCurrent ? 'ring-2 ring-[var(--gold-light)] p-1' : ''}`}>
+                     <p className={`font-pixel text-[9px] ${isCurrent ? 'text-[var(--gold-light)] font-bold' : 'text-[var(--gray-medium)]'}`}>
+                       {rank}
+                     </p>
+                     <p className="font-pixel text-[7px] text-[var(--gray-darkest)]">
+                       {thresholds[idx].toLocaleString()}
+                     </p>
+                   </div>
+                 );
+               })}
+             </div>
+           </PixelFrame>
+         </motion.div>
+       </div>
+     </div>
+   );
+ }
+
