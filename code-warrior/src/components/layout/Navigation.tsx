@@ -198,8 +198,9 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-[var(--void-light)] transition-colors"
-            aria-label="Toggle menu"
+            className="md:hidden p-2 hover:bg-[var(--void-light)] transition-colors rounded min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-light)]"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
             <IconMenu size={24} color="#ffd700" />
           </button>
@@ -223,14 +224,15 @@ export const Header: React.FC<HeaderProps> = ({
               size="sm"
               onClick={onSync}
               loading={syncing}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 min-h-[44px]"
+              aria-label={syncing ? 'Syncing GitHub stats...' : 'Sync GitHub stats'}
             >
               <IconSync
                 size={14}
                 color="#fff"
                 className={syncing ? 'animate-pixel-spin' : ''}
               />
-              SYNC
+              {syncing ? 'Syncing...' : 'Sync'}
             </PixelButton>
           )}
         </div>
