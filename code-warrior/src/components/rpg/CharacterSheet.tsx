@@ -66,15 +66,17 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         </div>
 
         {/* Avatar and basic info */}
-        <div className="flex items-center gap-5 mb-8">
-          <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
-          <div className="flex-1 min-w-0">
-            <h3 className="font-pixel text-[14px] text-white mb-2 text-outline-dark truncate">
+        <div className="flex items-start gap-4 mb-8">
+          <div className="flex-shrink-0">
+            <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
+          </div>
+          <div className="flex-1 min-w-0 pt-1">
+            <h3 className="font-pixel text-[12px] text-white mb-2 text-outline-dark break-words leading-relaxed">
               {username}
             </h3>
             <div className="flex items-center gap-2 mb-2">
-              <IconRank size={18} />
-              <span className="font-pixel text-[11px] text-[var(--gold-light)] leading-tight">
+              <IconRank size={16} />
+              <span className="font-pixel text-[10px] text-[var(--gold-light)] leading-tight">
                 {rankName}
               </span>
             </div>
@@ -120,7 +122,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconHeart size={24} color="#da3633" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="HEALTH (Commits)"
+                  label="HEALTH"
                   current={stats.health}
                   max={100}
                   variant="health"
@@ -134,7 +136,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconMana size={24} color="#58a6ff" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="MANA (Issues + Reviews)"
+                  label="MANA"
                   current={stats.mana}
                   max={100}
                   variant="mana"
@@ -148,7 +150,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconSword size={24} color="#da3633" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="STRENGTH (Pull Requests)"
+                  label="STRENGTH"
                   current={stats.strength}
                   max={100}
                   variant="strength"
@@ -162,7 +164,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconStar size={24} color="#ffd700" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="CHARISMA (Stars)"
+                  label="CHARISMA"
                   current={stats.charisma}
                   max={100}
                   variant="xp"
@@ -176,7 +178,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconReview size={24} color="#a371f7" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="WISDOM (Issues + Reviews)"
+                  label="WISDOM"
                   current={stats.wisdom}
                   max={100}
                   variant="purple"
