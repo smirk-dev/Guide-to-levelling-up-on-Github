@@ -39,7 +39,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="health" size="sm">
           <span className="flex items-center gap-1">
-            <IconCheck size={10} color="#fff" /> DONE
+            <IconCheck size={10} color="#fff" /> Completed
           </span>
         </PixelBadge>
       );
@@ -47,7 +47,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="mana" size="sm">
           <span className="flex items-center gap-1">
-            <IconClock size={10} color="#fff" /> IN PROGRESS
+            <IconClock size={10} color="#fff" /> In Progress
           </span>
         </PixelBadge>
       );
@@ -55,7 +55,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="gray" size="sm">
           <span className="flex items-center gap-1">
-            <IconScroll size={10} color="#fff" /> NEW
+            <IconScroll size={10} color="#fff" /> Available
           </span>
         </PixelBadge>
       );
@@ -107,8 +107,9 @@ export const QuestCard: React.FC<QuestCardProps> = ({
             <button
               onClick={handleToggleExpand}
               onMouseEnter={() => soundManager.hover()}
-              className="p-1 hover:bg-[var(--void-light)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-light)]"
-              aria-label={isExpanded ? 'Collapse' : 'Expand'}
+              className="p-2 hover:bg-[var(--void-light)] transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-light)] min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={isExpanded ? `Collapse ${quest.title} details` : `Expand ${quest.title} details`}
+              aria-expanded={isExpanded}
             >
               {isExpanded ? (
                 <IconMinus size={12} color="#8b949e" />
@@ -134,10 +135,10 @@ export const QuestCard: React.FC<QuestCardProps> = ({
               </p>
               <div className="mb-4 p-3 bg-[var(--void-darkest)] border-2 border-[var(--gray-dark)]">
                 <p className="font-pixel text-[7px] text-[var(--mana-light)] mb-1">
-                  OBJECTIVE:
+                  Objective:
                 </p>
                 <p className="font-pixel text-[var(--font-xs)] text-white">
-                  {quest.criteria_type.replace(/_/g, ' ').toUpperCase()}: {quest.criteria_threshold}
+                  {quest.criteria_type.replace(/_/g, ' ').charAt(0).toUpperCase() + quest.criteria_type.replace(/_/g, ' ').slice(1)}: {quest.criteria_threshold}
                 </p>
               </div>
             </motion.div>
@@ -149,7 +150,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
               <span className="font-pixel text-[7px] text-[var(--gray-light)]">
-                PROGRESS
+                Progress
               </span>
               <span className="font-pixel text-[7px] text-[var(--mana-light)]">
                 {progress}/{quest.criteria_threshold}
@@ -193,7 +194,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
           <div className="flex items-center gap-2">
             <IconXP size={16} color="#ffd700" />
             <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
-              +{quest.xp_reward} XP
+              +{quest.xp_reward}
             </span>
           </div>
 
@@ -205,13 +206,14 @@ export const QuestCard: React.FC<QuestCardProps> = ({
                 size="sm"
                 onClick={onClaim}
                 loading={loading}
+                aria-label={`Claim ${quest.xp_reward} XP reward for ${quest.title}`}
               >
-                CLAIM
+                Claim Reward
               </PixelButton>
             )}
             {isClaimed && (
-              <span className="font-pixel text-[var(--font-xs)] text-[var(--health-light)]">
-                ✓ CLAIMED
+              <span className="font-pixel text-[var(--font-xs)] text-[var(--health-light)]" role="status">
+                ✓ Claimed
               </span>
             )}
           </div>
