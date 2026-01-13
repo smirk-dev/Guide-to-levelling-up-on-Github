@@ -319,7 +319,7 @@ export default function DashboardPage() {
 
   return (
     <PageLayout
-      title="DASHBOARD"
+      title="Dashboard"
       subtitle={`Welcome back, ${user.username}!`}
       onSync={() => syncMutation.mutate()}
       syncing={syncMutation.isPending}
