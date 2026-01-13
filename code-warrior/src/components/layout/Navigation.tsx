@@ -40,7 +40,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive }) => {
       >
         {icon}
         <span
-          className={`font-pixel text-[10px] ${
+          className={`font-pixel text-[var(--font-sm)] ${
             isActive ? 'text-[var(--gold-light)]' : 'text-[var(--gray-highlight)]'
           }`}
         >
@@ -83,9 +83,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   ];
 
   return (
-    <div className={`w-64 bg-[var(--void-dark)] border-r-4 border-[var(--gray-dark)] ${className}`}>
+    <div className={`w-64 h-full flex flex-col bg-[var(--void-dark)] border-r-4 border-[var(--gray-dark)] ${className}`}>
       {/* Logo */}
-      <div className="p-6 border-b-4 border-[var(--gray-dark)]">
+      <div className="flex-shrink-0 p-6 border-b-4 border-[var(--gray-dark)]">
         <Link href="/dashboard" className="flex items-center gap-3">
           <IconSword size={32} color="#ffd700" />
           <div>
@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 
       {/* User Info */}
       {session?.user && (
-        <div className="p-4 border-b-4 border-[var(--gray-dark)]">
+        <div className="flex-shrink-0 p-4 border-b-4 border-[var(--gray-dark)]">
           <div className="flex items-center gap-3">
             <PixelAvatar
               src={session.user.image}
@@ -109,10 +109,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
               size="sm"
             />
             <div className="flex-1 min-w-0">
-              <p className="font-pixel text-[10px] text-white truncate">
+              <p className="font-pixel text-[var(--font-sm)] text-white truncate">
                 {session.user.name}
               </p>
-              <p className="font-pixel text-[7px] text-[var(--gray-medium)] truncate">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] truncate">
                 @{session.user.name}
               </p>
             </div>
@@ -120,8 +120,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         </div>
       )}
 
-      {/* Navigation */}
-      <nav className="py-4">
+      {/* Navigation - scrollable */}
+      <nav className="flex-1 py-4 overflow-y-auto">
         {navItems.map((item) => (
           <NavItem
             key={item.href}
@@ -131,14 +131,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         ))}
       </nav>
 
-      {/* Actions */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t-4 border-[var(--gray-dark)]">
+      {/* Actions - always at bottom, no overlap */}
+      <div className="flex-shrink-0 p-4 border-t-4 border-[var(--gray-dark)]">
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[var(--critical-dark)] transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[var(--critical-dark)] transition-colors rounded"
         >
           <IconLogout size={20} color="#da3633" />
-          <span className="font-pixel text-[10px] text-[var(--critical-light)]">
+          <span className="font-pixel text-[var(--font-sm)] text-[var(--critical-light)]">
             LOGOUT
           </span>
         </button>
@@ -164,50 +164,85 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  return (
-    <header
-      className={`bg-[var(--void-dark)] border-b-4 border-[var(--gray-dark)] p-4 ${className}`}
-    >
-      <div className="flex items-center justify-between">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2"
-        >
-          <IconMenu size={24} />
-        </button>
+  // Close mobile menu when clicking nav items
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
-        {/* Title */}
-        <div>
-          <h1 className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)]">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="font-pixel text-[8px] text-[var(--gray-highlight)] mt-1">
-              {subtitle}
-            </p>
+  return (
+    <>
+      <header
+        className={`bg-[var(--void-dark)] border-b-4 border-[var(--gray-dark)] p-4 ${className}`}
+      >
+        <div className="flex items-center justify-between">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 hover:bg-[var(--void-light)] transition-colors"
+            aria-label="Toggle menu"
+          >
+            <IconMenu size={24} color="#ffd700" />
+          </button>
+
+          {/* Title */}
+          <div>
+            <h1 className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)]">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mt-1">
+                {subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Sync Button */}
+          {onSync && (
+            <PixelButton
+              variant="mana"
+              size="sm"
+              onClick={onSync}
+              loading={syncing}
+              className="flex items-center gap-2"
+            >
+              <IconSync
+                size={14}
+                color="#fff"
+                className={syncing ? 'animate-pixel-spin' : ''}
+              />
+              SYNC
+            </PixelButton>
           )}
         </div>
+      </header>
 
-        {/* Sync Button */}
-        {onSync && (
-          <PixelButton
-            variant="mana"
-            size="sm"
-            onClick={onSync}
-            loading={syncing}
-            className="flex items-center gap-2"
-          >
-            <IconSync
-              size={14}
-              color="#fff"
-              className={syncing ? 'animate-pixel-spin' : ''}
-            />
-            SYNC
-          </PixelButton>
-        )}
-      </div>
-    </header>
+      {/* Mobile Menu Overlay */}
+      <motion.div
+        initial={false}
+        animate={mobileMenuOpen ? { opacity: 1, pointerEvents: 'auto' as const } : { opacity: 0, pointerEvents: 'none' as const }}
+        transition={{ duration: 0.2 }}
+        onClick={() => setMobileMenuOpen(false)}
+        className="fixed inset-0 bg-black/80 z-50 md:hidden"
+      />
+
+      {/* Mobile Drawer */}
+      <motion.aside
+        initial={{ x: '-100%' }}
+        animate={{ x: mobileMenuOpen ? 0 : '-100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="fixed left-0 top-0 h-full z-50 md:hidden"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <Sidebar className="h-full overflow-y-auto" />
+      </motion.aside>
+    </>
   );
 };
 
@@ -249,7 +284,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 20 }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto"
+          className="p-4 md:p-6 lg:p-8 max-w-[1200px] mx-auto"
         >
           {children}
         </motion.div>
