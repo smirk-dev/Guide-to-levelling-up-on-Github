@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { getServiceSupabase } from '@/lib/supabase';
-import { calculateGitHubStats } from '@/lib/github';
+import { calculateGitHubStats, fetchContributionCalendar, calculateGitHubAchievements } from '@/lib/github';
 import { calculateXP, calculateRankTier } from '@/lib/game-logic';
 
 /**
@@ -123,14 +123,23 @@ export async function POST(request: NextRequest) {
 
     // 3. Fetch GitHub stats
     console.log('Fetching GitHub stats for:', user.username);
-    const githubStats = await calculateGitHubStats(
-      user.username,
-      (session as any).accessToken
-    );
-    console.log('GitHub stats calculated:', { 
-      totalCommits: githubStats.totalCommits, 
+    const accessToken = (session as any).accessToken;
+
+    // Fetch stats, contributions, and calculate achievements in parallel
+    const [githubStats, contributions] = await Promise.all([
+      calculateGitHubStats(user.username, accessToken),
+      fetchContributionCalendar(user.username, accessToken),
+    ]);
+
+    // Calculate achievements from stats
+    const badges = calculateGitHubAchievements(githubStats);
+
+    console.log('GitHub stats calculated:', {
+      totalCommits: githubStats.totalCommits,
       totalPRs: githubStats.totalPRs,
-      totalRepos: githubStats.totalRepos 
+      totalRepos: githubStats.totalRepos,
+      contributionsCount: contributions.length,
+      badgesCount: badges.length,
     });
 
     // 4. Calculate RPG stats
