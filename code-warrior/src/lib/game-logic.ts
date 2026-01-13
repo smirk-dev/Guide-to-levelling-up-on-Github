@@ -66,6 +66,23 @@ export function getXPForNextRank(currentRank: RankTier): number {
 }
 
 /**
+ * Get the next rank tier
+ */
+export function getNextRank(currentRank: RankTier): RankTier {
+  const progression: Record<RankTier, RankTier> = {
+    C: 'B',
+    B: 'A',
+    A: 'AA',
+    AA: 'AAA',
+    AAA: 'S',
+    S: 'SS',
+    SS: 'SSS',
+    SSS: 'SSS', // Max rank stays the same
+  };
+  return progression[currentRank];
+}
+
+/**
  * Calculate RPG stats from GitHub data
  * - Health (HP): Based on Commit Consistency
  * - Mana (MP): Based on Review/Issue activity
