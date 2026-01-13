@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep:*)",
       "Bash(npm run build:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm run lint)"
     ]
   }
 }
