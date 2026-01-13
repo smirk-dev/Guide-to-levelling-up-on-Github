@@ -39,7 +39,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="health" size="sm">
           <span className="flex items-center gap-1">
-            <IconCheck size={10} color="#fff" /> COMPLETED
+            <IconCheck size={10} color="#fff" /> DONE
           </span>
         </PixelBadge>
       );
@@ -47,7 +47,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="mana" size="sm">
           <span className="flex items-center gap-1">
-            <IconClock size={10} color="#fff" /> ACTIVE
+            <IconClock size={10} color="#fff" /> IN PROGRESS
           </span>
         </PixelBadge>
       );
@@ -55,7 +55,7 @@ const getStatusBadge = (status: QuestStatus | undefined) => {
       return (
         <PixelBadge variant="gray" size="sm">
           <span className="flex items-center gap-1">
-            <IconLock size={10} color="#fff" /> AVAILABLE
+            <IconScroll size={10} color="#fff" /> NEW
           </span>
         </PixelBadge>
       );
