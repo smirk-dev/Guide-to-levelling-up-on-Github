@@ -42,6 +42,93 @@ export interface GitHubAchievement {
   unlockedAt?: string;
 }
 
+// Contribution calendar day structure
+export interface ContributionDay {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4; // intensity level for heatmap coloring
+}
+
+/**
+ * Fetch user's contribution calendar for the past year using GraphQL API
+ */
+export async function fetchContributionCalendar(
+  username: string,
+  accessToken?: string
+): Promise<ContributionDay[]> {
+  if (!accessToken) {
+    console.warn('No access token provided for contribution calendar');
+    return [];
+  }
+
+  const query = `
+    query($username: String!) {
+      user(login: $username) {
+        contributionsCollection {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+                contributionLevel
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables: { username } }),
+    });
+
+    if (!response.ok) {
+      console.error('GraphQL API error:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const weeks = data.data?.user?.contributionsCollection?.contributionCalendar?.weeks || [];
+
+    // Flatten weeks into array of days
+    const contributions: ContributionDay[] = [];
+    for (const week of weeks) {
+      for (const day of week.contributionDays) {
+        contributions.push({
+          date: day.date,
+          count: day.contributionCount,
+          level: mapContributionLevel(day.contributionLevel),
+        });
+      }
+    }
+
+    return contributions;
+  } catch (error) {
+    console.error('Error fetching contribution calendar:', error);
+    return [];
+  }
+}
+
+// Map GitHub's contribution level strings to numeric values
+function mapContributionLevel(level: string): 0 | 1 | 2 | 3 | 4 {
+  switch (level) {
+    case 'NONE': return 0;
+    case 'FIRST_QUARTILE': return 1;
+    case 'SECOND_QUARTILE': return 2;
+    case 'THIRD_QUARTILE': return 3;
+    case 'FOURTH_QUARTILE': return 4;
+    default: return 0;
+  }
+}
+
 /**
  * Fetch GitHub user profile
  */
