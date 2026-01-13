@@ -69,22 +69,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) 
     {
       href: '/dashboard',
       icon: <IconDashboard size={20} color={pathname === '/dashboard' ? '#ffd700' : '#8b949e'} />,
-      label: 'DASHBOARD',
+      label: 'Dashboard',
     },
     {
       href: '/quests',
       icon: <IconQuest size={20} color={pathname === '/quests' ? '#ffd700' : '#8b949e'} />,
-      label: 'QUESTS',
+      label: 'Quests',
     },
     {
       href: '/badges',
       icon: <IconBadge size={20} color={pathname === '/badges' ? '#ffd700' : '#8b949e'} />,
-      label: 'BADGES',
+      label: 'Badges',
     },
     {
       href: '/leaderboard',
       icon: <IconLeaderboard size={20} color={pathname === '/leaderboard' ? '#ffd700' : '#8b949e'} />,
-      label: 'LEADERBOARD',
+      label: 'Leaderboard',
     },
   ];
 
@@ -142,11 +142,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) 
       <div className="flex-shrink-0 p-4 border-t-4 border-[var(--gray-dark)]">
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[var(--critical-dark)] transition-colors rounded"
+          className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[var(--critical-dark)] transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--critical-light)] min-h-[44px]"
+          aria-label="Sign out of Code Warrior"
         >
           <IconLogout size={20} color="#da3633" />
           <span className="font-pixel text-[var(--font-sm)] text-[var(--critical-light)]">
-            LOGOUT
+            Logout
           </span>
         </button>
       </div>
