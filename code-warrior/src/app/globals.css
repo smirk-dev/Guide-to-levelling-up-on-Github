@@ -172,10 +172,8 @@ body {
 
 .font-pixel {
   font-family: 'Press Start 2P', monospace;
-  text-shadow: 
-    2px 2px 0 rgba(0, 0, 0, 0.8),
-    -1px -1px 0 rgba(0, 0, 0, 0.4);
-  letter-spacing: -0.5px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.3px;
   line-height: 1.6;
 }
 
@@ -991,14 +989,41 @@ body.performance-mode .pixel-avatar-glow {
     --pixel-size: 2px;
     --pixel-border: 2px;
     --pixel-border-thick: 4px;
+
+    /* Responsive font sizes (accessible minimums) */
+    --font-xs: 10px;   /* Minimum for small labels */
+    --font-sm: 12px;   /* Body text */
+    --font-md: 14px;   /* Headings */
+    --font-lg: 16px;   /* Large headings */
+    --font-xl: 20px;   /* Hero text */
   }
-  
+
   .font-pixel {
-    font-size: 8px;
+    font-size: var(--font-sm);
   }
-  
+
   .btn-pixel {
-    padding: 8px 16px;
-    font-size: 8px;
+    padding: 10px 16px;
+    font-size: var(--font-sm);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --font-xs: 11px;
+    --font-sm: 13px;
+    --font-md: 15px;
+    --font-lg: 18px;
+    --font-xl: 22px;
+  }
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --font-xs: 12px;
+    --font-sm: 14px;
+    --font-md: 16px;
+    --font-lg: 20px;
+    --font-xl: 24px;
   }
 }
