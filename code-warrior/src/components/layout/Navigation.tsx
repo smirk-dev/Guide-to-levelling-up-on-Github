@@ -24,18 +24,23 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   isActive: boolean;
+  onNavigate?: () => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive }) => {
+const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive, onNavigate }) => {
+  const handleClick = () => {
+    soundManager.click();
+    onNavigate?.();
+  };
+
   return (
-    <Link href={href}>
+    <Link href={href} onClick={handleClick}>
       <div
         className={`flex items-center gap-3 px-6 py-4 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--gold-light)] ${
           isActive
             ? 'bg-[var(--gold-dark)] border-l-4 border-[var(--gold-light)]'
             : 'hover:bg-[var(--void-light)] border-l-4 border-transparent'
         }`}
-        onClick={() => soundManager.click()}
         onMouseEnter={() => soundManager.hover()}
       >
         {icon}
@@ -53,9 +58,10 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive }) => {
 
 interface SidebarProps {
   className?: string;
+  onNavigate?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
@@ -86,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
     <div className={`w-64 h-full flex flex-col bg-[var(--void-dark)] border-r-4 border-[var(--gray-dark)] ${className}`}>
       {/* Logo */}
       <div className="flex-shrink-0 p-6 border-b-4 border-[var(--gray-dark)]">
-        <Link href="/dashboard" className="flex items-center gap-3">
+        <Link href="/dashboard" className="flex items-center gap-3" onClick={onNavigate}>
           <IconSword size={32} color="#ffd700" />
           <div>
             <h1 className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
@@ -105,15 +111,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
           <div className="flex items-center gap-3">
             <PixelAvatar
               src={session.user.image}
-              alt={session.user.name || 'User'}
+              alt={(session.user as any).username || session.user.name || 'User'}
               size="sm"
             />
             <div className="flex-1 min-w-0">
-              <p className="font-pixel text-[var(--font-sm)] text-white truncate">
-                {session.user.name}
+              <p className="font-pixel text-[11px] text-white truncate">
+                {(session.user as any).username || session.user.name}
               </p>
-              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] truncate">
-                @{session.user.name}
+              <p className="font-pixel text-[9px] text-[var(--gray-medium)] truncate">
+                @{(session.user as any).username || session.user.name}
               </p>
             </div>
           </div>
@@ -127,6 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
             key={item.href}
             {...item}
             isActive={pathname === item.href}
+            onNavigate={onNavigate}
           />
         ))}
       </nav>
@@ -145,6 +152,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
       </div>
     </div>
   );
+};
+
+// Mobile sidebar wrapper that closes menu on navigation
+const MobileSidebar: React.FC<{ onNavigate: () => void }> = ({ onNavigate }) => {
+  return <Sidebar className="h-full overflow-y-auto" onNavigate={onNavigate} />;
 };
 
 interface HeaderProps {
@@ -238,9 +250,9 @@ export const Header: React.FC<HeaderProps> = ({
         animate={{ x: mobileMenuOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="fixed left-0 top-0 h-full z-50 md:hidden"
-        onClick={() => setMobileMenuOpen(false)}
+        onClick={(e) => e.stopPropagation()}
       >
-        <Sidebar className="h-full overflow-y-auto" />
+        <MobileSidebar onNavigate={() => setMobileMenuOpen(false)} />
       </motion.aside>
     </>
   );
