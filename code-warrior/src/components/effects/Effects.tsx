@@ -174,7 +174,7 @@ export const RankUpModal: React.FC<RankUpModalProps> = ({
               <div className="relative z-10">
                 <IconStar size={64} color="#ffd700" className="mx-auto mb-4" />
 
-                <h2 className="font-pixel-heading text-[14px] text-[var(--gold-highlight)] mb-2">
+                <h2 className="font-pixel-heading text-[var(--font-lg)] text-[var(--gold-highlight)] mb-2">
                   RANK UP!
                 </h2>
 
@@ -258,7 +258,7 @@ export const QuestCompleteModal: React.FC<QuestCompleteModalProps> = ({
                 <IconCheck size={64} color="#2ea043" className="mx-auto mb-4" />
               </motion.div>
 
-              <h2 className="font-pixel-heading text-[14px] text-[var(--health-light)] mb-4">
+              <h2 className="font-pixel-heading text-[var(--font-lg)] text-[var(--health-light)] mb-4">
                 QUEST COMPLETE!
               </h2>
 
@@ -489,7 +489,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         </div>
 
         {/* Message */}
-        <p className="font-pixel text-[12px] text-[var(--gold-light)]">
+        <p className="font-pixel text-[var(--font-md)] text-[var(--gold-light)]">
           {message}{dots}
         </p>
       </div>
