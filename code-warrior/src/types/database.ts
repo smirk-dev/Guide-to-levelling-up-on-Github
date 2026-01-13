@@ -4,6 +4,22 @@ export type RankTier = 'C' | 'B' | 'A' | 'AA' | 'AAA' | 'S' | 'SS' | 'SSS';
 export type QuestStatus = 'ACTIVE' | 'COMPLETED';
 export type CriteriaType = 'REPO_COUNT' | 'PR_MERGED' | 'STAR_COUNT' | 'COMMIT_COUNT' | 'ISSUE_COUNT' | 'REVIEW_COUNT';
 
+// Contribution day for heatmap
+export interface ContributionDay {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
+}
+
+// GitHub achievement badge structure
+export interface GitHubAchievementBadge {
+  id: string;
+  name: string;
+  tier: 'x1' | 'x2' | 'x3' | 'x4' | null; // null for non-tiered badges
+  description: string;
+  unlockedAt?: string;
+}
+
 export interface GitHubStats {
   stars: number;
   repos: number;
@@ -11,6 +27,9 @@ export interface GitHubStats {
   prs: number;
   issues: number;
   reviews: number;
+  // Extended stats for dashboard redesign
+  contributions?: ContributionDay[];
+  badges?: GitHubAchievementBadge[];
 }
 
 export interface User {
