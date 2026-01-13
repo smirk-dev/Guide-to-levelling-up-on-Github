@@ -367,7 +367,7 @@ export default function DashboardPage() {
           >
             <PixelFrame variant="mana" padding="lg">
               <h3 className="font-pixel text-[var(--font-md)] text-[var(--mana-light)] mb-6">
-                QUICK STATS
+                Quick Stats
               </h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="flex flex-col items-center gap-2">
@@ -375,8 +375,8 @@ export default function DashboardPage() {
                   <p className="font-pixel-heading text-[20px] text-[var(--gold-light)] leading-tight">
                     {user.xp.toLocaleString()}
                   </p>
-                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
-                    TOTAL XP
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center leading-tight">
+                    Total XP
                   </p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
@@ -384,8 +384,8 @@ export default function DashboardPage() {
                   <p className="font-pixel-heading text-[20px] text-[var(--health-light)] leading-tight">
                     {completedQuests}
                   </p>
-                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
-                    QUESTS DONE
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center leading-tight">
+                    Completed
                   </p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
@@ -394,8 +394,8 @@ export default function DashboardPage() {
                       {level}
                     </p>
                   </div>
-                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
-                    LEVEL
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center leading-tight">
+                    Level
                   </p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
@@ -404,8 +404,8 @@ export default function DashboardPage() {
                       {user.github_stats?.repos ?? 0}
                     </p>
                   </div>
-                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
-                    REPOS
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center leading-tight">
+                    Repos
                   </p>
                 </div>
               </div>
@@ -425,7 +425,7 @@ export default function DashboardPage() {
                     <IconScroll size={28} color="#ffd700" className="flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-pixel text-[12px] text-[var(--gold-light)] mb-1">
-                        REWARDS AVAILABLE!
+                        Rewards Available!
                       </p>
                       <p className="font-pixel text-[10px] text-[var(--gray-highlight)] leading-tight">
                         {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready to claim
@@ -440,7 +440,7 @@ export default function DashboardPage() {
             </motion.div>
           )}
 
-          {/* Active Quests Preview */}
+          {/* Available Quests Preview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -448,7 +448,7 @@ export default function DashboardPage() {
           >
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-pixel text-[14px] text-[var(--gold-light)]">
-                ACTIVE QUESTS
+                Available Quests
               </h3>
               <a
                 href="/quests"
@@ -477,9 +477,14 @@ export default function DashboardPage() {
 
               {activeQuests.length === 0 && (
                 <PixelFrame variant="stone" padding="lg">
-                  <p className="font-pixel text-[11px] text-[var(--gray-highlight)] text-center leading-relaxed">
-                    No active quests. Sync your GitHub to start new adventures!
-                  </p>
+                  <div className="text-center py-4">
+                    <p className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-3 leading-relaxed">
+                      No quests available yet
+                    </p>
+                    <p className="font-pixel text-[9px] text-[var(--gray-medium)] leading-relaxed">
+                      Click SYNC above to load quests from your GitHub activity
+                    </p>
+                  </div>
                 </PixelFrame>
               )}
             </div>
@@ -494,7 +499,7 @@ export default function DashboardPage() {
               className="text-center mt-6"
             >
               <p className="font-pixel text-[10px] text-[var(--gray-medium)] leading-tight">
-                LAST SYNCED: {formatLastSynced(user.last_synced_at)}
+                Last synced: {formatLastSynced(user.last_synced_at)}
               </p>
             </motion.div>
           )}
