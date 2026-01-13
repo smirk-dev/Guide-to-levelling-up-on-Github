@@ -34,13 +34,22 @@ export interface GitHubStats {
   totalReviews: number;
 }
 
-// GitHub Achievement badge structure
+// GitHub Achievement badge structure (used internally)
 export interface GitHubAchievement {
+  id: string;
   name: string;
-  tier?: string; // 'x1', 'x2', 'x3', 'x4' for tiered achievements
-  iconUrl: string;
+  tier: 'x1' | 'x2' | 'x3' | 'x4' | null; // null for non-tiered badges
+  description: string;
   unlockedAt?: string;
 }
+
+// Badge criteria thresholds based on GitHub's actual achievement system
+const BADGE_CRITERIA = {
+  PULL_SHARK: { thresholds: [2, 16, 128, 512], stat: 'prs' as const },
+  STARSTRUCK: { thresholds: [16, 128, 512, 4096], stat: 'stars' as const },
+  GALAXY_BRAIN: { thresholds: [2, 8, 16, 32], stat: 'reviews' as const }, // Using reviews as proxy for discussion answers
+  YOLO: { threshold: 1, stat: 'prs' as const }, // Single PR merged (simplified)
+} as const;
 
 // Contribution calendar day structure
 export interface ContributionDay {
@@ -347,52 +356,91 @@ export async function calculateGitHubStats(
 }
 
 /**
- * Fetch user's GitHub achievement badges
- * Note: GitHub doesn't provide a public API for achievements yet,
- * so we'll need to scrape the profile page or use a proxy service
+ * Calculate GitHub achievement badges from stats
+ * Since GitHub doesn't expose achievements via API, we calculate them locally
+ * based on known criteria thresholds.
  */
-export async function fetchGitHubAchievements(
-  username: string,
-  accessToken?: string
-): Promise<GitHubAchievement[]> {
-  try {
-    // For now, return empty array as GitHub doesn't expose achievements via API
-    // In the future, we can:
-    // 1. Scrape from profile page (https://github.com/username?tab=achievements)
-    // 2. Use a third-party service that extracts this data
-    // 3. Wait for GitHub to add this to their API
+export function calculateGitHubAchievements(stats: GitHubStats): GitHubAchievement[] {
+  const achievements: GitHubAchievement[] = [];
+  const now = new Date().toISOString();
 
-    // Placeholder: return common achievements based on stats
-    const stats = await calculateGitHubStats(username, accessToken);
-    const achievements: GitHubAchievement[] = [];
+  // Helper to determine tier based on thresholds
+  const getTier = (value: number, thresholds: readonly number[]): 'x1' | 'x2' | 'x3' | 'x4' | null => {
+    if (value >= thresholds[3]) return 'x4';
+    if (value >= thresholds[2]) return 'x3';
+    if (value >= thresholds[1]) return 'x2';
+    if (value >= thresholds[0]) return 'x1';
+    return null;
+  };
 
-    // Generate achievements based on stats (simplified version)
-    if (stats.totalPRs >= 1) {
-      achievements.push({
-        name: 'Pull Shark',
-        tier: stats.totalPRs >= 128 ? 'x4' : stats.totalPRs >= 64 ? 'x3' : stats.totalPRs >= 16 ? 'x2' : 'x1',
-        iconUrl: '/achievements/pull-shark.png',
-      });
-    }
-
-    if (stats.totalRepos >= 1) {
-      achievements.push({
-        name: 'Quickdraw',
-        tier: stats.totalRepos >= 32 ? 'x4' : stats.totalRepos >= 16 ? 'x3' : stats.totalRepos >= 8 ? 'x2' : 'x1',
-        iconUrl: '/achievements/quickdraw.png',
-      });
-    }
-
-    if (stats.totalIssues + stats.totalPRs >= 1) {
-      achievements.push({
-        name: 'YOLO',
-        iconUrl: '/achievements/yolo.png',
-      });
-    }
-
-    return achievements;
-  } catch (error) {
-    console.error('Error fetching achievements:', error);
-    return [];
+  // Pull Shark - Based on merged PRs
+  const pullSharkTier = getTier(stats.totalPRs, BADGE_CRITERIA.PULL_SHARK.thresholds);
+  if (pullSharkTier) {
+    achievements.push({
+      id: `pull-shark-${pullSharkTier}`,
+      name: 'Pull Shark',
+      tier: pullSharkTier,
+      description: `Merged ${stats.totalPRs} pull requests`,
+      unlockedAt: now,
+    });
   }
+
+  // Starstruck - Based on stars received
+  const starstruckTier = getTier(stats.totalStars, BADGE_CRITERIA.STARSTRUCK.thresholds);
+  if (starstruckTier) {
+    achievements.push({
+      id: `starstruck-${starstruckTier}`,
+      name: 'Starstruck',
+      tier: starstruckTier,
+      description: `Received ${stats.totalStars} stars`,
+      unlockedAt: now,
+    });
+  }
+
+  // Galaxy Brain - Based on reviews (proxy for discussion answers)
+  const galaxyBrainTier = getTier(stats.totalReviews, BADGE_CRITERIA.GALAXY_BRAIN.thresholds);
+  if (galaxyBrainTier) {
+    achievements.push({
+      id: `galaxy-brain-${galaxyBrainTier}`,
+      name: 'Galaxy Brain',
+      tier: galaxyBrainTier,
+      description: `Provided ${stats.totalReviews} code reviews`,
+      unlockedAt: now,
+    });
+  }
+
+  // YOLO - Merged at least one PR (simplified - actual YOLO is PR without review)
+  if (stats.totalPRs >= BADGE_CRITERIA.YOLO.threshold) {
+    achievements.push({
+      id: 'yolo',
+      name: 'YOLO',
+      tier: null,
+      description: 'Merged a pull request',
+      unlockedAt: now,
+    });
+  }
+
+  // Arctic Code Vault Contributor - Based on commits (simplified)
+  if (stats.totalCommits >= 100) {
+    achievements.push({
+      id: 'arctic-code-vault',
+      name: 'Arctic Code Vault',
+      tier: null,
+      description: 'Contributed to the Arctic Code Vault',
+      unlockedAt: now,
+    });
+  }
+
+  // Public Sponsor - Based on having stars (community engagement proxy)
+  if (stats.totalStars >= 10) {
+    achievements.push({
+      id: 'public-sponsor',
+      name: 'Public Sponsor',
+      tier: null,
+      description: 'Active open source contributor',
+      unlockedAt: now,
+    });
+  }
+
+  return achievements;
 }
