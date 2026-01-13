@@ -56,7 +56,27 @@ export default function BadgesPage() {
         body: JSON.stringify({ badgeId }),
       });
       if (!res.ok) throw new Error('Equip failed');
-      return res.json();
+      const apiData = await res.json();
+      
+      // API returns { inventory, equippedBadges, equippedCount }
+      // but we need { badges, userBadges }
+      const badges: Badge[] = apiData.inventory?.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        icon_slug: item.icon_slug,
+        stat_boost: item.stat_boost,
+        created_at: item.created_at,
+      })) || [];
+      
+      const userBadges: UserBadge[] = apiData.inventory?.filter((item: any) => item.owned).map((item: any) => ({
+        id: item.id,
+        user_id: '', // Not needed for client
+        badge_id: item.id,
+        equipped: item.equipped,
+        earned_at: item.earned_at,
+      })) || [];
+      
+      return { badges, userBadges };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['badges'] });
