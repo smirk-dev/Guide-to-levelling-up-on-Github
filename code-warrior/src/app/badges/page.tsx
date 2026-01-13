@@ -200,7 +200,7 @@ export default function BadgesPage() {
           <div className="flex items-start gap-4">
             <IconBadge size={28} color="#8b949e" />
             <div className="flex-1">
-              <p className="font-pixel text-[9px] md:text-[10px] text-[var(--gray-highlight)] mb-3">
+              <p className="font-pixel text-[9px] md:text-[var(--font-sm)] text-[var(--gray-highlight)] mb-3">
                 BADGE TIPS
               </p>
               <ul className="font-pixel text-[7px] md:text-[8px] text-[var(--gray-medium)] space-y-2">
