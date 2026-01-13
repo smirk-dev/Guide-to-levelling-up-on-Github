@@ -144,6 +144,14 @@ export async function POST(request: NextRequest) {
       .update({
         xp: newXP,
         rank_tier: newRank,
+        github_stats: {
+          stars: githubStats.totalStars,
+          repos: githubStats.totalRepos,
+          commits: githubStats.totalCommits,
+          prs: githubStats.totalPRs,
+          issues: githubStats.totalIssues,
+          reviews: githubStats.totalReviews,
+        },
         last_synced_at: now.toISOString(),
       })
       .eq('id', user.id)
@@ -164,12 +172,65 @@ export async function POST(request: NextRequest) {
 
     console.log('User successfully updated:', updatedUser.id);
 
-    // 6. Return success with updated data
+    // 6. Update quest progress
+    try {
+      const { checkQuestCompletion } = await import('@/lib/quest-logic');
+
+      // Fetch user's quests
+      const { data: userQuests, error: questsError } = await supabase
+        .from('user_quests')
+        .select('*, quests(*)')
+        .eq('user_id', user.id);
+
+      if (!questsError && userQuests) {
+        const questUpdates = [];
+
+        for (const userQuest of userQuests) {
+          // Skip already completed quests
+          if (userQuest.status === 'COMPLETED') continue;
+
+          const quest = userQuest.quests;
+          if (!quest) continue;
+
+          const { completed, progress } = checkQuestCompletion(quest as any, githubStats);
+
+          // Update if progress changed or quest completed
+          if (progress !== userQuest.progress || (completed && userQuest.status !== 'COMPLETED')) {
+            questUpdates.push({
+              id: userQuest.id,
+              progress,
+              status: completed ? 'COMPLETED' : 'ACTIVE',
+              completed_at: completed && !userQuest.completed_at ? now.toISOString() : userQuest.completed_at,
+            });
+          }
+        }
+
+        // Batch update quests
+        if (questUpdates.length > 0) {
+          for (const update of questUpdates) {
+            await supabase
+              .from('user_quests')
+              .update({
+                progress: update.progress,
+                status: update.status,
+                completed_at: update.completed_at,
+              })
+              .eq('id', update.id);
+          }
+          console.log(`Updated ${questUpdates.length} quest(s)`);
+        }
+      }
+    } catch (questError) {
+      console.error('Quest update error (non-fatal):', questError);
+      // Don't fail the entire sync if quest update fails
+    }
+
+    // 7. Return success with updated data
     return NextResponse.json({
       success: true,
       user: updatedUser,
       stats: githubStats,
-      gainedXP: newXP - user.xp,
+      xpGained: newXP - user.xp,
       rankedUp: newRank !== user.rank_tier,
     });
 
