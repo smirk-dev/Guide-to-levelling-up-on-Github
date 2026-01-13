@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PixelFrame, PixelButton } from '@/components';
-import { IconSword, IconHome } from '@/components';
+import { IconSword, IconArrowLeft } from '@/components';
 
 export default function NotFound() {
   return (
@@ -51,20 +51,24 @@ export default function NotFound() {
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
             <Link href="/dashboard">
-              <PixelButton variant="gold" fullWidth>
-                <span className="flex items-center justify-center gap-2">
-                  <IconHome size={16} />
-                  RETURN TO DASHBOARD
-                </span>
-              </PixelButton>
+              <div className="w-full">
+                <PixelButton variant="gold">
+                  <span className="flex items-center justify-center gap-2">
+                    <IconArrowLeft size={16} />
+                    RETURN TO DASHBOARD
+                  </span>
+                </PixelButton>
+              </div>
             </Link>
             <Link href="/">
-              <PixelButton variant="mana" fullWidth>
-                <span className="flex items-center justify-center gap-2">
-                  <IconSword size={16} />
-                  BACK TO HOME
-                </span>
-              </PixelButton>
+              <div className="w-full">
+                <PixelButton variant="mana">
+                  <span className="flex items-center justify-center gap-2">
+                    <IconSword size={16} />
+                    BACK TO HOME
+                  </span>
+                </PixelButton>
+              </div>
             </Link>
           </div>
 
