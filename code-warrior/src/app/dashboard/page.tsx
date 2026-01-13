@@ -43,6 +43,31 @@ interface GitHubStats {
   stars: number;
 }
 
+// Format last synced date in a human-readable way
+function formatLastSynced(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  // For older dates, show formatted date
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -211,14 +236,55 @@ export default function DashboardPage() {
   }
 
   const user = data.user;
-  const rpgStats = calculateRPGStats({
-    totalStars: user.github_stats?.stars ?? 0,
-    totalRepos: user.github_stats?.repos ?? 0,
-    totalCommits: user.github_stats?.commits ?? 0,
-    totalPRs: user.github_stats?.prs ?? 0,
-    totalIssues: user.github_stats?.issues ?? 0,
-    totalReviews: user.github_stats?.reviews ?? 0,
-  });
+
+  // Check if github_stats has actual data (not just empty/null)
+  const hasGitHubStats = user.github_stats && (
+    (user.github_stats.stars ?? 0) > 0 ||
+    (user.github_stats.commits ?? 0) > 0 ||
+    (user.github_stats.prs ?? 0) > 0 ||
+    (user.github_stats.issues ?? 0) > 0 ||
+    (user.github_stats.reviews ?? 0) > 0
+  );
+
+  // If no github_stats but user has XP, estimate stats from XP for better UX
+  // This ensures users with XP don't see all-zero stats
+  let rpgStats;
+  if (hasGitHubStats) {
+    rpgStats = calculateRPGStats({
+      totalStars: user.github_stats?.stars ?? 0,
+      totalRepos: user.github_stats?.repos ?? 0,
+      totalCommits: user.github_stats?.commits ?? 0,
+      totalPRs: user.github_stats?.prs ?? 0,
+      totalIssues: user.github_stats?.issues ?? 0,
+      totalReviews: user.github_stats?.reviews ?? 0,
+    });
+  } else if (user.xp > 0) {
+    // Estimate stats from XP - not perfect but better than zeros
+    // Assume roughly: 40% from commits, 25% from PRs, 20% from stars, 15% from issues/reviews
+    const estimatedCommits = Math.floor(user.xp * 0.4 / 10); // XP_WEIGHT.COMMIT = 10
+    const estimatedPRs = Math.floor(user.xp * 0.25 / 40);    // XP_WEIGHT.PR = 40
+    const estimatedStars = Math.floor(user.xp * 0.2 / 50);   // XP_WEIGHT.STAR = 50
+    const estimatedIssues = Math.floor(user.xp * 0.1 / 15);  // XP_WEIGHT.ISSUE = 15
+    const estimatedReviews = Math.floor(user.xp * 0.05 / 20); // XP_WEIGHT.REVIEW = 20
+
+    rpgStats = calculateRPGStats({
+      totalStars: estimatedStars,
+      totalRepos: Math.floor(user.xp / 500), // Rough estimate
+      totalCommits: estimatedCommits,
+      totalPRs: estimatedPRs,
+      totalIssues: estimatedIssues,
+      totalReviews: estimatedReviews,
+    });
+  } else {
+    rpgStats = calculateRPGStats({
+      totalStars: 0,
+      totalRepos: 0,
+      totalCommits: 0,
+      totalPRs: 0,
+      totalIssues: 0,
+      totalReviews: 0,
+    });
+  }
 
   // Calculate level from XP
   const level = Math.floor(user.xp / 1000) + 1;
@@ -334,12 +400,12 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-7 h-7 flex items-center justify-center">
-                    <p className="font-pixel-heading text-[20px] text-[var(--gold-light)]">
-                      {user.rank_tier}
+                    <p className="font-pixel-heading text-[20px] text-[var(--mana-light)]">
+                      {user.github_stats?.repos ?? 0}
                     </p>
                   </div>
                   <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
-                    RANK
+                    REPOS
                   </p>
                 </div>
               </div>
@@ -428,7 +494,7 @@ export default function DashboardPage() {
               className="text-center mt-6"
             >
               <p className="font-pixel text-[10px] text-[var(--gray-medium)] leading-tight">
-                LAST SYNCED: {new Date(user.last_synced_at).toLocaleString()}
+                LAST SYNCED: {formatLastSynced(user.last_synced_at)}
               </p>
             </motion.div>
           )}
