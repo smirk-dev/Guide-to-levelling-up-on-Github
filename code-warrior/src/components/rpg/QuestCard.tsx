@@ -262,7 +262,7 @@ export const QuestLog: React.FC<QuestLogProps> = ({
       <div className="flex items-center gap-3 mb-6">
         <IconScroll size={32} color="#b8960f" />
         <h2 className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
-          QUEST LOG
+          Quest Log
         </h2>
       </div>
 
@@ -298,9 +298,9 @@ export const QuestLog: React.FC<QuestLogProps> = ({
               </motion.div>
 
               <h3 className="font-pixel text-[var(--font-md)] text-[var(--gray-highlight)] mb-2">
-                NO QUESTS AVAILABLE
+                No Quests Available
               </h3>
-              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto leading-relaxed">
                 The quest board is empty. Check back later for new adventures, or sync your GitHub activity to unlock quests!
               </p>
             </div>
