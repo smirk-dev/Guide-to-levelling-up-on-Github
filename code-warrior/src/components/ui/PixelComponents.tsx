@@ -201,15 +201,19 @@ export const StatBar: React.FC<StatBarProps> = ({
   className = '',
 }) => {
   const percentage = Math.min((current / max) * 100, 100);
+  const displayCurrent = Math.round(current);
+  const displayMax = Math.round(max);
 
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={`${className}`}>
       {showLabel && (
-        <div className="flex justify-between items-center text-[var(--font-xs)] font-pixel text-gray-400">
-          <span>{label}</span>
+        <div className="flex justify-between items-center mb-2 gap-2">
+          <span className="font-pixel text-[10px] text-[var(--gray-highlight)] leading-tight">
+            {label}
+          </span>
           {showValues && (
-            <span className="text-[#ffd700]">
-              {current}/{max}
+            <span className="font-pixel text-[10px] text-[#ffd700] tabular-nums whitespace-nowrap">
+              {displayCurrent}/{displayMax}
             </span>
           )}
         </div>
@@ -221,7 +225,7 @@ export const StatBar: React.FC<StatBarProps> = ({
         />
         {!showLabel && showValues && (
           <span className="stat-bar-label">
-            {current}/{max}
+            {displayCurrent}/{displayMax}
           </span>
         )}
       </div>
