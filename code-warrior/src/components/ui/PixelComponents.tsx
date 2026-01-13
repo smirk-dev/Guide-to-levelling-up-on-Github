@@ -431,6 +431,109 @@ export const PixelTooltip: React.FC<PixelTooltipProps> = ({
   );
 };
 
+interface VerticalStatBarProps {
+  label: string;
+  value: number;
+  max: number;
+  variant?: 'health' | 'mana' | 'strength' | 'charisma' | 'wisdom';
+  showValue?: boolean;
+  height?: 'sm' | 'md' | 'lg';
+}
+
+export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
+  label,
+  value,
+  max,
+  variant = 'health',
+  showValue = true,
+  height = 'md',
+}) => {
+  const percentage = Math.min((value / max) * 100, 100);
+
+  const heightClasses = {
+    sm: 'h-24',
+    md: 'h-32',
+    lg: 'h-40',
+  };
+
+  const variantColors = {
+    health: {
+      bg: 'bg-[var(--health-dark)]',
+      fill: 'bg-[var(--health-light)]',
+      glow: 'shadow-[0_0_8px_var(--health-light)]',
+      text: 'text-[var(--health-light)]',
+    },
+    mana: {
+      bg: 'bg-[var(--mana-dark)]',
+      fill: 'bg-[var(--mana-light)]',
+      glow: 'shadow-[0_0_8px_var(--mana-light)]',
+      text: 'text-[var(--mana-light)]',
+    },
+    strength: {
+      bg: 'bg-[var(--critical-dark)]',
+      fill: 'bg-[var(--critical-light)]',
+      glow: 'shadow-[0_0_8px_var(--critical-light)]',
+      text: 'text-[var(--critical-light)]',
+    },
+    charisma: {
+      bg: 'bg-[var(--gold-dark)]',
+      fill: 'bg-[var(--gold-light)]',
+      glow: 'shadow-[0_0_8px_var(--gold-light)]',
+      text: 'text-[var(--gold-light)]',
+    },
+    wisdom: {
+      bg: 'bg-[var(--xp-dark)]',
+      fill: 'bg-[var(--xp-light)]',
+      glow: 'shadow-[0_0_8px_var(--xp-light)]',
+      text: 'text-[var(--xp-light)]',
+    },
+  };
+
+  const colors = variantColors[variant];
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {/* Stat abbreviation label */}
+      <span className={`font-pixel text-[9px] ${colors.text} uppercase tracking-wider`}>
+        {label.slice(0, 3)}
+      </span>
+
+      {/* Vertical bar container */}
+      <div
+        className={`relative w-6 ${heightClasses[height]} ${colors.bg} border-2 border-[var(--gray-dark)] overflow-hidden`}
+        style={{
+          boxShadow: 'inset 2px 2px 0 rgba(0, 0, 0, 0.5)',
+        }}
+      >
+        {/* Fill from bottom */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 ${colors.fill} transition-all duration-500 ease-out`}
+          style={{
+            height: `${percentage}%`,
+            boxShadow: `inset 0 2px 0 rgba(255, 255, 255, 0.3), ${percentage > 80 ? colors.glow.replace('shadow-[', '').replace(']', '') : ''}`,
+          }}
+        />
+
+        {/* Pixel grid overlay for retro feel */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          style={{
+            backgroundImage: 'linear-gradient(transparent 50%, rgba(0,0,0,0.3) 50%)',
+            backgroundSize: '100% 4px',
+          }}
+        />
+      </div>
+
+      {/* Value display */}
+      {showValue && (
+        <span className={`font-pixel text-[10px] ${colors.text} tabular-nums`}>
+          {Math.round(value)}
+        </span>
+      )}
+    </div>
+  );
+};
+
 interface SkeletonCardProps {
   variant?: 'quest' | 'badge' | 'leaderboard' | 'character';
   className?: string;
