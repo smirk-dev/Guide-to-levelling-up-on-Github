@@ -172,51 +172,73 @@ export async function POST(request: NextRequest) {
 
     console.log('User successfully updated:', updatedUser.id);
 
-    // 6. Update quest progress
+    // 6. Update quest progress and auto-enroll in new quests
     try {
       const { checkQuestCompletion } = await import('@/lib/quest-logic');
 
-      // Fetch user's quests
+      // Fetch ALL active quests
+      const { data: allQuests, error: allQuestsError } = await supabase
+        .from('quests')
+        .select('*')
+        .eq('is_active', true);
+
+      // Fetch user's existing quest progress
       const { data: userQuests, error: questsError } = await supabase
         .from('user_quests')
-        .select('*, quests(*)')
+        .select('*')
         .eq('user_id', user.id);
 
-      if (!questsError && userQuests) {
+      if (!allQuestsError && allQuests && !questsError) {
         const questUpdates = [];
+        const newQuestEntries = [];
 
-        for (const userQuest of userQuests) {
-          // Skip already completed quests
-          if (userQuest.status === 'COMPLETED') continue;
-
-          const quest = userQuest.quests;
-          if (!quest) continue;
-
+        for (const quest of allQuests) {
           const { completed, progress } = checkQuestCompletion(quest as any, githubStats);
+          const existingUserQuest = (userQuests || []).find(uq => uq.quest_id === quest.id);
 
-          // Update if progress changed or quest completed
-          if (progress !== userQuest.progress || (completed && userQuest.status !== 'COMPLETED')) {
-            questUpdates.push({
-              id: userQuest.id,
-              progress,
+          if (existingUserQuest) {
+            // Update existing quest if not already completed
+            if (existingUserQuest.status !== 'COMPLETED') {
+              if (progress !== existingUserQuest.progress || (completed && existingUserQuest.status !== 'COMPLETED')) {
+                questUpdates.push({
+                  id: existingUserQuest.id,
+                  progress,
+                  status: completed ? 'COMPLETED' : 'ACTIVE',
+                  completed_at: completed && !existingUserQuest.completed_at ? now.toISOString() : existingUserQuest.completed_at,
+                });
+              }
+            }
+          } else if (progress > 0) {
+            // Auto-enroll in quest if user has any progress
+            newQuestEntries.push({
+              user_id: user.id,
+              quest_id: quest.id,
               status: completed ? 'COMPLETED' : 'ACTIVE',
-              completed_at: completed && !userQuest.completed_at ? now.toISOString() : userQuest.completed_at,
+              progress,
+              completed_at: completed ? now.toISOString() : null,
             });
           }
         }
 
-        // Batch update quests
+        // Batch update existing quests
+        for (const update of questUpdates) {
+          await supabase
+            .from('user_quests')
+            .update({
+              progress: update.progress,
+              status: update.status,
+              completed_at: update.completed_at,
+            })
+            .eq('id', update.id);
+        }
+
+        // Insert new quest entries
+        if (newQuestEntries.length > 0) {
+          await supabase.from('user_quests').insert(newQuestEntries);
+          console.log(`Auto-enrolled in ${newQuestEntries.length} quest(s)`);
+        }
+
         if (questUpdates.length > 0) {
-          for (const update of questUpdates) {
-            await supabase
-              .from('user_quests')
-              .update({
-                progress: update.progress,
-                status: update.status,
-                completed_at: update.completed_at,
-              })
-              .eq('id', update.id);
-          }
           console.log(`Updated ${questUpdates.length} quest(s)`);
         }
       }
