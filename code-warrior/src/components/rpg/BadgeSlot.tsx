@@ -115,7 +115,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
 
           {/* Badge Name */}
           <h3
-            className={`font-pixel text-[10px] text-center mb-2 ${
+            className={`font-pixel text-[var(--font-sm)] text-center mb-2 ${
               isOwned ? 'text-white' : 'text-[var(--gray-medium)]'
             }`}
           >
@@ -144,7 +144,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
           {/* Status/Actions */}
           <div className="flex justify-center">
             {!isOwned && (
-              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+              <span className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
                 LOCKED
               </span>
             )}
@@ -271,7 +271,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
 
       {/* Equipped Section */}
       <div className="mb-10 md:mb-12">
-        <h3 className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)] mb-5">
+        <h3 className="font-pixel text-[var(--font-sm)] md:text-[11px] text-[var(--gray-highlight)] mb-5">
           EQUIPPED BADGES ({equippedCount}/{maxEquipped})
         </h3>
         <div className="grid grid-cols-3 gap-4 md:gap-6">
@@ -319,7 +319,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
                   <div className="w-16 h-16 md:w-20 md:h-20 mx-auto flex items-center justify-center opacity-30">
                     <IconShield size={48} color="#484848" />
                   </div>
-                  <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] text-center mt-3">
+                  <p className="font-pixel text-[var(--font-xs)] md:text-[9px] text-[var(--gray-medium)] text-center mt-3">
                     DROP HERE
                   </p>
                 </PixelFrame>
@@ -331,7 +331,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
 
       {/* All Badges Grid */}
       <div>
-        <h3 className="font-pixel text-[10px] md:text-[11px] text-[var(--gray-highlight)] mb-5">
+        <h3 className="font-pixel text-[var(--font-sm)] md:text-[11px] text-[var(--gray-highlight)] mb-5">
           ALL BADGES ({userBadges.length}/{badges.length} UNLOCKED)
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
@@ -372,10 +372,10 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
                 <IconBadge size={64} color="#484848" className="mx-auto" />
               </motion.div>
 
-              <h3 className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--gray-highlight)] mb-2">
                 NO BADGES EARNED
               </h3>
-              <p className="font-pixel text-[8px] md:text-[9px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
+              <p className="font-pixel text-[var(--font-xs)] md:text-[9px] text-[var(--gray-medium)] mb-4 max-w-xs mx-auto">
                 Complete quests to earn badges! Each badge grants special stat boosts to power up your warrior.
               </p>
             </div>
