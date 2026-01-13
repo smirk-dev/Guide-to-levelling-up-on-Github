@@ -277,9 +277,9 @@ export default function DashboardPage() {
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] gap-6 lg:gap-8 max-w-7xl mx-auto px-4">
         {/* Left Column - Character Sheet */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="w-full">
           <CharacterSheet
             username={user.username}
             avatarUrl={user.avatar_url}
@@ -292,7 +292,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Column - Quick Stats & Active Quests */}
-        <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+        <div className="w-full space-y-6">
           {/* Quick Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -300,41 +300,45 @@ export default function DashboardPage() {
             transition={{ delay: 0.2 }}
           >
             <PixelFrame variant="mana" padding="lg">
-              <h3 className="font-pixel text-[var(--font-md)] text-[var(--mana-light)] mb-4">
+              <h3 className="font-pixel text-[var(--font-md)] text-[var(--mana-light)] mb-6">
                 QUICK STATS
               </h3>
-              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                <div className="text-center">
-                  <IconXP size={24} color="#ffd700" className="mx-auto mb-2" />
-                  <p className="font-pixel-heading text-[var(--font-lg)] text-[var(--gold-light)]">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="flex flex-col items-center gap-2">
+                  <IconXP size={28} color="#ffd700" />
+                  <p className="font-pixel-heading text-[20px] text-[var(--gold-light)] leading-tight">
                     {user.xp.toLocaleString()}
                   </p>
-                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
                     TOTAL XP
                   </p>
                 </div>
-                <div className="text-center">
-                  <IconScroll size={24} color="#2ea043" className="mx-auto mb-2" />
-                  <p className="font-pixel-heading text-[var(--font-lg)] text-[var(--health-light)]">
+                <div className="flex flex-col items-center gap-2">
+                  <IconScroll size={28} color="#2ea043" />
+                  <p className="font-pixel-heading text-[20px] text-[var(--health-light)] leading-tight">
                     {completedQuests}
                   </p>
-                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
+                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
                     QUESTS DONE
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="font-pixel-heading text-[24px] text-white mb-2">
-                    {level}
-                  </p>
-                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-7 h-7 flex items-center justify-center">
+                    <p className="font-pixel-heading text-[20px] text-white">
+                      {level}
+                    </p>
+                  </div>
+                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
                     LEVEL
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="font-pixel-heading text-[24px] text-[var(--gold-light)] mb-2">
-                    {user.rank_tier}
-                  </p>
-                  <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-7 h-7 flex items-center justify-center">
+                    <p className="font-pixel-heading text-[20px] text-[var(--gold-light)]">
+                      {user.rank_tier}
+                    </p>
+                  </div>
+                  <p className="font-pixel text-[10px] text-[var(--gray-medium)] text-center leading-tight">
                     RANK
                   </p>
                 </div>
@@ -349,20 +353,20 @@ export default function DashboardPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <PixelFrame variant="gold" padding="md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <IconScroll size={24} color="#ffd700" />
-                    <div>
-                      <p className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
+              <PixelFrame variant="gold" padding="lg">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <IconScroll size={28} color="#ffd700" className="flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-pixel text-[12px] text-[var(--gold-light)] mb-1">
                         REWARDS AVAILABLE!
                       </p>
-                      <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)]">
+                      <p className="font-pixel text-[10px] text-[var(--gray-highlight)] leading-tight">
                         {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready to claim
                       </p>
                     </div>
                   </div>
-                  <PixelBadge variant="gold" size="md">
+                  <PixelBadge variant="gold" size="md" className="flex-shrink-0">
                     {claimableQuests}
                   </PixelBadge>
                 </div>
@@ -376,19 +380,19 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-pixel text-[var(--font-md)] text-[var(--gold-light)]">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-pixel text-[14px] text-[var(--gold-light)]">
                 ACTIVE QUESTS
               </h3>
               <a
                 href="/quests"
-                className="font-pixel text-[var(--font-xs)] text-[var(--mana-light)] hover:underline"
+                className="font-pixel text-[10px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)] transition-colors"
               >
                 VIEW ALL →
               </a>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-5">
               {activeQuests.map(({ quest, userQuest }, index) => (
                 <motion.div
                   key={quest.id}
@@ -406,8 +410,8 @@ export default function DashboardPage() {
               ))}
 
               {activeQuests.length === 0 && (
-                <PixelFrame variant="stone" padding="md">
-                  <p className="font-pixel text-[var(--font-sm)] text-[var(--gray-highlight)] text-center">
+                <PixelFrame variant="stone" padding="lg">
+                  <p className="font-pixel text-[11px] text-[var(--gray-highlight)] text-center leading-relaxed">
                     No active quests. Sync your GitHub to start new adventures!
                   </p>
                 </PixelFrame>
@@ -421,9 +425,9 @@ export default function DashboardPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="text-center"
+              className="text-center mt-6"
             >
-              <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
+              <p className="font-pixel text-[10px] text-[var(--gray-medium)] leading-tight">
                 LAST SYNCED: {new Date(user.last_synced_at).toLocaleString()}
               </p>
             </motion.div>
