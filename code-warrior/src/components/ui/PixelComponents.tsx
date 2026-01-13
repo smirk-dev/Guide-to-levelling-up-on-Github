@@ -123,9 +123,9 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
   type = 'button',
 }) => {
   const sizeClasses = {
-    sm: 'px-3 py-2 text-[8px]',
-    md: 'px-6 py-3 text-[10px]',
-    lg: 'px-8 py-4 text-[12px]',
+    sm: 'px-3 py-2 text-[var(--font-xs)]',
+    md: 'px-6 py-3 text-[var(--font-sm)]',
+    lg: 'px-8 py-4 text-[var(--font-md)]',
   };
 
   const handleClick = () => {
@@ -205,7 +205,7 @@ export const StatBar: React.FC<StatBarProps> = ({
   return (
     <div className={`space-y-1 ${className}`}>
       {showLabel && (
-        <div className="flex justify-between items-center text-[8px] font-pixel text-gray-400">
+        <div className="flex justify-between items-center text-[var(--font-xs)] font-pixel text-gray-400">
           <span>{label}</span>
           {showValues && (
             <span className="text-[#ffd700]">
@@ -276,7 +276,7 @@ export const PixelProgress: React.FC<PixelProgressProps> = ({
         }}
       />
       {showText && (
-        <span className="absolute inset-0 flex items-center justify-center text-[8px] font-pixel text-white text-outline-dark">
+        <span className="absolute inset-0 flex items-center justify-center text-[var(--font-xs)] font-pixel text-white text-outline-dark">
           {Math.round(percentage)}%
         </span>
       )}
@@ -329,8 +329,8 @@ export const PixelBadge: React.FC<PixelBadgeProps> = ({
   };
 
   const sizeClasses = {
-    sm: 'px-2 py-1 text-[6px]',
-    md: 'px-3 py-2 text-[8px]',
+    sm: 'px-2 py-1 text-[var(--font-xs)]',
+    md: 'px-3 py-2 text-[var(--font-xs)]',
   };
 
   return (
@@ -415,7 +415,7 @@ export const PixelTooltip: React.FC<PixelTooltipProps> = ({
       {children}
       {show && (
         <div
-          className={`absolute ${positionClasses[position]} z-50 px-3 py-2 bg-[var(--void-darkest)] border-4 border-[var(--gray-dark)] font-pixel text-[8px] text-white whitespace-nowrap`}
+          className={`absolute ${positionClasses[position]} z-50 px-3 py-2 bg-[var(--void-darkest)] border-4 border-[var(--gray-dark)] font-pixel text-[var(--font-xs)] text-white whitespace-nowrap`}
           style={{
             boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.5)',
           }}
