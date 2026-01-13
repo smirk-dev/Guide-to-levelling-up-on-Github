@@ -135,7 +135,7 @@ export default function LandingPage() {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="font-pixel text-[12px] md:text-[14px] text-[var(--gray-highlight)] mb-8 leading-relaxed"
+            className="font-pixel text-[var(--font-md)] md:text-[var(--font-lg)] text-[var(--gray-highlight)] mb-8 leading-relaxed"
           >
             TRANSFORM YOUR GITHUB CONTRIBUTIONS<br />
             INTO AN EPIC RPG ADVENTURE
@@ -178,7 +178,7 @@ export default function LandingPage() {
           >
             <button
               onClick={handleSignIn}
-              className="btn-pixel btn-gold text-[12px] md:text-[14px] px-8 py-4 inline-flex items-center gap-4"
+              className="btn-pixel btn-gold text-[var(--font-md)] md:text-[var(--font-lg)] px-8 py-4 inline-flex items-center gap-4"
             >
               <IconGitHub size={24} color="#0a0a0f" />
               SIGN IN WITH GITHUB
@@ -192,7 +192,7 @@ export default function LandingPage() {
             transition={{ opacity: { delay: 1.5 }, y: { duration: 1, repeat: Infinity } }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
           >
-            <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+            <span className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
               SCROLL DOWN
             </span>
           </motion.div>
@@ -206,7 +206,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
+            className="font-pixel-heading text-[var(--font-lg)] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
           >
             YOUR CODING JOURNEY AWAITS
           </motion.h2>
@@ -223,10 +223,10 @@ export default function LandingPage() {
                 <PixelFrame variant="stone" padding="lg" className="h-full">
                   <div className="text-center">
                     <div className="mb-4">{feature.icon}</div>
-                    <h3 className="font-pixel text-[12px] text-[var(--gold-light)] mb-2">
+                    <h3 className="font-pixel text-[var(--font-md)] text-[var(--gold-light)] mb-2">
                       {feature.title}
                     </h3>
-                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)] leading-relaxed">
+                    <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] leading-relaxed">
                       {feature.description}
                     </p>
                   </div>
@@ -244,7 +244,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--mana-light)] text-center mb-4"
+            className="font-pixel-heading text-[var(--font-lg)] md:text-[20px] text-[var(--mana-light)] text-center mb-4"
           >
             RPG STATS SYSTEM
           </motion.h2>
@@ -253,7 +253,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-pixel text-[10px] text-[var(--gray-highlight)] text-center mb-12"
+            className="font-pixel text-[var(--font-sm)] text-[var(--gray-highlight)] text-center mb-12"
           >
             YOUR GITHUB ACTIVITY SHAPES YOUR CHARACTER
           </motion.p>
@@ -270,7 +270,7 @@ export default function LandingPage() {
                   className="text-center"
                 >
                   <div className="mb-2">{stat.icon}</div>
-                  <h3 className="font-pixel text-[10px] text-white mb-1">
+                  <h3 className="font-pixel text-[var(--font-sm)] text-white mb-1">
                     {stat.label}
                   </h3>
                   <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
@@ -290,7 +290,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-pixel-heading text-[16px] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
+            className="font-pixel-heading text-[var(--font-lg)] md:text-[20px] text-[var(--gold-light)] text-center mb-12"
           >
             HOW IT WORKS
           </motion.h2>
@@ -315,10 +315,10 @@ export default function LandingPage() {
                       {step.num}
                     </div>
                     <div>
-                      <h3 className="font-pixel text-[12px] text-[var(--gold-light)] mb-1">
+                      <h3 className="font-pixel text-[var(--font-md)] text-[var(--gold-light)] mb-1">
                         {step.title}
                       </h3>
-                      <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                      <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)]">
                         {step.desc}
                       </p>
                     </div>
@@ -340,15 +340,15 @@ export default function LandingPage() {
           >
             <PixelFrame variant="gold" padding="lg">
               <IconRank size={48} color="#ffd700" className="mx-auto mb-6" />
-              <h2 className="font-pixel-heading text-[14px] md:text-[18px] text-[var(--gold-light)] mb-4">
+              <h2 className="font-pixel-heading text-[var(--font-lg)] md:text-[18px] text-[var(--gold-light)] mb-4">
                 BEGIN YOUR QUEST
               </h2>
-              <p className="font-pixel text-[10px] text-[var(--gray-highlight)] mb-8">
+              <p className="font-pixel text-[var(--font-sm)] text-[var(--gray-highlight)] mb-8">
                 Join thousands of developers leveling up their coding journey
               </p>
               <button
                 onClick={handleSignIn}
-                className="btn-pixel btn-gold text-[12px] px-8 py-4 inline-flex items-center gap-4"
+                className="btn-pixel btn-gold text-[var(--font-md)] px-8 py-4 inline-flex items-center gap-4"
               >
                 <IconGitHub size={20} color="#0a0a0f" />
                 START YOUR ADVENTURE
@@ -361,7 +361,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-8 px-4 bg-[var(--void-darkest)] border-t-4 border-[var(--gray-dark)]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="font-pixel text-[8px] text-[var(--gray-medium)]">
+          <p className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
             BUILT WITH ♥ FOR GITHUB WARRIORS
           </p>
           <p className="font-pixel text-[6px] text-[var(--gray-dark)] mt-2">
