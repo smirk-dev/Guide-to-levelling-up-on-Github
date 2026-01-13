@@ -18,6 +18,7 @@ CREATE TABLE users (
   avatar_url TEXT,
   xp INTEGER DEFAULT 0 NOT NULL,
   rank_tier rank_tier DEFAULT 'C' NOT NULL,
+  github_stats JSONB DEFAULT '{}'::jsonb, -- Stores GitHub metrics for RPG stat calculation
   last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT NULL, -- Allow NULL for first-time users
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
