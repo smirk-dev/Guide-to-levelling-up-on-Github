@@ -148,7 +148,9 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
           <div className="grid gap-5">
             {/* Health */}
             <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
-              <IconHeart size={24} color="#da3633" />
+              <PixelTooltip content="Based on your commit activity" position="right">
+                <IconHeart size={24} color="#da3633" />
+              </PixelTooltip>
               <div className="flex-1 min-w-0">
                 <StatBar
                   label="Health"
@@ -162,7 +164,9 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
             {/* Mana */}
             <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
-              <IconMana size={24} color="#58a6ff" />
+              <PixelTooltip content="Based on issues and reviews" position="right">
+                <IconMana size={24} color="#58a6ff" />
+              </PixelTooltip>
               <div className="flex-1 min-w-0">
                 <StatBar
                   label="Mana"
@@ -176,7 +180,9 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
             {/* Strength */}
             <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
-              <IconSword size={24} color="#da3633" />
+              <PixelTooltip content="Based on your pull requests" position="right">
+                <IconSword size={24} color="#da3633" />
+              </PixelTooltip>
               <div className="flex-1 min-w-0">
                 <StatBar
                   label="Strength"
@@ -190,7 +196,9 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
             {/* Charisma */}
             <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
-              <IconStar size={24} color="#ffd700" />
+              <PixelTooltip content="Based on repository stars" position="right">
+                <IconStar size={24} color="#ffd700" />
+              </PixelTooltip>
               <div className="flex-1 min-w-0">
                 <StatBar
                   label="Charisma"
@@ -204,7 +212,9 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
             {/* Wisdom */}
             <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
-              <IconReview size={24} color="#a371f7" />
+              <PixelTooltip content="Based on community engagement" position="right">
+                <IconReview size={24} color="#a371f7" />
+              </PixelTooltip>
               <div className="flex-1 min-w-0">
                 <StatBar
                   label="Wisdom"
