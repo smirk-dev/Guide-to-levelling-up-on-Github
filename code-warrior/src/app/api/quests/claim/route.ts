@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     }
 
     // Check if quest is completed and not already claimed
-    if (userQuest.status !== 'completed') {
+    if (userQuest.status !== 'COMPLETED') {
       return NextResponse.json(
         { error: 'Quest not completed yet' },
         { status: 400 }
