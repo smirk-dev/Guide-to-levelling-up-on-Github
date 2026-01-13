@@ -510,7 +510,15 @@ export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
           className={`absolute bottom-0 left-0 right-0 ${colors.fill} transition-all duration-500 ease-out`}
           style={{
             height: `${percentage}%`,
-            boxShadow: `inset 0 2px 0 rgba(255, 255, 255, 0.3), ${percentage > 80 ? colors.glow.replace('shadow-[', '').replace(']', '') : ''}`,
+            boxShadow: percentage > 80 
+              ? `inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 0 8px ${
+                  variant === 'health' ? 'var(--health-light)' :
+                  variant === 'mana' ? 'var(--mana-light)' :
+                  variant === 'strength' ? 'var(--critical-light)' :
+                  variant === 'charisma' ? 'var(--gold-light)' :
+                  'var(--xp-light)'
+                }`
+              : 'inset 0 2px 0 rgba(255, 255, 255, 0.3)',
           }}
         />
 
