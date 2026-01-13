@@ -4,6 +4,15 @@ export type RankTier = 'C' | 'B' | 'A' | 'AA' | 'AAA' | 'S' | 'SS' | 'SSS';
 export type QuestStatus = 'ACTIVE' | 'COMPLETED';
 export type CriteriaType = 'REPO_COUNT' | 'PR_MERGED' | 'STAR_COUNT' | 'COMMIT_COUNT' | 'ISSUE_COUNT' | 'REVIEW_COUNT';
 
+export interface GitHubStats {
+  stars: number;
+  repos: number;
+  commits: number;
+  prs: number;
+  issues: number;
+  reviews: number;
+}
+
 export interface User {
   id: string;
   github_id: string;
@@ -11,6 +20,7 @@ export interface User {
   avatar_url: string | null;
   xp: number;
   rank_tier: RankTier;
+  github_stats?: GitHubStats; // Optional for backward compatibility
   last_synced_at: string;
   created_at: string;
   updated_at: string;
