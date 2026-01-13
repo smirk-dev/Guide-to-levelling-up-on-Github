@@ -58,10 +58,10 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         {/* Header with rank badge */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
-            CHARACTER
+            Character
           </h2>
           <PixelBadge variant="gold" size="md">
-            RANK {rankTier}
+            {rankTier}
           </PixelBadge>
         </div>
 
@@ -71,26 +71,55 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
             <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
           </div>
           <div className="flex-1 min-w-0 pt-1">
-            <h3 className="font-pixel text-[12px] text-white mb-2 text-outline-dark break-words leading-relaxed">
+            <h3 className="font-pixel text-[13px] text-white mb-2 break-words leading-relaxed">
               {username}
             </h3>
             <div className="flex items-center gap-2 mb-2">
-              <IconRank size={16} />
+              <IconRank size={14} />
               <span className="font-pixel text-[10px] text-[var(--gold-light)] leading-tight">
                 {rankName}
               </span>
             </div>
-            <div className="font-pixel text-[10px] text-[var(--gray-highlight)]">
-              LVL {level}
+            <div className="flex items-center gap-2">
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">
+                Level {level}
+              </span>
+              <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
+                •
+              </span>
+              <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
+                {xp.toLocaleString()} XP
+              </span>
             </div>
           </div>
         </div>
 
-        {/* XP Bar */}
+        {/* Level Progress Bar */}
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2 gap-2">
+            <span className="font-pixel text-[10px] text-[var(--mana-light)] leading-tight">
+              Level Progress
+            </span>
+            <span className="font-pixel text-[9px] text-[var(--gray-highlight)] tabular-nums">
+              Level {level} → {level + 1}
+            </span>
+          </div>
+          <div className="stat-bar stat-bar-mana">
+            <div
+              className="stat-bar-fill"
+              style={{ width: `${((xp % 1000) / 1000) * 100}%` }}
+            />
+            <span className="stat-bar-label">
+              {1000 - (xp % 1000)} XP to next
+            </span>
+          </div>
+        </div>
+
+        {/* Rank Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2 gap-2">
             <span className="font-pixel text-[10px] text-[var(--gold-light)] leading-tight">
-              EXPERIENCE
+              Rank Progress
             </span>
             <span className="font-pixel text-[10px] text-[var(--gold-medium)] tabular-nums">
               {xp.toLocaleString()} XP
@@ -103,16 +132,16 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
             />
             <span className="stat-bar-label">
               {rankTier !== 'SSS'
-                ? `${(xpToNextRank - xp).toLocaleString()} TO NEXT`
-                : 'MAX RANK'}
+                ? `${(xpToNextRank - xp).toLocaleString()} to ${getRankDisplayName(getNextRank(rankTier))}`
+                : 'Max Rank'}
             </span>
           </div>
         </div>
 
         {/* RPG Stats */}
         <div className="space-y-5">
-          <h4 className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-4 uppercase tracking-wider">
-            ATTRIBUTES
+          <h4 className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-4">
+            Attributes
           </h4>
 
           {/* Grid layout for stats */}
@@ -122,7 +151,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconHeart size={24} color="#da3633" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="HEALTH"
+                  label="Health"
                   current={stats.health}
                   max={100}
                   variant="health"
@@ -136,7 +165,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconMana size={24} color="#58a6ff" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="MANA"
+                  label="Mana"
                   current={stats.mana}
                   max={100}
                   variant="mana"
@@ -150,7 +179,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconSword size={24} color="#da3633" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="STRENGTH"
+                  label="Strength"
                   current={stats.strength}
                   max={100}
                   variant="strength"
@@ -164,7 +193,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconStar size={24} color="#ffd700" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="CHARISMA"
+                  label="Charisma"
                   current={stats.charisma}
                   max={100}
                   variant="xp"
@@ -178,7 +207,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
               <IconReview size={24} color="#a371f7" />
               <div className="flex-1 min-w-0">
                 <StatBar
-                  label="WISDOM"
+                  label="Wisdom"
                   current={stats.wisdom}
                   max={100}
                   variant="purple"
