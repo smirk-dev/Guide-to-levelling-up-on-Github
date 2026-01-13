@@ -94,14 +94,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) 
       <div className="flex-shrink-0 p-6 border-b-4 border-[var(--gray-dark)]">
         <Link href="/dashboard" className="flex items-center gap-3" onClick={onNavigate}>
           <IconSword size={32} color="#ffd700" />
-          <div>
-            <h1 className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
-              CODE
-            </h1>
-            <h1 className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
-              WARRIOR
-            </h1>
-          </div>
+          <h1 className="font-pixel-heading text-[14px] text-[var(--gold-light)] leading-relaxed">
+            Code Warrior
+          </h1>
         </Link>
       </div>
 
