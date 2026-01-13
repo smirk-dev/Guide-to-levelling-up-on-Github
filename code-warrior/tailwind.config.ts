@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: '375px', // iPhone SE and up
+      },
       colors: {
         // Cyber-Fantasy Theme from docs/ux-design.md
         background: "var(--background)",
