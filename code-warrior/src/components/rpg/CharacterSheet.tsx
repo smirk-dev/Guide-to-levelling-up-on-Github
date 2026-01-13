@@ -56,8 +56,8 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
     >
       <PixelFrame variant="gold" padding="lg">
         {/* Header with rank badge */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-pixel-heading text-[var(--font-md)] text-[var(--gold-light)]">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
             CHARACTER
           </h2>
           <PixelBadge variant="gold" size="md">
@@ -66,31 +66,31 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         </div>
 
         {/* Avatar and basic info */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-5 mb-8">
           <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
-          <div className="flex-1">
-            <h3 className="font-pixel text-[var(--font-md)] text-white mb-1 text-outline-dark">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-pixel text-[14px] text-white mb-2 text-outline-dark truncate">
               {username}
             </h3>
             <div className="flex items-center gap-2 mb-2">
-              <IconRank size={16} />
-              <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
+              <IconRank size={18} />
+              <span className="font-pixel text-[11px] text-[var(--gold-light)] leading-tight">
                 {rankName}
               </span>
             </div>
-            <div className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)]">
+            <div className="font-pixel text-[10px] text-[var(--gray-highlight)]">
               LVL {level}
             </div>
           </div>
         </div>
 
         {/* XP Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-pixel text-[var(--font-xs)] text-[var(--gold-light)]">
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-2 gap-2">
+            <span className="font-pixel text-[10px] text-[var(--gold-light)] leading-tight">
               EXPERIENCE
             </span>
-            <span className="font-pixel text-[var(--font-xs)] text-[var(--gold-medium)]">
+            <span className="font-pixel text-[10px] text-[var(--gold-medium)] tabular-nums">
               {xp.toLocaleString()} XP
             </span>
           </div>
@@ -101,71 +101,89 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
             />
             <span className="stat-bar-label">
               {rankTier !== 'SSS'
-                ? `${xpToNextRank - xp} TO NEXT RANK`
+                ? `${(xpToNextRank - xp).toLocaleString()} TO NEXT`
                 : 'MAX RANK'}
             </span>
           </div>
         </div>
 
         {/* RPG Stats */}
-        <div className="space-y-4">
-          <h4 className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-3 uppercase tracking-wider">
+        <div className="space-y-5">
+          <h4 className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-4 uppercase tracking-wider">
             ATTRIBUTES
           </h4>
 
-          <div className="flex items-center gap-2">
-            <IconHeart size={16} color="#da3633" />
-            <StatBar
-              label="HEALTH"
-              current={stats.health}
-              max={100}
-              variant="health"
-              className="flex-1"
-            />
-          </div>
+          {/* Grid layout for stats */}
+          <div className="grid gap-5">
+            {/* Health */}
+            <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
+              <IconHeart size={24} color="#da3633" />
+              <div className="flex-1 min-w-0">
+                <StatBar
+                  label="HEALTH (Commits)"
+                  current={stats.health}
+                  max={100}
+                  variant="health"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <IconMana size={16} color="#58a6ff" />
-            <StatBar
-              label="MANA"
-              current={stats.mana}
-              max={100}
-              variant="mana"
-              className="flex-1"
-            />
-          </div>
+            {/* Mana */}
+            <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
+              <IconMana size={24} color="#58a6ff" />
+              <div className="flex-1 min-w-0">
+                <StatBar
+                  label="MANA (Issues + Reviews)"
+                  current={stats.mana}
+                  max={100}
+                  variant="mana"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <IconSword size={16} color="#da3633" />
-            <StatBar
-              label="STRENGTH"
-              current={stats.strength}
-              max={100}
-              variant="strength"
-              className="flex-1"
-            />
-          </div>
+            {/* Strength */}
+            <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
+              <IconSword size={24} color="#da3633" />
+              <div className="flex-1 min-w-0">
+                <StatBar
+                  label="STRENGTH (Pull Requests)"
+                  current={stats.strength}
+                  max={100}
+                  variant="strength"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <IconStar size={16} color="#ffd700" />
-            <StatBar
-              label="CHARISMA"
-              current={stats.charisma}
-              max={100}
-              variant="xp"
-              className="flex-1"
-            />
-          </div>
+            {/* Charisma */}
+            <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
+              <IconStar size={24} color="#ffd700" />
+              <div className="flex-1 min-w-0">
+                <StatBar
+                  label="CHARISMA (Stars)"
+                  current={stats.charisma}
+                  max={100}
+                  variant="xp"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <IconReview size={16} color="#a371f7" />
-            <StatBar
-              label="WISDOM"
-              current={stats.wisdom}
-              max={100}
-              variant="purple"
-              className="flex-1"
-            />
+            {/* Wisdom */}
+            <div className="grid grid-cols-[24px_1fr] gap-3 items-center">
+              <IconReview size={24} color="#a371f7" />
+              <div className="flex-1 min-w-0">
+                <StatBar
+                  label="WISDOM (Issues + Reviews)"
+                  current={stats.wisdom}
+                  max={100}
+                  variant="purple"
+                  className="w-full"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </PixelFrame>
