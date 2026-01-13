@@ -16,11 +16,11 @@ const BADGE_ICONS: Record<string, string> = {
   'Pull Shark': '\u{1F988}', // shark
   'Starstruck': '\u{2B50}', // star
   'Galaxy Brain': '\u{1F9E0}', // brain
+  'Pair Extraordinaire': '\u{1F91D}', // handshake
   'YOLO': '\u{1F525}', // fire
+  'Quickdraw': '\u{26A1}', // lightning
   'Arctic Code Vault': '\u{2744}', // snowflake
   'Public Sponsor': '\u{1F496}', // heart
-  'Pair Extraordinaire': '\u{1F91D}', // handshake
-  'Quickdraw': '\u{26A1}', // lightning
 };
 
 // Tier colors
