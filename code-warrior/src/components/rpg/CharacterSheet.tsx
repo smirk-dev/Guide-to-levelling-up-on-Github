@@ -57,7 +57,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
       <PixelFrame variant="gold" padding="lg">
         {/* Header with rank badge */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-pixel-heading text-[12px] text-[var(--gold-light)]">
+          <h2 className="font-pixel-heading text-[var(--font-md)] text-[var(--gold-light)]">
             CHARACTER
           </h2>
           <PixelBadge variant="gold" size="md">
@@ -69,16 +69,16 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         <div className="flex items-center gap-4 mb-6">
           <PixelAvatar src={avatarUrl} alt={username} size="xl" glow />
           <div className="flex-1">
-            <h3 className="font-pixel text-[12px] text-white mb-1 text-outline-dark">
+            <h3 className="font-pixel text-[var(--font-md)] text-white mb-1 text-outline-dark">
               {username}
             </h3>
             <div className="flex items-center gap-2 mb-2">
               <IconRank size={16} />
-              <span className="font-pixel text-[10px] text-[var(--gold-light)]">
+              <span className="font-pixel text-[var(--font-sm)] text-[var(--gold-light)]">
                 {rankName}
               </span>
             </div>
-            <div className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+            <div className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)]">
               LVL {level}
             </div>
           </div>
@@ -87,10 +87,10 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
         {/* XP Bar */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-1">
-            <span className="font-pixel text-[8px] text-[var(--gold-light)]">
+            <span className="font-pixel text-[var(--font-xs)] text-[var(--gold-light)]">
               EXPERIENCE
             </span>
-            <span className="font-pixel text-[8px] text-[var(--gold-medium)]">
+            <span className="font-pixel text-[var(--font-xs)] text-[var(--gold-medium)]">
               {xp.toLocaleString()} XP
             </span>
           </div>
@@ -109,7 +109,7 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
         {/* RPG Stats */}
         <div className="space-y-4">
-          <h4 className="font-pixel text-[8px] text-[var(--gray-highlight)] mb-3 uppercase tracking-wider">
+          <h4 className="font-pixel text-[var(--font-xs)] text-[var(--gray-highlight)] mb-3 uppercase tracking-wider">
             ATTRIBUTES
           </h4>
 
