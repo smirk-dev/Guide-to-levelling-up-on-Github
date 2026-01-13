@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { PixelFrame, StatBar, PixelAvatar, PixelBadge } from '../ui/PixelComponents';
 import { IconHeart, IconMana, IconSword, IconStar, IconReview, IconRank } from '../icons/PixelIcons';
-import { getRankDisplayName } from '@/lib/game-logic';
+import { getRankDisplayName, getNextRank } from '@/lib/game-logic';
 import type { RankTier, RPGStats } from '@/types/database';
 
 interface CharacterSheetProps {
