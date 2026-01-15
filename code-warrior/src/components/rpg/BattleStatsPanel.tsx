@@ -9,6 +9,7 @@ import type { RPGStats } from '@/types/database';
 interface BattleStatsPanelProps {
   stats: RPGStats;
   className?: string;
+  barHeight?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const STAT_TOOLTIPS = {
@@ -22,6 +23,7 @@ const STAT_TOOLTIPS = {
 export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
   stats,
   className = '',
+  barHeight = 'lg',
 }) => {
   return (
     <motion.div
@@ -43,7 +45,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
               value={stats.health}
               max={100}
               variant="health"
-              height="lg"
+              height={barHeight}
             />
           </PixelTooltip>
 
@@ -53,7 +55,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
               value={stats.mana}
               max={100}
               variant="mana"
-              height="lg"
+              height={barHeight}
             />
           </PixelTooltip>
 
@@ -63,7 +65,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
               value={stats.strength}
               max={100}
               variant="strength"
-              height="lg"
+              height={barHeight}
             />
           </PixelTooltip>
 
@@ -73,7 +75,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
               value={stats.charisma}
               max={100}
               variant="charisma"
-              height="lg"
+              height={barHeight}
             />
           </PixelTooltip>
 
@@ -83,7 +85,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
               value={stats.wisdom}
               max={100}
               variant="wisdom"
-              height="lg"
+              height={barHeight}
             />
           </PixelTooltip>
         </div>
