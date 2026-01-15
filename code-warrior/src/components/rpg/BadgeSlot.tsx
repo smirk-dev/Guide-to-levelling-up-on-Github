@@ -254,7 +254,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
     return 0;
   });
 
-  const equippedCount = userBadges.filter((ub) => ub.equipped).length;
+  const equippedCount = safeUserBadges.filter((ub) => ub.equipped).length;
   const maxEquipped = 3; // Can equip up to 3 badges
 
   return (
@@ -297,7 +297,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
             const equippedBadge = sortedBadges.find(
               (b, i) =>
                 getUserBadge(b.id)?.equipped &&
-                userBadges.filter((ub) => ub.equipped).indexOf(getUserBadge(b.id)!) === slot
+                safeUserBadges.filter((ub) => ub.equipped).indexOf(getUserBadge(b.id)!) === slot
             );
             const badge = equippedBadge
               ? badges.find((b) => getUserBadge(b.id)?.equipped)
