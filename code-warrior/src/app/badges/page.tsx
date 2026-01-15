@@ -36,12 +36,33 @@ export default function BadgesPage() {
   }, [status, router]);
 
   // Fetch badges data
-  const { data, isLoading } = useQuery<BadgesData>({
+  const { data, isLoading, error } = useQuery<BadgesData>({
     queryKey: ['badges'],
     queryFn: async () => {
       const res = await fetch('/api/badges/inventory');
       if (!res.ok) throw new Error('Failed to fetch badges');
-      return res.json();
+      const apiData = await res.json();
+
+      // Transform API response { inventory, equippedBadges } to { badges, userBadges }
+      const badges: Badge[] = (apiData.inventory || []).map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        icon_slug: item.icon_slug,
+        stat_boost: item.stat_boost,
+        created_at: item.created_at,
+      }));
+
+      const userBadges: UserBadge[] = (apiData.inventory || [])
+        .filter((item: any) => item.owned)
+        .map((item: any) => ({
+          id: item.id,
+          user_id: '',
+          badge_id: item.id,
+          equipped: item.equipped || false,
+          earned_at: item.earned_at,
+        }));
+
+      return { badges, userBadges };
     },
     enabled: status === 'authenticated',
   });
@@ -136,13 +157,40 @@ export default function BadgesPage() {
     return <LoadingScreen message="LOADING BADGES" />;
   }
 
+  if (status === 'unauthenticated') {
+    return <LoadingScreen message="REDIRECTING" />;
+  }
+
+  if (error) {
+    return (
+      <PageLayout title="BADGES" subtitle="Error loading badges">
+        <PixelFrame variant="critical" padding="lg">
+          <div className="text-center">
+            <p className="font-pixel text-[11px] text-[var(--critical-light)] mb-4">
+              Failed to load badges. Please try again.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="font-pixel text-[9px] text-[var(--mana-light)] hover:underline"
+            >
+              REFRESH PAGE
+            </button>
+          </div>
+        </PixelFrame>
+      </PageLayout>
+    );
+  }
+
   if (!session || !data) {
     return <LoadingScreen message="LOADING BADGE DATA" />;
   }
 
-  const unlockedCount = data.userBadges.length;
-  const totalCount = data.badges.length;
-  const equippedCount = data.userBadges.filter((ub) => ub.equipped).length;
+  // Defensive null checks
+  const badges = data.badges || [];
+  const userBadges = data.userBadges || [];
+  const unlockedCount = userBadges.length;
+  const totalCount = badges.length;
+  const equippedCount = userBadges.filter((ub) => ub?.equipped).length;
 
   return (
     <PageLayout
@@ -201,8 +249,8 @@ export default function BadgesPage() {
         className="mb-8 md:mb-12"
       >
         <BadgeGrid
-          badges={data.badges}
-          userBadges={data.userBadges}
+          badges={badges}
+          userBadges={userBadges}
           onEquipBadge={(badgeId) => equipMutation.mutate(badgeId)}
           onUnequipBadge={(badgeId) => unequipMutation.mutate(badgeId)}
           loadingBadgeId={loadingBadgeId}
