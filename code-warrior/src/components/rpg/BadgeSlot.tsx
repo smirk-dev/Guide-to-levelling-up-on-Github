@@ -300,7 +300,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
                 safeUserBadges.filter((ub) => ub.equipped).indexOf(getUserBadge(b.id)!) === slot
             );
             const badge = equippedBadge
-              ? badges.find((b) => getUserBadge(b.id)?.equipped)
+              ? safeBadges.find((b) => getUserBadge(b.id)?.equipped)
               : null;
 
 
