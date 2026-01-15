@@ -478,11 +478,11 @@ body {
 
 .stat-bar {
   position: relative;
-  height: 32px;
+  height: 12px;
   background: var(--void-darkest);
-  border: 4px solid;
+  border: 2px solid;
   border-color: var(--gray-darkest) var(--gray-light) var(--gray-light) var(--gray-darkest);
-  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.5);
   overflow: hidden;
 }
 
