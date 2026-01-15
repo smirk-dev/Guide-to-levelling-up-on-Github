@@ -9,17 +9,30 @@ import { checkQuestCompletion, updateQuestProgress } from '@/lib/quest-logic';
  * GET /api/quests
  * Fetch all quests and user's quest progress
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    console.log('[Quests GET] Starting request');
     const session = await getServerSession(authOptions);
+    console.log('[Quests GET] Session object:', JSON.stringify(session, null, 2));
 
-    if (!session?.user?.id) {
-      console.error('Quests GET: No session or user ID found');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) {
+      console.error('[Quests GET] No session at all');
+      return NextResponse.json({ error: 'Unauthorized - no session' }, { status: 401 });
+    }
+
+    if (!session.user) {
+      console.error('[Quests GET] Session exists but no user');
+      return NextResponse.json({ error: 'Unauthorized - no user in session' }, { status: 401 });
+    }
+
+    if (!session.user.id) {
+      console.error('[Quests GET] User exists but no ID. User object:', JSON.stringify(session.user));
+      return NextResponse.json({ error: 'Unauthorized - no user ID in session' }, { status: 401 });
     }
 
     const githubId = session.user.id;
     const supabase = getServiceSupabase();
+    console.log('[Quests GET] Fetching user with github_id:', githubId);
 
     // Fetch user
     const { data: user, error: userError } = await supabase
@@ -28,8 +41,19 @@ export async function GET() {
       .eq('github_id', githubId)
       .single();
 
-    if (userError || !user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    console.log('[Quests GET] User fetch result:', { hasError: !!userError, hasUser: !!user, errorMessage: userError?.message });
+
+    if (userError) {
+      console.error('[Quests GET] Supabase error fetching user:', userError.message);
+      if (userError.code === 'PGRST116') {
+        return NextResponse.json({ error: 'User not found in database. Please sync your GitHub stats first.' }, { status: 404 });
+      }
+      throw userError;
+    }
+
+    if (!user) {
+      console.error('[Quests GET] No user returned even though no error');
+      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
     }
 
     // Fetch all quests
@@ -40,6 +64,7 @@ export async function GET() {
       .order('created_at', { ascending: true });
 
     if (questsError) {
+      console.error('[Quests GET] Error fetching quests:', questsError.message);
       throw questsError;
     }
 
@@ -50,18 +75,21 @@ export async function GET() {
       .eq('user_id', user.id);
 
     if (userQuestsError) {
+      console.error('[Quests GET] Error fetching user quests:', userQuestsError.message);
       throw userQuestsError;
     }
 
+    console.log('[Quests GET] Success. Returning quests:', { questCount: quests?.length, userQuestCount: userQuests?.length });
     return NextResponse.json({
-      user, // Include the user object in the response
+      user,
       quests: quests || [],
       userQuests: userQuests || [],
     });
   } catch (error) {
-    console.error('Error fetching quests:', error);
+    console.error('[Quests GET] Caught error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Failed to fetch quests' },
+      { error: 'Failed to fetch quests', details: errorMessage },
       { status: 500 }
     );
   }
