@@ -337,7 +337,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
       {/* All Badges Grid */}
       <div>
         <h3 className="font-pixel text-[var(--font-sm)] md:text-[11px] text-[var(--gray-highlight)] mb-5">
-          ALL BADGES ({userBadges.length}/{badges.length} UNLOCKED)
+          ALL BADGES ({safeUserBadges.length}/{safeBadges.length} UNLOCKED)
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
           {sortedBadges.map((badge, index) => (
