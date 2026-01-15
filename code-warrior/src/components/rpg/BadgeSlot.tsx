@@ -363,7 +363,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
           ))}
         </div>
 
-        {badges.length === 0 && (
+        {safeBadges.length === 0 && (
           <PixelFrame variant="stone" padding="lg">
             <div className="text-center py-8">
               <motion.div
