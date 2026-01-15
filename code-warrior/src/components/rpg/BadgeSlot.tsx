@@ -243,7 +243,7 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
   };
 
   // Sort: equipped first, then owned, then locked
-  const sortedBadges = [...badges].sort((a, b) => {
+  const sortedBadges = [...safeBadges].sort((a, b) => {
     const ubA = getUserBadge(a.id);
     const ubB = getUserBadge(b.id);
 
