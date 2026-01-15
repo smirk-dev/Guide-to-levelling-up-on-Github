@@ -203,14 +203,29 @@ export default function DashboardPage() {
   };
   const xpToNextRank = rankThresholds[user.rank_tier];
 
-  // Get active quests
-  const activeQuests = data.quests
-    .map((quest) => ({
-      quest,
-      userQuest: data.userQuests.find((uq) => uq.quest_id === quest.id) || null,
-    }))
-    .filter(({ userQuest }) => userQuest?.status === 'ACTIVE' || !userQuest)
-    .slice(0, 3);
+  // Get quests with their status
+  const questsWithStatus = data.quests.map((quest) => ({
+    quest,
+    userQuest: data.userQuests.find((uq) => uq.quest_id === quest.id) || null,
+  }));
+
+  // Prioritize: 1) In-progress, 2) Claimable (completed but not claimed), 3) Not started
+  const inProgressQuests = questsWithStatus.filter(
+    ({ userQuest }) => userQuest?.status === 'ACTIVE'
+  );
+  const claimableQuestItems = questsWithStatus.filter(
+    ({ userQuest }) => userQuest?.status === 'COMPLETED' && !userQuest?.claimed_at
+  );
+  const notStartedQuests = questsWithStatus.filter(
+    ({ userQuest }) => !userQuest
+  );
+
+  // Combine for display (prioritize in-progress, then claimable, then not started)
+  const activeQuests = [
+    ...inProgressQuests,
+    ...claimableQuestItems,
+    ...notStartedQuests,
+  ].slice(0, 3);
 
   // Quick stats
   const completedQuests = data.userQuests.filter((uq) => uq.status === 'COMPLETED').length;
@@ -510,7 +525,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-pixel text-[11px] text-[var(--gold-light)]">
-                  Active Quests
+                  Quests
                 </h3>
                 <a
                   href="/quests"
@@ -541,10 +556,12 @@ export default function DashboardPage() {
                   <PixelFrame variant="stone" padding="lg">
                     <div className="text-center py-4">
                       <p className="font-pixel text-[10px] text-[var(--gray-highlight)]">
-                        No active quests
+                        {completedQuests > 0 ? 'All quests completed!' : 'No quests available'}
                       </p>
                       <p className="font-pixel text-[8px] text-[var(--gray-medium)] mt-2">
-                        Sync your stats to discover quests
+                        {completedQuests > 0
+                          ? 'Check back later for new quests'
+                          : 'Sync your stats to discover quests'}
                       </p>
                     </div>
                   </PixelFrame>
