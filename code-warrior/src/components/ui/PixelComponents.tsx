@@ -437,7 +437,7 @@ interface VerticalStatBarProps {
   max: number;
   variant?: 'health' | 'mana' | 'strength' | 'charisma' | 'wisdom';
   showValue?: boolean;
-  height?: 'sm' | 'md' | 'lg';
+  height?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
@@ -454,6 +454,7 @@ export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
     sm: 'h-24',
     md: 'h-32',
     lg: 'h-40',
+    xl: 'h-64',
   };
 
   const variantColors = {
@@ -491,17 +492,27 @@ export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
 
   const colors = variantColors[variant];
 
+  // Calculate actual pixel heights
+  const heightPixels = {
+    sm: 96,
+    md: 128,
+    lg: 160,
+    xl: 256,
+  }[height];
+
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3">
       {/* Stat abbreviation label */}
-      <span className={`font-pixel text-[9px] ${colors.text} uppercase tracking-wider`}>
+      <span className={`font-pixel text-[11px] ${colors.text} uppercase tracking-wider`}>
         {label.slice(0, 3)}
       </span>
 
       {/* Vertical bar container */}
       <div
-        className={`relative w-6 ${heightClasses[height]} ${colors.bg} border-2 border-[var(--gray-dark)] overflow-hidden`}
+        className={`relative ${colors.bg} border-2 border-[var(--gray-dark)] overflow-hidden`}
         style={{
+          width: '32px',
+          height: `${heightPixels}px`,
           boxShadow: 'inset 2px 2px 0 rgba(0, 0, 0, 0.5)',
         }}
       >
