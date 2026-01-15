@@ -69,6 +69,18 @@ export default function DashboardPage() {
     retry: 3,
   });
 
+  // Fetch leaderboard data
+  const { data: leaderboardData } = useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: async () => {
+      const res = await fetch('/api/leaderboard');
+      if (!res.ok) throw new Error('Failed to fetch leaderboard');
+      return res.json();
+    },
+    enabled: !!data?.user,
+    retry: 2,
+  });
+
   // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async () => {
@@ -239,6 +251,7 @@ export default function DashboardPage() {
         onSync={() => syncMutation.mutate()}
         syncing={syncMutation.isPending}
         lastSynced={user.last_synced_at}
+        showProfile={false}
       />
 
       {/* Main Content */}
@@ -260,22 +273,24 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* Two-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
-          {/* Left Column: Character Portrait + Badges + Stats */}
-          <div className="space-y-4">
+        {/* Three-Column Layout */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Left Column (1/3): Character Portrait + Achievements + Battle Stats */}
+          <div className="space-y-3">
             {/* Character Portrait Card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <PixelFrame variant="gold" padding="lg">
+              <PixelFrame variant="gold" padding="md">
                 <div className="flex flex-col items-center">
                   {/* Avatar */}
-                  <PixelAvatar src={user.avatar_url} alt={user.username} size="xl" glow />
+                  <div style={{ width: '72px', height: '72px' }}>
+                    <PixelAvatar src={user.avatar_url} alt={user.username} size="lg" glow />
+                  </div>
 
                   {/* Username */}
-                  <h2 className="font-pixel text-[14px] text-white mt-4 text-center">
+                  <h2 className="font-pixel text-[14px] text-white mt-3 text-center">
                     {user.username}
                   </h2>
 
@@ -288,12 +303,12 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Rank Badge */}
-                  <PixelBadge variant="gold" size="md" className="mt-3">
+                  <PixelBadge variant="gold" size="sm" className="mt-3">
                     {user.rank_tier} Rank
                   </PixelBadge>
 
                   {/* XP Progress to next rank */}
-                  <div className="w-full mt-4">
+                  <div className="w-full mt-3">
                     <div className="flex justify-between text-[9px] font-pixel mb-1">
                       <span className="text-[var(--gray-highlight)]">Rank Progress</span>
                       <span className="text-[var(--gold-light)]">
@@ -312,58 +327,143 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Achievement Badges */}
-                <div className="mt-6 pt-4 border-t-2 border-dashed border-[var(--gold-dark)]">
+                <div className="mt-4 pt-3 border-t-2 border-dashed border-[var(--gold-dark)]">
                   <h4 className="font-pixel text-[9px] text-[var(--gray-highlight)] text-center mb-3">
                     Achievements
                   </h4>
-                  <AchievementBadges badges={badges} maxDisplay={6} />
+                  <AchievementBadges badges={badges} size="lg" />
                 </div>
+
+                {/* Leaderboard Showcase - Compact */}
+                {leaderboardData?.users && leaderboardData.users.length > 0 && (
+                  <div className="mt-3 pt-3 border-t-2 border-dashed border-[var(--gold-dark)]">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                        Leaderboard
+                      </h4>
+                      <a
+                        href="/leaderboard"
+                        className="font-pixel text-[7px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)]"
+                      >
+                        ALL
+                      </a>
+                    </div>
+                    <div className="space-y-1">
+                      {(() => {
+                        const users = leaderboardData.users;
+                        const userIndex = users.findIndex((u: any) => u.id === user.id);
+                        const userRank = userIndex + 1;
+
+                        // Build display list: preceding, current, succeeding
+                        const displayUsers: { user: any; rank: number }[] = [];
+
+                        if (userIndex === -1) {
+                          // User not found, show top 3
+                          users.slice(0, 3).forEach((u: any, idx: number) => {
+                            displayUsers.push({ user: u, rank: idx + 1 });
+                          });
+                        } else {
+                          // Add preceding user if exists
+                          if (userIndex > 0) {
+                            displayUsers.push({ user: users[userIndex - 1], rank: userRank - 1 });
+                          }
+                          // Add current user
+                          displayUsers.push({ user: users[userIndex], rank: userRank });
+                          // Add succeeding user if exists
+                          if (userIndex < users.length - 1) {
+                            displayUsers.push({ user: users[userIndex + 1], rank: userRank + 1 });
+                          }
+                        }
+
+                        return displayUsers.map(({ user: rankedUser, rank }) => {
+                          const isCurrentUser = rankedUser.id === user.id;
+                          return (
+                            <div
+                              key={rankedUser.id}
+                              className={`flex items-center gap-1.5 px-1.5 py-1 rounded ${
+                                isCurrentUser
+                                  ? 'bg-[var(--gold-dark)]/30 border border-[var(--gold-medium)]'
+                                  : 'bg-transparent'
+                              }`}
+                            >
+                              <span
+                                className={`font-pixel text-[8px] w-5 text-right flex-shrink-0 ${
+                                  isCurrentUser ? 'text-[var(--gold-light)]' : 'text-[var(--gray-medium)]'
+                                }`}
+                              >
+                                #{rank}
+                              </span>
+                              <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
+                                <img
+                                  src={rankedUser.avatar_url}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <span
+                                className={`font-pixel text-[7px] truncate flex-1 ${
+                                  isCurrentUser ? 'text-white' : 'text-[var(--gray-light)]'
+                                }`}
+                              >
+                                {rankedUser.username}
+                              </span>
+                              <span
+                                className={`font-pixel text-[7px] flex-shrink-0 ${
+                                  isCurrentUser ? 'text-[var(--gold-light)]' : 'text-[var(--gray-medium)]'
+                                }`}
+                              >
+                                {rankedUser.xp >= 1000 ? `${(rankedUser.xp / 1000).toFixed(1)}k` : rankedUser.xp}
+                              </span>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                )}
               </PixelFrame>
             </motion.div>
-
-            {/* Battle Stats Panel - Vertical Bars */}
-            <BattleStatsPanel stats={rpgStats} />
           </div>
 
-          {/* Right Column: Quick Stats + Quests */}
-          <div className="space-y-6">
+          {/* Right Column (2/3): Quick Stats + Quests */}
+          <div className="col-span-2 space-y-3">
             {/* Quick Stats Row */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <PixelFrame variant="mana" padding="md">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <PixelFrame variant="mana" padding="sm">
+                <div className="grid grid-cols-4 gap-3">
                   <div className="text-center">
-                    <p className="font-pixel-heading text-[20px] text-[var(--gold-light)]">
+                    <p className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
                       {user.xp.toLocaleString()}
                     </p>
-                    <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
                       Total XP
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="font-pixel-heading text-[20px] text-[var(--health-light)]">
+                    <p className="font-pixel-heading text-[16px] text-[var(--health-light)]">
                       {completedQuests}
                     </p>
-                    <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
                       Quests Done
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="font-pixel-heading text-[20px] text-white">
+                    <p className="font-pixel-heading text-[16px] text-white">
                       {level}
                     </p>
-                    <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
                       Level
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="font-pixel-heading text-[20px] text-[var(--mana-light)]">
+                    <p className="font-pixel-heading text-[16px] text-[var(--mana-light)]">
                       {user.github_stats?.repos ?? 0}
                     </p>
-                    <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
                       Repos
                     </p>
                   </div>
@@ -382,15 +482,15 @@ export default function DashboardPage() {
                   className="cursor-pointer hover:scale-105 transition-transform"
                   onClick={() => router.push('/quests')}
                 >
-                  <PixelFrame variant="gold" padding="md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <IconScroll size={24} color="#ffd700" />
+                  <PixelFrame variant="gold" padding="sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <IconScroll size={18} color="#ffd700" />
                         <div>
-                          <p className="font-pixel text-[11px] text-[var(--gold-light)]">
+                          <p className="font-pixel text-[10px] text-[var(--gold-light)]">
                             Rewards Available!
                           </p>
-                          <p className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                          <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
                             {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready
                           </p>
                         </div>
@@ -408,19 +508,19 @@ export default function DashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-pixel text-[12px] text-[var(--gold-light)]">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-pixel text-[11px] text-[var(--gold-light)]">
                   Active Quests
                 </h3>
                 <a
                   href="/quests"
-                  className="font-pixel text-[9px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)]"
+                  className="font-pixel text-[8px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)]"
                 >
                   VIEW ALL
                 </a>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {activeQuests.map(({ quest, userQuest }, index) => (
                   <motion.div
                     key={quest.id}
@@ -451,18 +551,20 @@ export default function DashboardPage() {
                 )}
               </div>
             </motion.div>
+
+            {/* Battle Stats Panel - Vertical Bars */}
+            <BattleStatsPanel stats={rpgStats} barHeight="lg" />
+
+            {/* Activity Heatmap */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <ActivityHeatmap contributions={contributions} />
+            </motion.div>
           </div>
         </div>
-
-        {/* Activity Heatmap - Full Width */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6"
-        >
-          <ActivityHeatmap contributions={contributions} />
-        </motion.div>
 
         {/* Last Sync Info */}
         {user.last_synced_at && (
@@ -495,10 +597,10 @@ export default function DashboardPage() {
                  const isCurrent = rank === user.rank_tier;
                  return (
                    <div key={rank} className={`${isCurrent ? 'ring-2 ring-[var(--gold-light)] p-1' : ''}`}>
-                     <p className={`font-pixel text-[9px] ${isCurrent ? 'text-[var(--gold-light)] font-bold' : 'text-[var(--gray-medium)]'}`}>
+                     <p className={`font-pixel text-[9px] ${isCurrent ? 'text-[var(--gold-highlight)] font-bold' : 'text-[var(--gray-highlight)]'}`}>
                        {rank}
                      </p>
-                     <p className="font-pixel text-[7px] text-[var(--gray-darkest)]">
+                     <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
                        {thresholds[idx].toLocaleString()}
                      </p>
                    </div>
