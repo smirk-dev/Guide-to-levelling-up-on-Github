@@ -17,6 +17,7 @@ interface GameHUDProps {
   onSync: () => void;
   syncing?: boolean;
   lastSynced?: string | null;
+  showProfile?: boolean;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -29,6 +30,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onSync,
   syncing = false,
   lastSynced,
+  showProfile = true,
 }) => {
   const xpInLevel = xp % 1000;
   const xpProgress = (xpInLevel / 1000) * 100;
@@ -42,34 +44,38 @@ export const GameHUD: React.FC<GameHUDProps> = ({
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Left: Avatar + User Info */}
-        <div className="flex items-center gap-3">
-          <PixelAvatar src={avatarUrl} alt={username} size="md" glow />
+        {showProfile ? (
+          <div className="flex items-center gap-3">
+            <PixelAvatar src={avatarUrl} alt={username} size="md" glow />
 
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <span className="font-pixel text-[11px] text-white truncate max-w-[120px]">
-                {username}
-              </span>
-              <PixelBadge variant="gold" size="sm">
-                {rankTier}
-              </PixelBadge>
-            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="font-pixel text-[11px] text-white truncate max-w-[120px]">
+                  {username}
+                </span>
+                <PixelBadge variant="gold" size="sm">
+                  {rankTier}
+                </PixelBadge>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <span className="font-pixel text-[9px] text-[var(--gray-highlight)]">
-                Lv.{level}
-              </span>
-              <div className="w-24">
-                <PixelProgress
-                  value={xpInLevel}
-                  max={1000}
-                  variant="gold"
-                  size="sm"
-                />
+              <div className="flex items-center gap-2">
+                <span className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                  Lv.{level}
+                </span>
+                <div className="w-24">
+                  <PixelProgress
+                    value={xpInLevel}
+                    max={1000}
+                    variant="gold"
+                    size="sm"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex-1" />
+        )}
 
         {/* Center: XP Display */}
         <div className="hidden md:flex items-center gap-2">
