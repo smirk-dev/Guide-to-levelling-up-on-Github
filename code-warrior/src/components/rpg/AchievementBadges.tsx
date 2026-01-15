@@ -9,6 +9,7 @@ interface AchievementBadgesProps {
   badges: GitHubAchievementBadge[];
   className?: string;
   maxDisplay?: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 // Pixel art emoji icons for each badge type
@@ -35,7 +36,15 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({
   badges,
   className = '',
   maxDisplay = 6,
+  size = 'md',
 }) => {
+  const sizeMap = {
+    sm: { container: 40, icon: 'text-lg', tier: 16, tierText: 'text-[7px]', gap: 'gap-2' },
+    md: { container: 48, icon: 'text-2xl', tier: 20, tierText: 'text-[8px]', gap: 'gap-3' },
+    lg: { container: 64, icon: 'text-4xl', tier: 24, tierText: 'text-[10px]', gap: 'gap-4' },
+    xl: { container: 96, icon: 'text-6xl', tier: 32, tierText: 'text-[12px]', gap: 'gap-4' },
+  };
+  const sizing = sizeMap[size];
   if (!badges || badges.length === 0) {
     return (
       <div className={`text-center py-2 ${className}`}>
@@ -46,12 +55,12 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({
     );
   }
 
-  const displayBadges = badges.slice(0, maxDisplay);
-  const remainingCount = badges.length - maxDisplay;
+  const displayBadges = maxDisplay ? badges.slice(0, maxDisplay) : badges;
+  const remainingCount = maxDisplay ? Math.max(0, badges.length - maxDisplay) : 0;
 
   return (
     <div className={`${className}`}>
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className={`flex flex-wrap items-center justify-center ${sizing.gap}`}>
         {displayBadges.map((badge, index) => (
           <motion.div
             key={badge.id}
@@ -64,26 +73,30 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({
               position="top"
             >
               <div
-                className="relative w-10 h-10 flex items-center justify-center bg-[var(--void-darker)] border-2 border-[var(--gray-dark)] cursor-pointer hover:border-[var(--gold-medium)] transition-colors"
+                className="relative flex items-center justify-center bg-[var(--void-darker)] border-2 border-[var(--gray-dark)] cursor-pointer hover:border-[var(--gold-medium)] transition-colors"
                 style={{
+                  width: `${sizing.container}px`,
+                  height: `${sizing.container}px`,
                   boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.4)',
                 }}
               >
                 {/* Badge Icon */}
-                <span className="text-lg">
+                <span className={sizing.icon}>
                   {BADGE_ICONS[badge.name] || '\u{1F3C6}'}
                 </span>
 
                 {/* Tier indicator */}
                 {badge.tier && (
                   <div
-                    className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center bg-[var(--void-darkest)] border border-[var(--gray-dark)]"
+                    className="absolute -bottom-1 -right-1 flex items-center justify-center bg-[var(--void-darkest)] border border-[var(--gray-dark)]"
                     style={{
+                      width: `${sizing.tier}px`,
+                      height: `${sizing.tier}px`,
                       boxShadow: '1px 1px 0 rgba(0, 0, 0, 0.4)',
                     }}
                   >
                     <span
-                      className="font-pixel text-[7px]"
+                      className={`font-pixel ${sizing.tierText}`}
                       style={{ color: TIER_COLORS[badge.tier] }}
                     >
                       {badge.tier.replace('x', '')}
@@ -94,23 +107,6 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({
             </PixelTooltip>
           </motion.div>
         ))}
-
-        {/* Show remaining count if there are more badges */}
-        {remainingCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: displayBadges.length * 0.05 }}
-          >
-            <div
-              className="w-10 h-10 flex items-center justify-center bg-[var(--void-darker)] border-2 border-dashed border-[var(--gray-medium)]"
-            >
-              <span className="font-pixel text-[9px] text-[var(--gray-highlight)]">
-                +{remainingCount}
-              </span>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );
