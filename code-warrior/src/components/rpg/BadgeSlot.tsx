@@ -200,15 +200,19 @@ interface BadgeGridProps {
 }
 
 export const BadgeGrid: React.FC<BadgeGridProps> = ({
-  badges,
-  userBadges,
+  badges = [],
+  userBadges = [],
   onEquipBadge,
   onUnequipBadge,
   loadingBadgeId,
   className = '',
 }) => {
+  // Defensive null checks
+  const safeBadges = badges || [];
+  const safeUserBadges = userBadges || [];
+
   const getUserBadge = (badgeId: string) =>
-    userBadges.find((ub) => ub.badge_id === badgeId) || null;
+    safeUserBadges.find((ub) => ub.badge_id === badgeId) || null;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
