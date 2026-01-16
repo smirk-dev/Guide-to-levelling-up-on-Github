@@ -1,9 +1,35 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PixelFrame, PixelTooltip } from '../ui/PixelComponents';
 import type { ContributionDay } from '@/types/database';
+
+// Hook for lazy loading with IntersectionObserver
+const useLazyLoad = (rootMargin = '100px') => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [rootMargin]);
+
+  return { ref, isVisible };
+};
 
 interface ActivityHeatmapProps {
   contributions: ContributionDay[];
@@ -26,6 +52,9 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
   contributions,
   className = '',
 }) => {
+  // Lazy loading - only render full heatmap when visible
+  const { ref, isVisible } = useLazyLoad('200px');
+
   // Process contributions into weeks for rendering
   const { weeks, monthLabels, totalContributions } = useMemo(() => {
     if (!contributions || contributions.length === 0) {
@@ -93,6 +122,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
@@ -108,7 +138,17 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
           </span>
         </div>
 
-        {/* Heatmap Grid */}
+        {/* Skeleton loader when not visible */}
+        {!isVisible && (
+          <div className="h-[120px] bg-[var(--void-darker)] animate-pulse flex items-center justify-center">
+            <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
+              Loading activity...
+            </span>
+          </div>
+        )}
+
+        {/* Heatmap Grid - only render when visible */}
+        {isVisible && (
         <div className="overflow-x-auto pb-2">
           <div className="inline-flex flex-col gap-1 min-w-max">
             {/* Month labels */}
@@ -174,6 +214,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
             </div>
           </div>
         </div>
+        )}
       </PixelFrame>
     </motion.div>
   );
