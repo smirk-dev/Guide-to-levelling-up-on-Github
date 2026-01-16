@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { PageLayout, PixelFrame, PixelButton } from '@/components';
+import { PixelFrame, PixelButton } from '@/components';
+import { IconBadge } from '@/components/icons/PixelIcons';
 
 export default function BadgesError({
   error,
@@ -11,22 +12,28 @@ export default function BadgesError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Badges page error:', error);
+    console.error('Badges error:', error);
   }, [error]);
 
   return (
-    <PageLayout title="BADGES" subtitle="Error loading badges">
-      <PixelFrame variant="critical" padding="lg" className="max-w-md mx-auto">
+    <div className="min-h-screen bg-[var(--void-darkest)] flex items-center justify-center p-4">
+      <PixelFrame variant="critical" padding="lg" className="max-w-lg w-full">
         <div className="text-center">
-          <h2 className="font-pixel text-[12px] text-[var(--critical-light)] mb-4">
-            BADGE SYSTEM ERROR
+          <div className="flex justify-center mb-4 opacity-50">
+            <IconBadge size={48} color="var(--gray-medium)" />
+          </div>
+          <h2 className="font-pixel text-[14px] text-[var(--critical-light)] mb-3">
+            BADGE ARMORY LOCKED
           </h2>
-          <p className="font-pixel text-[9px] text-[var(--gray-highlight)] mb-6">
+          <p className="font-pixel text-[9px] text-[var(--gray-highlight)] mb-2">
             Failed to load your badge collection.
+          </p>
+          <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-6">
+            The armory is temporarily inaccessible. Please try again.
           </p>
           <div className="flex flex-col gap-3">
             <PixelButton variant="mana" onClick={reset}>
-              RETRY
+              UNLOCK ARMORY
             </PixelButton>
             <a
               href="/dashboard"
@@ -37,6 +44,6 @@ export default function BadgesError({
           </div>
         </div>
       </PixelFrame>
-    </PageLayout>
+    </div>
   );
 }
