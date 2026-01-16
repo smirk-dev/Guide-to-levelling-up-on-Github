@@ -26,3 +26,20 @@ export {
   LoadingScreen,
   Toast,
 } from './effects/Effects';
+
+// Error Handling
+export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';
+
+// Onboarding
+export { OnboardingTutorial, useOnboarding } from './onboarding/OnboardingTutorial';
+
+// Notifications
+export {
+  NotificationProvider,
+  NotificationPanel,
+  NotificationBell,
+  useNotifications,
+} from './notifications/NotificationProvider';
+
+// Export/Share
+export { ShareableCard, ShareStatsButton } from './export/ShareableCard';
