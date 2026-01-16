@@ -92,13 +92,29 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
 
         {/* Optional: Show total power level */}
         <div className="mt-4 pt-4 border-t-2 border-dashed border-[var(--gray-dark)]">
-          <div className="flex justify-between items-center">
-            <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
-              Power Level
-            </span>
-            <span className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
-              {Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}
-            </span>
+          <PixelTooltip
+            content="Power Level = Average of all 5 stats (HP + MP + STR + CHA + WIS) / 5"
+            position="top"
+          >
+            <div className="flex justify-between items-center cursor-help">
+              <span className="font-pixel text-[9px] text-[var(--gray-medium)] flex items-center gap-1">
+                Power Level
+                <span className="text-[var(--mana-light)] opacity-60">?</span>
+              </span>
+              <span className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
+                {Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}
+              </span>
+            </div>
+          </PixelTooltip>
+          <div className="mt-2">
+            <div className="h-2 bg-[var(--void-darker)] border border-[var(--gray-dark)] overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[var(--gold-dark)] to-[var(--gold-light)] transition-all duration-500"
+                style={{
+                  width: `${Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}%`,
+                }}
+              />
+            </div>
           </div>
         </div>
       </PixelFrame>
