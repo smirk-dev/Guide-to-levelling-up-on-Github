@@ -534,6 +534,64 @@ export const IconUnlock: React.FC<IconProps> = ({ size = 24, className = '', col
   </IconWrapper>
 );
 
+// Alias for IconX - commonly used for close buttons
+export const IconClose: React.FC<IconProps> = ({ size = 24, className = '', color = '#8b949e' }) => (
+  <IconWrapper size={size} className={className}>
+    <rect x="2" y="2" width="2" height="2" fill={color} />
+    <rect x="4" y="4" width="2" height="2" fill={color} />
+    <rect x="6" y="6" width="4" height="4" fill={color} />
+    <rect x="10" y="4" width="2" height="2" fill={color} />
+    <rect x="12" y="2" width="2" height="2" fill={color} />
+    <rect x="4" y="10" width="2" height="2" fill={color} />
+    <rect x="2" y="12" width="2" height="2" fill={color} />
+    <rect x="10" y="10" width="2" height="2" fill={color} />
+    <rect x="12" y="12" width="2" height="2" fill={color} />
+  </IconWrapper>
+);
+
+export const IconShare: React.FC<IconProps> = ({ size = 24, className = '', color = '#58a6ff' }) => (
+  <IconWrapper size={size} className={className}>
+    {/* Arrow */}
+    <rect x="7" y="0" width="2" height="8" fill={color} />
+    <rect x="5" y="2" width="2" height="2" fill={color} />
+    <rect x="9" y="2" width="2" height="2" fill={color} />
+    {/* Box */}
+    <rect x="2" y="6" width="2" height="8" fill={color} />
+    <rect x="12" y="6" width="2" height="8" fill={color} />
+    <rect x="2" y="14" width="12" height="2" fill={color} />
+  </IconWrapper>
+);
+
+export const IconBell: React.FC<IconProps> = ({ size = 24, className = '', color = '#ffd700' }) => (
+  <IconWrapper size={size} className={className}>
+    {/* Bell body */}
+    <rect x="4" y="2" width="8" height="8" fill={color} />
+    <rect x="2" y="6" width="2" height="4" fill={color} />
+    <rect x="12" y="6" width="2" height="4" fill={color} />
+    <rect x="2" y="10" width="12" height="2" fill={color} />
+    {/* Clapper */}
+    <rect x="6" y="12" width="4" height="2" fill={color} />
+    <rect x="7" y="14" width="2" height="2" fill={color} />
+    {/* Top */}
+    <rect x="7" y="0" width="2" height="2" fill={color} />
+  </IconWrapper>
+);
+
+export const IconDownload: React.FC<IconProps> = ({ size = 24, className = '', color = '#2ea043' }) => (
+  <IconWrapper size={size} className={className}>
+    {/* Arrow */}
+    <rect x="7" y="0" width="2" height="8" fill={color} />
+    <rect x="5" y="6" width="2" height="2" fill={color} />
+    <rect x="9" y="6" width="2" height="2" fill={color} />
+    <rect x="3" y="8" width="2" height="2" fill={color} />
+    <rect x="11" y="8" width="2" height="2" fill={color} />
+    {/* Base */}
+    <rect x="2" y="12" width="12" height="2" fill={color} />
+    <rect x="2" y="10" width="2" height="2" fill={color} />
+    <rect x="12" y="10" width="2" height="2" fill={color} />
+  </IconWrapper>
+);
+
 // Export all icons as a map for easy access
 export const PixelIcons = {
   sword: IconSword,
@@ -571,4 +629,8 @@ export const PixelIcons = {
   warning: IconWarning,
   lock: IconLock,
   unlock: IconUnlock,
+  close: IconClose,
+  share: IconShare,
+  bell: IconBell,
+  download: IconDownload,
 };
