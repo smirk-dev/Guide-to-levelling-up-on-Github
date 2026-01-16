@@ -1,12 +1,56 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DndContext, closestCenter, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import { PixelFrame, PixelButton, PixelBadge, PixelTooltip } from '../ui/PixelComponents';
-import { IconBadge, IconShield, IconCheck, IconLock, IconHeart, IconMana, IconSword, IconStar, IconReview } from '../icons/PixelIcons';
+import { IconBadge, IconShield, IconCheck, IconLock, IconHeart, IconMana, IconSword, IconStar, IconReview, IconInfo } from '../icons/PixelIcons';
 import { soundManager } from '@/lib/sound';
 import type { Badge, UserBadge } from '@/types/database';
+
+// Badge unlock requirements - defines how each badge can be unlocked
+const BADGE_UNLOCK_REQUIREMENTS: Record<string, { description: string; requirement: string; icon: string }> = {
+  'Newbie Sword': {
+    description: 'Your first weapon in the coding arena',
+    requirement: 'Complete your first quest',
+    icon: '⚔️',
+  },
+  'Scroll of Truth': {
+    description: 'Knowledge is power',
+    requirement: 'Create 5 issues on GitHub',
+    icon: '📜',
+  },
+  'Pull Shark': {
+    description: 'Master of merging code',
+    requirement: 'Get 10 pull requests merged',
+    icon: '🦈',
+  },
+  'YOLO Badge': {
+    description: 'Living on the edge',
+    requirement: 'Push directly to main branch',
+    icon: '🔥',
+  },
+  'Star Collector': {
+    description: 'Your repos shine bright',
+    requirement: 'Receive 50 stars on your repositories',
+    icon: '⭐',
+  },
+  'Code Ninja': {
+    description: 'Silent but deadly commits',
+    requirement: 'Make 100 commits',
+    icon: '🥷',
+  },
+  'Bug Hunter': {
+    description: 'Squashing bugs since day one',
+    requirement: 'Close 20 issues',
+    icon: '🐛',
+  },
+  'Review Master': {
+    description: 'Guardian of code quality',
+    requirement: 'Complete 25 code reviews',
+    icon: '👀',
+  },
+};
 
 interface BadgeSlotProps {
   badge: Badge;
