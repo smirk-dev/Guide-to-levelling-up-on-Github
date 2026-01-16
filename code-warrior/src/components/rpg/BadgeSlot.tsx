@@ -186,11 +186,27 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
           )}
 
           {/* Status/Actions */}
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-2">
             {!isOwned && (
-              <span className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)]">
-                LOCKED
-              </span>
+              <div className="text-center">
+                <PixelTooltip
+                  content={
+                    BADGE_UNLOCK_REQUIREMENTS[badge.name]?.requirement ||
+                    'Complete quests to unlock this badge'
+                  }
+                  position="top"
+                >
+                  <span className="font-pixel text-[var(--font-xs)] text-[var(--gray-medium)] cursor-help flex items-center gap-1">
+                    <IconLock size={10} color="#6b7280" />
+                    LOCKED
+                  </span>
+                </PixelTooltip>
+                {BADGE_UNLOCK_REQUIREMENTS[badge.name] && (
+                  <p className="font-pixel text-[6px] text-[var(--gray-dark)] mt-1 max-w-[120px]">
+                    {BADGE_UNLOCK_REQUIREMENTS[badge.name].requirement}
+                  </p>
+                )}
+              </div>
             )}
             {isOwned && !isEquipped && onEquip && (
               <PixelButton
