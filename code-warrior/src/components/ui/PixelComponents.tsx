@@ -364,6 +364,8 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
   className = '',
   glow = false,
 }) => {
+  const [imageError, setImageError] = React.useState(false);
+  
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -372,18 +374,27 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
   };
 
   const glowClass = glow ? 'pixel-avatar-glow' : '';
+  
+  // Generate initials from alt text (e.g., "John Doe" -> "JD")
+  const initials = alt
+    .split(' ')
+    .map((word) => word.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div className={`${sizeClasses[size]} ${glowClass} ${className}`}>
-      {src ? (
+      {src && !imageError ? (
         <img
           src={src}
           alt={alt}
+          onError={() => setImageError(true)}
           className="w-full h-full pixel-avatar object-cover"
         />
       ) : (
         <div className="w-full h-full pixel-avatar bg-[var(--gray-dark)] flex items-center justify-center">
-          <span className="text-[var(--gray-light)] font-pixel text-xs">?</span>
+          <span className="text-white font-pixel text-sm">{initials || '?'}</span>
         </div>
       )}
     </div>
