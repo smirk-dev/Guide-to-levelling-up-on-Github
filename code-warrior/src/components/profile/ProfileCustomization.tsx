@@ -95,7 +95,8 @@ export const ProfileCustomization: React.FC<ProfileCustomizationProps> = ({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:opacity-70"
+              className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
+              aria-label="Close customization"
             >
               <IconClose size={16} color="var(--gray-medium)" />
             </button>
