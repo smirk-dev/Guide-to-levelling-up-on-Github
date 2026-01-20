@@ -162,6 +162,10 @@ interface PixelInputProps {
   type?: 'text' | 'email' | 'password' | 'number';
   className?: string;
   disabled?: boolean;
+  id?: string;
+  hasError?: boolean;
+  errorMessage?: string;
+  'aria-label'?: string;
 }
 
 export const PixelInput: React.FC<PixelInputProps> = ({
@@ -171,16 +175,38 @@ export const PixelInput: React.FC<PixelInputProps> = ({
   type = 'text',
   className = '',
   disabled = false,
+  id,
+  hasError = false,
+  errorMessage = '',
+  'aria-label': ariaLabel,
 }) => {
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = `${inputId}-error`;
+
   return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={`input-pixel w-full ${className}`}
-    />
+    <div className="w-full">
+      <input
+        id={inputId}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? errorId : undefined}
+        className={`input-pixel w-full ${hasError ? 'border-2 border-[var(--critical)]' : ''} ${className}`}
+      />
+      {hasError && errorMessage && (
+        <div
+          id={errorId}
+          role="alert"
+          className="font-pixel text-[10px] text-[var(--critical)] mt-1"
+        >
+          {errorMessage}
+        </div>
+      )}
+    </div>
   );
 };
 

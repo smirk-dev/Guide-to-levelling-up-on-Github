@@ -258,6 +258,7 @@ export default function LeaderboardPage() {
               <input
                 type="text"
                 placeholder="Search warriors..."
+                aria-label="Search leaderboard by warrior username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 bg-[var(--void-darker)] border-2 border-[var(--gray-dark)] text-white font-pixel text-[10px] placeholder:text-[var(--gray-medium)] focus:border-[var(--mana-medium)] focus:outline-none"
