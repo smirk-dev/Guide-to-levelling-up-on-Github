@@ -23,6 +23,7 @@ import {
 } from '@/components';
 import { calculateRPGStats, getRankDisplayName, getNextRank } from '@/lib/game-logic';
 import { soundManager } from '@/lib/sound';
+import { DashboardSkeleton } from '@/components/ui/LoadingSkeletons';
 import type { User, Quest, UserQuest, RankTier, ContributionDay, GitHubAchievementBadge } from '@/types/database';
 
 interface DashboardData {
@@ -158,7 +159,7 @@ export default function DashboardPage() {
   }
 
   if (isLoading && !data) {
-    return <LoadingScreen message="LOADING DASHBOARD" />;
+    return <DashboardSkeleton />;
   }
 
   if (error && !data) {
