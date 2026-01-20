@@ -177,7 +177,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
                   <PixelBadge variant="health" size="sm">
                     <div className="flex items-center gap-1">
                       {getStatIcon(stat)}
-                      <span className="text-[6px]">+{value}</span>
+                      <span className="text-[10px]">+{value}</span>
                     </div>
                   </PixelBadge>
                 </PixelTooltip>
@@ -202,7 +202,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
                   </span>
                 </PixelTooltip>
                 {BADGE_UNLOCK_REQUIREMENTS[badge.name] && (
-                  <p className="font-pixel text-[6px] text-[var(--gray-dark)] mt-1 max-w-[120px]">
+                  <p className="font-pixel text-[10px] text-[var(--gray-highlight)] mt-1 max-w-[120px]">
                     {BADGE_UNLOCK_REQUIREMENTS[badge.name].requirement}
                   </p>
                 )}
@@ -239,7 +239,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
           {/* Earned date */}
           {userBadge?.earned_at && (
             <div className="text-center mt-2">
-              <span className="font-pixel text-[6px] text-[var(--gray-medium)]">
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">
                 EARNED {new Date(userBadge.earned_at).toLocaleDateString()}
               </span>
             </div>

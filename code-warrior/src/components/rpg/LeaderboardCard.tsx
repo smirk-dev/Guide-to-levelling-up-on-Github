@@ -108,7 +108,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               >
                 {rankName}
               </span>
-              <span className="font-pixel text-[6px] text-[var(--gray-medium)]">
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">
                 ({user.rank_tier})
               </span>
             </div>
@@ -122,7 +122,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 {user.xp.toLocaleString()}
               </span>
             </div>
-            <span className="font-pixel text-[6px] text-[var(--gray-medium)]">
+            <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">
               XP
             </span>
           </div>

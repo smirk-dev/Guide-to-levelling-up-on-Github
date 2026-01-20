@@ -156,7 +156,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
               {monthLabels.map(({ month, index }, i) => (
                 <span
                   key={`${month}-${i}`}
-                  className="font-pixel text-[8px] text-[var(--gray-medium)]"
+                  className="font-pixel text-[10px] text-[var(--gray-highlight)]"
                   style={{ marginLeft: i === 0 ? 0 : `${(index - (monthLabels[i - 1]?.index || 0)) * 11 - 20}px` }}
                 >
                   {month}
@@ -171,7 +171,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                 {DAYS.map((day, i) => (
                   <span
                     key={i}
-                    className="font-pixel text-[7px] text-[var(--gray-medium)] h-[9px] leading-[9px]"
+                    className="font-pixel text-[10px] text-[var(--gray-highlight)] h-[9px] leading-[9px]"
                   >
                     {day}
                   </span>
@@ -203,14 +203,14 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
 
             {/* Legend */}
             <div className="flex items-center justify-end gap-2 mt-3">
-              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">Less</span>
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">Less</span>
               {[0, 1, 2, 3, 4].map((level) => (
                 <div
                   key={level}
                   className={`w-[9px] h-[9px] ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} border border-[var(--void-darker)]`}
                 />
               ))}
-              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">More</span>
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">More</span>
             </div>
           </div>
         </div>

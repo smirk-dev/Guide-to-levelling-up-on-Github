@@ -134,7 +134,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
                 {quest.description}
               </p>
               <div className="mb-4 p-3 bg-[var(--void-darkest)] border-2 border-[var(--gray-dark)]">
-                <p className="font-pixel text-[7px] text-[var(--mana-light)] mb-1">
+                <p className="font-pixel text-[10px] text-[var(--mana-light)] mb-1">
                   Objective:
                 </p>
                 <p className="font-pixel text-[var(--font-xs)] text-white">
@@ -149,10 +149,10 @@ export const QuestCard: React.FC<QuestCardProps> = ({
         {isActive && (
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
-              <span className="font-pixel text-[7px] text-[var(--gray-light)]">
+              <span className="font-pixel text-[10px] text-[var(--gray-highlight)]">
                 Progress
               </span>
-              <span className="font-pixel text-[7px] text-[var(--mana-light)]">
+              <span className="font-pixel text-[10px] text-[var(--mana-light)]">
                 {progress}/{quest.criteria_threshold}
               </span>
             </div>
