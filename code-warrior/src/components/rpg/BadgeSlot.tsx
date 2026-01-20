@@ -217,6 +217,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
                   onEquip();
                 }}
                 loading={loading}
+                aria-label={`Equip ${badge.name} badge`}
               >
                 EQUIP
               </PixelButton>
@@ -229,6 +230,8 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
                   soundManager.click();
                   onUnequip();
                 }}
+                loading={loading}
+                aria-label={`Unequip ${badge.name} badge`}                }}
                 loading={loading}
               >
                 UNEQUIP

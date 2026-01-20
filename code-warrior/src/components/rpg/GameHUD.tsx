@@ -96,6 +96,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             onClick={onSync}
             loading={syncing}
             disabled={syncing}
+            aria-label={syncing ? 'Syncing GitHub stats...' : 'Sync GitHub stats'}
           >
             <span className="flex items-center gap-2">
               <IconSync size={14} className={syncing ? 'animate-spin' : ''} />

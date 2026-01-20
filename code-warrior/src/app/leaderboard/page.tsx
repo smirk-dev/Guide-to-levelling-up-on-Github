@@ -268,6 +268,8 @@ export default function LeaderboardPage() {
             <div className="flex flex-wrap gap-2 justify-center">
               <button
                 onClick={() => setSelectedRankFilter('ALL')}
+                aria-label="Show all warriors regardless of rank"
+                aria-pressed={selectedRankFilter === 'ALL'}
                 className={`px-3 py-1 font-pixel text-[8px] border-2 transition-colors ${
                   selectedRankFilter === 'ALL'
                     ? 'bg-[var(--mana-medium)] border-[var(--mana-light)] text-white'
@@ -280,6 +282,8 @@ export default function LeaderboardPage() {
                 <button
                   key={rank}
                   onClick={() => setSelectedRankFilter(rank)}
+                  aria-label={`Filter leaderboard to show only ${rank} rank warriors`}
+                  aria-pressed={selectedRankFilter === rank}
                   className={`px-2 py-1 font-pixel text-[8px] border-2 transition-colors ${
                     selectedRankFilter === rank
                       ? 'bg-[var(--gold-medium)] border-[var(--gold-light)] text-[var(--void-darkest)]'

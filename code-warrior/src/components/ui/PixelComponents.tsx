@@ -110,6 +110,7 @@ interface PixelButtonProps {
   onClick?: () => void;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
+  'aria-label'?: string;
 }
 
 export const PixelButton: React.FC<PixelButtonProps> = ({
@@ -121,6 +122,7 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
   onClick,
   className = '',
   type = 'button',
+  'aria-label': ariaLabel,
 }) => {
   const sizeClasses = {
     sm: 'px-3 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-xs)]',
@@ -141,6 +143,7 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
       onClick={handleClick}
       onMouseEnter={() => !disabled && soundManager.hover()}
       disabled={disabled || loading}
+      aria-label={ariaLabel}
       className={`btn-pixel btn-${variant} ${sizeClasses[size]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--void-darkest)] focus-visible:ring-[var(--mana-light)] ${className}`}
     >
       {loading ? (
