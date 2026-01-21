@@ -33,6 +33,21 @@ const UserProfileModal: React.FC<{
   onClose: () => void;
   rank: number;
 }> = ({ user, isOpen, onClose, rank }) => {
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !user) return null;
 
   const level = Math.floor(user.xp / 1000) + 1;

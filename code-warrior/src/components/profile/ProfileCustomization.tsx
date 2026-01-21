@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelFrame, PixelButton, PixelBadge, PixelAvatar } from '../ui/PixelComponents';
 import { IconClose, IconCheck, IconStar, IconRank } from '../icons/PixelIcons';
@@ -60,6 +60,21 @@ export const ProfileCustomization: React.FC<ProfileCustomizationProps> = ({
 }) => {
   const [selectedBorder, setSelectedBorder] = useState<keyof typeof AVATAR_BORDERS>(currentBorder);
   const [selectedTitle, setSelectedTitle] = useState<keyof typeof CUSTOM_TITLES>(currentTitle);
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   const handleSave = () => {
     onSave(selectedBorder, selectedTitle);
