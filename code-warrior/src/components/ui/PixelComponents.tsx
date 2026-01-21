@@ -126,8 +126,8 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
 }) => {
   const sizeClasses = {
     sm: 'px-3 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-xs)]',
-    md: 'px-6 py-3 text-[var(--font-sm)]',
-    lg: 'px-8 py-4 text-[var(--font-md)]',
+    md: 'px-6 py-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-sm)]',
+    lg: 'px-8 py-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-md)]',
   };
 
   const handleClick = () => {
