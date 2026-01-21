@@ -31,6 +31,42 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo);
   }
 
+  private getErrorMessage = (): string => {
+    if (!this.state.error) return 'An unexpected error occurred';
+
+    const message = this.state.error.message.toLowerCase();
+
+    if (message.includes('fetch') || message.includes('network')) {
+      return 'Unable to load this component. Please check your internet connection and try again.';
+    }
+    if (message.includes('not found')) {
+      return 'The requested resource could not be found.';
+    }
+    if (message.includes('unauthorized') || message.includes('forbidden')) {
+      return 'You do not have permission to access this resource.';
+    }
+
+    return this.state.error.message || 'An unexpected error occurred';
+  };
+
+  private getErrorTitle = (): string => {
+    if (!this.state.error) return 'Error';
+
+    const message = this.state.error.message.toLowerCase();
+
+    if (message.includes('fetch') || message.includes('network')) {
+      return 'Connection Error';
+    }
+    if (message.includes('not found')) {
+      return 'Not Found';
+    }
+    if (message.includes('unauthorized') || message.includes('forbidden')) {
+      return 'Access Denied';
+    }
+
+    return 'Error';
+  };
+
   private handleRetry = () => {
     this.setState({ hasError: false, error: null });
   };
@@ -47,12 +83,12 @@ export class ErrorBoundary extends Component<Props, State> {
             <IconWarning size={24} color="var(--critical-light)" />
             <div className="flex-1">
               <h3 className="font-pixel text-[11px] text-[var(--critical-light)] mb-2">
-                {this.props.context ? `Error loading ${this.props.context}` : 'Something went wrong'}
+                {this.getErrorTitle()}
               </h3>
-              <p className="font-pixel text-[8px] text-[var(--gray-medium)] mb-3">
-                {this.state.error?.message || 'An unexpected error occurred'}
+              <p className="font-pixel text-[10px] text-[var(--gray-medium)] mb-3 leading-relaxed">
+                {this.getErrorMessage()}
               </p>
-              <PixelButton variant="ghost" size="sm" onClick={this.handleRetry}>
+              <PixelButton variant="health" size="sm" onClick={this.handleRetry}>
                 TRY AGAIN
               </PixelButton>
             </div>
