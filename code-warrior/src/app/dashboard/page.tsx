@@ -159,7 +159,15 @@ export default function DashboardPage() {
   }
 
   if (isLoading && !data) {
-    return <DashboardSkeleton />;
+    return (
+      <>
+        {/* Screen reader announcement for loading state */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          Loading dashboard content...
+        </div>
+        <DashboardSkeleton />
+      </>
+    );
   }
 
   if (error && !data) {
@@ -237,6 +245,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--void-darkest)]">
+      {/* Screen reader announcement for page load completion */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        Dashboard content loaded successfully
+      </div>
+
       {/* Toast */}
       <Toast
         message={toast.message}
@@ -412,7 +425,7 @@ export default function DashboardPage() {
                               <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
                                 <img
                                   src={rankedUser.avatar_url}
-                                  alt=""
+                                  alt={`${rankedUser.username}'s avatar`}
                                   className="w-full h-full object-cover"
                                 />
                               </div>
