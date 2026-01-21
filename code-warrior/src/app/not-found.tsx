@@ -74,10 +74,10 @@ export default function NotFound() {
 
           {/* Fun Easter Egg Message */}
           <div className="mt-8 pt-6 border-t-2 border-dashed border-[var(--gray-dark)]">
-            <p className="font-pixel text-[7px] text-[var(--gray-medium)] italic">
+            <p className="font-pixel text-[10px] text-[var(--gray-highlight)] italic">
               💾 404 CORE MEMORY DUMP 💾
             </p>
-            <p className="font-pixel text-[6px] text-[var(--gray-darkest)] mt-2 font-mono">
+            <p className="font-pixel text-[10px] text-[var(--gray-light)] mt-2 font-mono">
               [SYS ERROR] Location Not Found
             </p>
           </div>

@@ -42,6 +42,11 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       transition={{ duration: 0.3 }}
       className="w-full bg-[var(--void-darker)] border-b-4 border-[var(--gray-dark)] px-4 py-3"
     >
+      {/* Screen reader announcements for sync status */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {syncing && "Syncing GitHub statistics..."}
+      </div>
+
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Left: Avatar + User Info */}
         {showProfile ? (
@@ -96,6 +101,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             onClick={onSync}
             loading={syncing}
             disabled={syncing}
+            aria-label={syncing ? 'Syncing GitHub stats...' : 'Sync GitHub stats'}
+            aria-busy={syncing}
           >
             <span className="flex items-center gap-2">
               <IconSync size={14} className={syncing ? 'animate-spin' : ''} />

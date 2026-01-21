@@ -33,6 +33,21 @@ const UserProfileModal: React.FC<{
   onClose: () => void;
   rank: number;
 }> = ({ user, isOpen, onClose, rank }) => {
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !user) return null;
 
   const level = Math.floor(user.xp / 1000) + 1;
@@ -62,7 +77,8 @@ const UserProfileModal: React.FC<{
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-2 right-2 p-2 hover:opacity-70"
+              className="absolute top-2 right-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
+              aria-label="Close user profile"
             >
               <IconClose size={16} color="var(--gray-medium)" />
             </button>
@@ -257,6 +273,7 @@ export default function LeaderboardPage() {
               <input
                 type="text"
                 placeholder="Search warriors..."
+                aria-label="Search leaderboard by warrior username"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 bg-[var(--void-darker)] border-2 border-[var(--gray-dark)] text-white font-pixel text-[10px] placeholder:text-[var(--gray-medium)] focus:border-[var(--mana-medium)] focus:outline-none"
@@ -267,6 +284,8 @@ export default function LeaderboardPage() {
             <div className="flex flex-wrap gap-2 justify-center">
               <button
                 onClick={() => setSelectedRankFilter('ALL')}
+                aria-label="Show all warriors regardless of rank"
+                aria-pressed={selectedRankFilter === 'ALL'}
                 className={`px-3 py-1 font-pixel text-[8px] border-2 transition-colors ${
                   selectedRankFilter === 'ALL'
                     ? 'bg-[var(--mana-medium)] border-[var(--mana-light)] text-white'
@@ -279,6 +298,8 @@ export default function LeaderboardPage() {
                 <button
                   key={rank}
                   onClick={() => setSelectedRankFilter(rank)}
+                  aria-label={`Filter leaderboard to show only ${rank} rank warriors`}
+                  aria-pressed={selectedRankFilter === rank}
                   className={`px-2 py-1 font-pixel text-[8px] border-2 transition-colors ${
                     selectedRankFilter === rank
                       ? 'bg-[var(--gold-medium)] border-[var(--gold-light)] text-[var(--void-darkest)]'

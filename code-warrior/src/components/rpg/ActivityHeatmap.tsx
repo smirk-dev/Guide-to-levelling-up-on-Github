@@ -149,14 +149,14 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
 
         {/* Heatmap Grid - only render when visible */}
         {isVisible && (
-        <div className="overflow-x-auto pb-2">
-          <div className="inline-flex flex-col gap-1 min-w-max">
+        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[var(--void-darker)] scrollbar-track-[var(--void-darkest)]">
+          <div className="inline-flex flex-col gap-1 min-w-max sm:min-w-0">
             {/* Month labels */}
-            <div className="flex gap-[2px] ml-7 mb-1">
+            <div className="flex gap-[2px] ml-5 sm:ml-7 mb-1">
               {monthLabels.map(({ month, index }, i) => (
                 <span
                   key={`${month}-${i}`}
-                  className="font-pixel text-[8px] text-[var(--gray-medium)]"
+                  className="font-pixel text-[8px] sm:text-[10px] text-[var(--gray-highlight)]"
                   style={{ marginLeft: i === 0 ? 0 : `${(index - (monthLabels[i - 1]?.index || 0)) * 11 - 20}px` }}
                 >
                   {month}
@@ -171,7 +171,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                 {DAYS.map((day, i) => (
                   <span
                     key={i}
-                    className="font-pixel text-[7px] text-[var(--gray-medium)] h-[9px] leading-[9px]"
+                    className="font-pixel text-[8px] sm:text-[10px] text-[var(--gray-highlight)] h-[7px] sm:h-[9px] leading-[7px] sm:leading-[9px]"
                   >
                     {day}
                   </span>
@@ -189,7 +189,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                         position="top"
                       >
                         <div
-                          className={`w-[9px] h-[9px] ${LEVEL_COLORS[day.level]} border border-[var(--void-darker)] cursor-pointer hover:border-[var(--gold-light)] transition-colors`}
+                          className={`w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] ${LEVEL_COLORS[day.level]} border border-[var(--void-darker)] cursor-pointer hover:border-[var(--gold-light)] transition-colors`}
                           style={{
                             boxShadow: day.level > 0 ? 'inset 1px 1px 0 rgba(255,255,255,0.2)' : undefined,
                           }}
@@ -203,14 +203,14 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
 
             {/* Legend */}
             <div className="flex items-center justify-end gap-2 mt-3">
-              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">Less</span>
+              <span className="font-pixel text-[8px] sm:text-[10px] text-[var(--gray-highlight)]">Less</span>
               {[0, 1, 2, 3, 4].map((level) => (
                 <div
                   key={level}
-                  className={`w-[9px] h-[9px] ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} border border-[var(--void-darker)]`}
+                  className={`w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] ${LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]} border border-[var(--void-darker)]`}
                 />
               ))}
-              <span className="font-pixel text-[8px] text-[var(--gray-medium)]">More</span>
+              <span className="font-pixel text-[8px] sm:text-[10px] text-[var(--gray-highlight)]">More</span>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ export * from './icons/PixelIcons';
 
 // UI Components
 export * from './ui/PixelComponents';
+export * from './ui/LoadingSkeletons';
 
 // RPG Components
 export { CharacterSheet } from './rpg/CharacterSheet';
