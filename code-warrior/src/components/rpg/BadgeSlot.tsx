@@ -231,8 +231,7 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
                   onUnequip();
                 }}
                 loading={loading}
-                aria-label={`Unequip ${badge.name} badge`}                }}
-                loading={loading}
+                aria-label={`Unequip ${badge.name} badge`}
               >
                 UNEQUIP
               </PixelButton>
