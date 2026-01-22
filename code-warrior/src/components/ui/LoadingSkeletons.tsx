@@ -58,7 +58,7 @@ export const SkeletonStatBar: React.FC<SkeletonProps> = ({ className = '' }) => 
 );
 
 // Card skeleton for quests, badges, etc.
-export const SkeletonCard: React.FC<SkeletonProps> = ({ className = '' }) => (
+export const SkeletonCardLoading: React.FC<SkeletonProps> = ({ className = '' }) => (
   <PixelFrame variant="stone" padding="md" className={className}>
     <div className="space-y-3">
       <SkeletonLine className="h-4 w-3/4" />
@@ -123,7 +123,7 @@ export const DashboardSkeleton: React.FC = () => (
           <div className="space-y-2">
             <SkeletonLine className="h-4 w-20" />
             {[1, 2, 3].map((i) => (
-              <SkeletonCard key={i} />
+              <SkeletonCardLoading key={i} />
             ))}
           </div>
 
@@ -278,7 +278,7 @@ export const PageSkeleton: React.FC<{ title?: string }> = ({ title }) => (
       )}
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <SkeletonCard key={i} />
+          <SkeletonCardLoading key={i} />
         ))}
       </div>
     </div>
