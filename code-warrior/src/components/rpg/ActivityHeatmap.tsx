@@ -128,7 +128,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
       transition={{ duration: 0.4, delay: 0.2 }}
       className={className}
     >
-      <PixelFrame variant="stone" padding="lg">
+      <PixelFrame variant="stone" padding="lg" className="overflow-hidden">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)]">
             Activity Log
