@@ -55,7 +55,7 @@ const getNotificationIcon = (type: NotificationType) => {
   }
 };
 
-const getNotificationColor = (type: NotificationType): 'gold' | 'mana' | 'health' | 'purple' => {
+const getNotificationColor = (type: NotificationType): 'stone' | 'metal' | 'gold' | 'mana' | 'health' | 'critical' => {
   switch (type) {
     case 'quest':
       return 'gold';
@@ -63,11 +63,11 @@ const getNotificationColor = (type: NotificationType): 'gold' | 'mana' | 'health
     case 'rank':
       return 'gold';
     case 'badge':
-      return 'purple';
+      return 'mana'; // Changed from 'purple' to 'mana'
     case 'xp':
       return 'health';
     default:
-      return 'mana';
+      return 'stone';
   }
 };
 
