@@ -981,6 +981,37 @@ body.performance-mode .pixel-avatar-glow {
 }
 
 /* ============================================
+   LAYOUT & OVERFLOW FIXES
+   ============================================ */
+
+/* Activity Log Container - Prevent bleeding into sidebar */
+.activity-heatmap-container {
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Main content area - Prevent absolute positioning collisions */
+.dashboard-main-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Left sidebar - Ensure proper stacking context */
+.dashboard-sidebar {
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+/* Right content area - Scrollable container */
+.dashboard-content {
+  position: relative;
+  z-index: 2;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ============================================
    RESPONSIVE BREAKPOINTS (pixel-snapped)
    ============================================ */
 
