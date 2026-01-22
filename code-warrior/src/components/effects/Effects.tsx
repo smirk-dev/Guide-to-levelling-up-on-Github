@@ -466,7 +466,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-[var(--void-darkest)] flex items-center justify-center z-50">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-full h-screen bg-[var(--void-darkest)] flex items-center justify-center z-50">
       <div className="text-center">
         {/* Pixel sword animation */}
         <motion.div
