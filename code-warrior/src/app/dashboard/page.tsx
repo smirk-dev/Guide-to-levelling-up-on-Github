@@ -320,10 +320,10 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* Three-Column Layout */}
-        <div className="grid grid-cols-3 gap-6">
-          {/* Left Column (1/3): Character Portrait + Achievements + Battle Stats */}
-          <div className="space-y-3">
+        {/* Two-Column Layout with Flexbox - Fixed Structure */}
+        <div className="flex flex-col lg:flex-row gap-6 overflow-hidden">
+          {/* Left Column: Character Portrait + Achievements + Battle Stats */}
+          <div className="w-full lg:w-1/3 flex flex-col gap-3 min-w-0">
             {/* Character Portrait Card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -331,8 +331,8 @@ export default function DashboardPage() {
             >
               <PixelFrame variant="gold" padding="md">
                 <div className="flex flex-col items-center">
-                  {/* Avatar */}
-                  <div style={{ width: '72px', height: '72px' }}>
+                  {/* Avatar - Constrained Size */}
+                  <div className="w-32 h-32 max-w-full flex-shrink-0">
                     <PixelAvatar src={user.avatar_url} alt={user.username} size="lg" glow />
                   </div>
 
@@ -472,16 +472,17 @@ export default function DashboardPage() {
             </motion.div>
           </div>
 
-          {/* Right Column (2/3): Quick Stats + Quests */}
-          <div className="col-span-2 space-y-3">
+          {/* Right Column: Quick Stats + Quests + Stats + Activity */}
+          <div className="w-full lg:w-2/3 flex flex-col gap-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: 'calc(100vh - 300px)' }}>
             {/* Quick Stats Row */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              className="flex-shrink-0"
             >
               <PixelFrame variant="mana" padding="sm">
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="text-center">
                     <p className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
                       {user.xp.toLocaleString()}
@@ -524,6 +525,7 @@ export default function DashboardPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
+                className="flex-shrink-0"
               >
                 <div 
                   className="cursor-pointer hover:scale-105 transition-transform"
@@ -553,6 +555,7 @@ export default function DashboardPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              className="flex-shrink-0"
               transition={{ delay: 0.3 }}
             >
               <div className="flex items-center justify-between mb-2">
@@ -602,13 +605,16 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* Battle Stats Panel - Vertical Bars */}
-            <BattleStatsPanel stats={rpgStats} barHeight="lg" />
+            <div className="flex-shrink-0 pt-2">
+              <BattleStatsPanel stats={rpgStats} barHeight="lg" />
+            </div>
 
             {/* Activity Heatmap */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
+              className="flex-shrink-0 pb-4"
             >
               <ActivityHeatmap contributions={contributions} />
             </motion.div>
