@@ -112,7 +112,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
               {/* Skip button */}
               <button
                 onClick={handleSkip}
-                className="absolute top-4 right-4 p-2 hover:opacity-70 transition-opacity"
+                className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
                 aria-label="Skip tutorial"
               >
                 <IconClose size={16} color="var(--gray-medium)" />

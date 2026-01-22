@@ -110,6 +110,8 @@ interface PixelButtonProps {
   onClick?: () => void;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
+  'aria-label'?: string;
+  'aria-busy'?: boolean;
 }
 
 export const PixelButton: React.FC<PixelButtonProps> = ({
@@ -121,11 +123,13 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
   onClick,
   className = '',
   type = 'button',
+  'aria-label': ariaLabel,
+  'aria-busy': ariaBusy,
 }) => {
   const sizeClasses = {
-    sm: 'px-3 py-2 text-[var(--font-xs)]',
-    md: 'px-6 py-3 text-[var(--font-sm)]',
-    lg: 'px-8 py-4 text-[var(--font-md)]',
+    sm: 'px-3 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-xs)]',
+    md: 'px-6 py-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-sm)]',
+    lg: 'px-8 py-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--font-md)]',
   };
 
   const handleClick = () => {
@@ -141,6 +145,8 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
       onClick={handleClick}
       onMouseEnter={() => !disabled && soundManager.hover()}
       disabled={disabled || loading}
+      aria-label={ariaLabel}
+      aria-busy={ariaBusy}
       className={`btn-pixel btn-${variant} ${sizeClasses[size]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--void-darkest)] focus-visible:ring-[var(--mana-light)] ${className}`}
     >
       {loading ? (
@@ -159,6 +165,10 @@ interface PixelInputProps {
   type?: 'text' | 'email' | 'password' | 'number';
   className?: string;
   disabled?: boolean;
+  id?: string;
+  hasError?: boolean;
+  errorMessage?: string;
+  'aria-label'?: string;
 }
 
 export const PixelInput: React.FC<PixelInputProps> = ({
@@ -168,16 +178,38 @@ export const PixelInput: React.FC<PixelInputProps> = ({
   type = 'text',
   className = '',
   disabled = false,
+  id,
+  hasError = false,
+  errorMessage = '',
+  'aria-label': ariaLabel,
 }) => {
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = `${inputId}-error`;
+
   return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={`input-pixel w-full ${className}`}
-    />
+    <div className="w-full">
+      <input
+        id={inputId}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? errorId : undefined}
+        className={`input-pixel w-full ${hasError ? 'border-2 border-[var(--critical)]' : ''} ${className}`}
+      />
+      {hasError && errorMessage && (
+        <div
+          id={errorId}
+          role="alert"
+          className="font-pixel text-[10px] text-[var(--critical)] mt-1"
+        >
+          {errorMessage}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -364,6 +396,8 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
   className = '',
   glow = false,
 }) => {
+  const [imageError, setImageError] = React.useState(false);
+  
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -372,18 +406,27 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
   };
 
   const glowClass = glow ? 'pixel-avatar-glow' : '';
+  
+  // Generate initials from alt text (e.g., "John Doe" -> "JD")
+  const initials = alt
+    .split(' ')
+    .map((word) => word.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div className={`${sizeClasses[size]} ${glowClass} ${className}`}>
-      {src ? (
+      {src && !imageError ? (
         <img
           src={src}
           alt={alt}
+          onError={() => setImageError(true)}
           className="w-full h-full pixel-avatar object-cover"
         />
       ) : (
         <div className="w-full h-full pixel-avatar bg-[var(--gray-dark)] flex items-center justify-center">
-          <span className="text-[var(--gray-light)] font-pixel text-xs">?</span>
+          <span className="text-white font-pixel text-sm">{initials || '?'}</span>
         </div>
       )}
     </div>

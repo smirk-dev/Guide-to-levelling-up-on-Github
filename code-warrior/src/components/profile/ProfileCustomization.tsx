@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelFrame, PixelButton, PixelBadge, PixelAvatar } from '../ui/PixelComponents';
 import { IconClose, IconCheck, IconStar, IconRank } from '../icons/PixelIcons';
@@ -61,6 +61,21 @@ export const ProfileCustomization: React.FC<ProfileCustomizationProps> = ({
   const [selectedBorder, setSelectedBorder] = useState<keyof typeof AVATAR_BORDERS>(currentBorder);
   const [selectedTitle, setSelectedTitle] = useState<keyof typeof CUSTOM_TITLES>(currentTitle);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   const handleSave = () => {
     onSave(selectedBorder, selectedTitle);
     onClose();
@@ -95,7 +110,8 @@ export const ProfileCustomization: React.FC<ProfileCustomizationProps> = ({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:opacity-70"
+              className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
+              aria-label="Close customization"
             >
               <IconClose size={16} color="var(--gray-medium)" />
             </button>

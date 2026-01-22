@@ -155,7 +155,7 @@ export const NotificationPanel: React.FC<{
                 </PixelBadge>
               )}
             </div>
-            <button onClick={onClose} className="p-2 hover:opacity-70">
+            <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-70 transition-opacity" aria-label="Close notifications">
               <IconClose size={16} color="var(--gray-medium)" />
             </button>
           </div>
@@ -339,7 +339,7 @@ export const NotificationBell: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="relative p-2 hover:opacity-80 transition-opacity"
+      className="relative min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-80 transition-opacity"
       aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
     >
       <IconBell size={24} color={unreadCount > 0 ? '#ffd700' : '#8b949e'} />

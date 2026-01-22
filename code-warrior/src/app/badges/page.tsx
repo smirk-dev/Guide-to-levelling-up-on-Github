@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -27,6 +27,26 @@ export default function BadgesPage() {
   const queryClient = useQueryClient();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
   const [loadingBadgeId, setLoadingBadgeId] = useState<string | null>(null);
+
+  // Helper function to handle API errors including session timeout
+  const handleApiError = (error: any, defaultMessage: string) => {
+    if (error.status === 401 || error.message?.includes('Unauthorized')) {
+      // Session expired
+      signOut({ callbackUrl: '/?session=expired' });
+      setToast({
+        message: 'Your session has expired. Please sign in again.',
+        type: 'warning',
+        visible: true,
+      });
+    } else {
+      soundManager.error();
+      setToast({
+        message: defaultMessage,
+        type: 'error',
+        visible: true,
+      });
+    }
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -76,7 +96,11 @@ export default function BadgesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ badgeId }),
       });
-      if (!res.ok) throw new Error('Equip failed');
+      if (!res.ok) {
+        const error: any = new Error('Equip failed');
+        error.status = res.status;
+        throw error;
+      }
       const apiData = await res.json();
       
       // API returns { inventory, equippedBadges, equippedCount }
@@ -109,14 +133,9 @@ export default function BadgesPage() {
       });
       setLoadingBadgeId(null);
     },
-    onError: () => {
-      soundManager.error();
-      setToast({
-        message: 'Failed to equip badge',
-        type: 'error',
-        visible: true,
-      });
+    onError: (error: any) => {
       setLoadingBadgeId(null);
+      handleApiError(error, 'Failed to equip badge');
     },
   });
 
@@ -129,7 +148,11 @@ export default function BadgesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ badgeId }),
       });
-      if (!res.ok) throw new Error('Unequip failed');
+      if (!res.ok) {
+        const error: any = new Error('Unequip failed');
+        error.status = res.status;
+        throw error;
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -142,14 +165,9 @@ export default function BadgesPage() {
       });
       setLoadingBadgeId(null);
     },
-    onError: () => {
-      soundManager.error();
-      setToast({
-        message: 'Failed to unequip badge',
-        type: 'error',
-        visible: true,
-      });
+    onError: (error: any) => {
       setLoadingBadgeId(null);
+      handleApiError(error, 'Failed to unequip badge');
     },
   });
 

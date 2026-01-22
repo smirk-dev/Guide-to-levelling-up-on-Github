@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -33,6 +33,26 @@ export default function QuestsPage() {
   const [claimedQuest, setClaimedQuest] = useState<{ title: string; xp: number } | null>(null);
   const [loadingQuestId, setLoadingQuestId] = useState<string | null>(null);
 
+  // Helper function to handle API errors including session timeout
+  const handleApiError = (error: any, defaultMessage: string) => {
+    if (error.status === 401 || error.message?.includes('Unauthorized')) {
+      // Session expired
+      signOut({ callbackUrl: '/?session=expired' });
+      setToast({
+        message: 'Your session has expired. Please sign in again.',
+        type: 'warning',
+        visible: true,
+      });
+    } else {
+      soundManager.error();
+      setToast({
+        message: defaultMessage,
+        type: 'error',
+        visible: true,
+      });
+    }
+  };
+
   // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -55,7 +75,11 @@ export default function QuestsPage() {
   const syncMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/sync', { method: 'POST' });
-      if (!res.ok) throw new Error('Sync failed');
+      if (!res.ok) {
+        const error: any = new Error('Sync failed');
+        error.status = res.status;
+        throw error;
+      }
       return res.json();
     },
     onSuccess: (result) => {
@@ -72,13 +96,8 @@ export default function QuestsPage() {
         visible: true,
       });
     },
-    onError: () => {
-      soundManager.error();
-      setToast({
-        message: 'Failed to sync progress',
-        type: 'error',
-        visible: true,
-      });
+    onError: (error: any) => {
+      handleApiError(error, 'Failed to sync progress');
     },
   });
 
@@ -91,7 +110,11 @@ export default function QuestsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questId }),
       });
-      if (!res.ok) throw new Error('Claim failed');
+      if (!res.ok) {
+        const error: any = new Error('Claim failed');
+        error.status = res.status;
+        throw error;
+      }
       return res.json();
     },
     onSuccess: (result, questId) => {
@@ -106,14 +129,9 @@ export default function QuestsPage() {
 
       setLoadingQuestId(null);
     },
-    onError: () => {
-      soundManager.error();
-      setToast({
-        message: 'Failed to claim quest reward',
-        type: 'error',
-        visible: true,
-      });
+    onError: (error: any) => {
       setLoadingQuestId(null);
+      handleApiError(error, 'Failed to claim quest reward');
     },
   });
 
