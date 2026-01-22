@@ -8,7 +8,7 @@ import { PixelFrame } from './PixelComponents';
 const shimmerAnimation = {
   initial: { x: '-100%' },
   animate: { x: '100%' },
-  transition: { repeat: Infinity, duration: 1.5, ease: 'linear' },
+  transition: { repeat: Infinity, duration: 1.5, ease: 'linear' as const },
 };
 
 interface SkeletonProps {
