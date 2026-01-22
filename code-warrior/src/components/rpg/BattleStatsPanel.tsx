@@ -32,7 +32,7 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
       transition={{ duration: 0.4, delay: 0.1 }}
       className={className}
     >
-      <PixelFrame variant="stone" padding="lg">
+      <PixelFrame variant="stone" padding="lg" className="overflow-hidden">
         <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-4 text-center">
           Battle Stats
         </h3>
