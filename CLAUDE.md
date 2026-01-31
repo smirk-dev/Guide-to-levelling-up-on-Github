@@ -137,28 +137,33 @@ Tracks top players globally based on XP and rank:
 
 #### 7. Additional Features
 
-**Drag-and-Drop Badge Management (dnd-kit)**
+##### Drag-and-Drop Badge Management (dnd-kit)
+
 - Users can reorganize equipped badges
 - Visual feedback during drag operations
 - Persistent slot assignments
 
-**Profile Export (html2canvas)**
+##### Profile Export (html2canvas)
+
 - Shareable character card as image
 - Export stats and achievements
 - Social media friendly format
 
-**Onboarding Tutorial**
+##### Onboarding Tutorial
+
 - First-time user guidance
 - Game mechanics explanation
 - Quick sync demonstration
 
-**Notifications System**
+##### Notifications System
+
 - Toast notifications for sync events
 - Quest completion alerts
 - XP gain feedback
 - Achievement unlocks
 
-**Performance Optimizations**
+##### Performance Optimizations
+
 - usePerformanceMode hook for low-end devices
 - Screen shake effect hook for combat feedback
 - Rate limiting utilities to prevent API abuse
