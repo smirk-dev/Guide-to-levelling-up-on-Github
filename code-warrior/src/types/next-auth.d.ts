@@ -12,6 +12,11 @@ declare module 'next-auth' {
     };
     accessToken?: string;
   }
+
+  interface User {
+    id: string;
+    username?: string;
+  }
 }
 
 declare module 'next-auth/jwt' {
@@ -19,5 +24,6 @@ declare module 'next-auth/jwt' {
     accessToken?: string;
     githubId?: string;
     username?: string;
+    id?: string;
   }
 }
