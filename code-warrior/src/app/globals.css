@@ -3,6 +3,7 @@
 /* Import enhanced theme and layout systems */
 @import '../styles/cyber-theme.css';
 @import '../styles/dashboard-layout.css';
+@import '../styles/dashboard-tabs.css';
 
 @tailwind base;
 @tailwind components;
