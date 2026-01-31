@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelBadge, PixelButton } from '../ui/PixelComponents';
 import { IconCheck, IconLock, IconStar, IconXP } from '../icons/PixelIcons';
@@ -531,7 +531,7 @@ export const QuestMap: React.FC<QuestMapProps> = ({
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
 
   // Map quests to regions based on criteria type and threshold
-  const getQuestRegion = (quest: Quest): MapRegion => {
+  const getQuestRegion = useCallback((quest: Quest): MapRegion => {
     const threshold = quest.criteria_threshold;
     
     // Beginner quests (low thresholds)
@@ -568,10 +568,12 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     }
     
     return 'starting_village';
-  };
+  }, []);
 
   // Calculate quest positions
   const questPositions = useMemo(() => {
+    if (!quests || quests.length === 0) return [];
+    
     const regionQuests: Record<MapRegion, Quest[]> = {
       starting_village: [],
       forest_of_commits: [],
@@ -582,7 +584,7 @@ export const QuestMap: React.FC<QuestMapProps> = ({
 
     // Group quests by region
     quests.forEach((quest) => {
-      const region = getQuestRegion(quest);
+      const region: MapRegion = getQuestRegion(quest);
       regionQuests[region].push(quest);
     });
 
@@ -609,10 +611,14 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     });
 
     return positions;
-  }, [quests]);
+  }, [quests, getQuestRegion]);
 
   // Calculate overall progress
   const { totalProgress, completedRegions } = useMemo(() => {
+    if (!quests || quests.length === 0) {
+      return { totalProgress: 0, completedRegions: new Set<MapRegion>() };
+    }
+    
     const completed = userQuests.filter((uq) => uq.claimed_at).length;
     const total = quests.length;
     const progress = total > 0 ? (completed / total) * 100 : 0;
@@ -620,12 +626,12 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     // Determine which regions are complete
     const regionsComplete = new Set<MapRegion>();
     MAP_REGIONS.forEach((region) => {
-      const regionQuests = questPositions.filter((qp) => qp.region === region.id);
-      const regionCompleted = regionQuests.every((qp) => {
+      const regionQuestsFiltered = questPositions.filter((qp) => qp.region === region.id);
+      const regionCompleted = regionQuestsFiltered.every((qp) => {
         const uq = userQuests.find((u) => u.quest_id === qp.quest.id);
         return uq?.claimed_at;
       });
-      if (regionCompleted && regionQuests.length > 0) {
+      if (regionCompleted && regionQuestsFiltered.length > 0) {
         regionsComplete.add(region.id);
       }
     });
@@ -638,36 +644,63 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     return questPositions.map((qp) => ({ x: qp.x, y: qp.y }));
   }, [questPositions]);
 
-  const handleQuestSelect = (quest: Quest) => {
+  const handleQuestSelect = useCallback((quest: Quest) => {
     soundManager.click();
     setSelectedQuest(quest);
     onQuestSelect(quest);
-  };
+  }, [onQuestSelect]);
 
-  const getUserQuestForQuest = (questId: string) => {
+  const getUserQuestForQuest = useCallback((questId: string) => {
     return userQuests.find((uq) => uq.quest_id === questId);
-  };
+  }, [userQuests]);
 
   // Determine if a quest is locked (previous quest not completed)
-  const isQuestLocked = (questIndex: number) => {
+  const isQuestLocked = useCallback((questIndex: number) => {
     if (questIndex === 0) return false;
     const prevQuest = questPositions[questIndex - 1]?.quest;
     if (!prevQuest) return false;
     const prevUserQuest = getUserQuestForQuest(prevQuest.id);
     return !prevUserQuest?.claimed_at;
-  };
+  }, [questPositions, getUserQuestForQuest]);
+
+  // Early return if no quests - AFTER all hooks
+  if (!quests || quests.length === 0) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="
+          relative w-full min-h-[300px]
+          bg-gradient-to-br from-[#0d1117] via-[#161b22] to-[#0d1117]
+          border-4 border-[var(--gray-dark)]
+          rounded-lg overflow-hidden
+          flex items-center justify-center
+        ">
+          <div className="text-center p-8">
+            <span className="text-4xl mb-4 block">🗺️</span>
+            <p className="font-pixel text-[12px] text-[var(--gray-highlight)] mb-2">
+              No Quests Available
+            </p>
+            <p className="font-pixel text-[9px] text-[var(--gray-medium)]">
+              Sync your GitHub data to discover quests!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative ${className}`}>
       {/* Map container with aspect ratio */}
       <div className="
         relative w-full
-        aspect-[16/10] md:aspect-[16/9]
+        min-h-[300px] md:min-h-[400px] lg:min-h-[500px]
         bg-gradient-to-br from-[#0d1117] via-[#161b22] to-[#0d1117]
         border-4 border-[var(--gray-dark)]
         rounded-lg overflow-hidden
         shadow-[0_0_40px_rgba(0,0,0,0.5),inset_0_0_60px_rgba(0,0,0,0.3)]
-      ">
+      "
+      style={{ aspectRatio: '16/10' }}
+      >
         {/* Background grid pattern */}
         <div 
           className="absolute inset-0 opacity-10"
