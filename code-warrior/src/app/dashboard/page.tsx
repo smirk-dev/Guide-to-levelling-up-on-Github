@@ -386,7 +386,7 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Top HUD Bar - Sticky with SYNC button */}
+      {/* Top HUD Bar - Sticky with SYNC button (profile hidden - shown in HeroSidebar) */}
       <GameHUD
         username={user.username}
         avatarUrl={user.avatar_url}
@@ -397,7 +397,7 @@ export default function DashboardPage() {
         onSync={() => syncMutation.mutate()}
         syncing={syncMutation.isPending}
         lastSynced={user.last_synced_at}
-        showProfile={true}
+        showProfile={false}
       />
 
       {/* Main Dashboard Grid - Hybrid Layout */}
