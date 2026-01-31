@@ -528,7 +528,7 @@ npm test  # (or configure as needed in package.json)
 
 1. Install dependencies: `npm install`
 2. Copy `.env.example` to `.env.local` and configure with actual credentials
-3. Start dev server: `npm run dev` (runs on http://localhost:3000)
+3. Start dev server: `npm run dev` (runs on `http://localhost:3000`)
 4. Changes hot-reload automatically
 
 ### Code Quality
