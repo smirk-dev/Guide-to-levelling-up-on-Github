@@ -1,0 +1,997 @@
+/* ============================================
+   🎮 CYBER-FANTASY RPG DESIGN SYSTEM v2.0
+   Code Warrior - High-Fidelity Neon Overhaul
+   ============================================
+   
+   DESIGN PRINCIPLES:
+   - 16-bit pixel art influence for icons/progress
+   - Professional modern glassmorphism layout
+   - Cyber-Neon palette (Obsidian, Cyan, Violet)
+   - RPG gamification: HP/MP bars, Quest buttons
+   ============================================ */
+
+/* ============================================
+   📐 ENHANCED CSS CUSTOM PROPERTIES
+   ============================================ */
+
+:root {
+  /* ==========================================
+     🌑 DEEP OBSIDIAN - Primary Backgrounds
+     The void from which all code emerges
+     ========================================== */
+  --obsidian-abyss: #030305;
+  --obsidian-darkest: #050507;
+  --obsidian-darker: #0A0A0B;
+  --obsidian-dark: #0F0F12;
+  --obsidian-medium: #151518;
+  --obsidian-light: #1A1A1F;
+  --obsidian-lighter: #222228;
+  --obsidian-surface: #2A2A32;
+
+  /* ==========================================
+     ⚡ ELECTRIC CYAN - Mana/Tech/Primary
+     The energy that powers the code
+     ========================================== */
+  --cyber-cyan-darkest: #001A22;
+  --cyber-cyan-darker: #003344;
+  --cyber-cyan-dark: #006677;
+  --cyber-cyan-medium: #00A8B8;
+  --cyber-cyan: #00F0FF;
+  --cyber-cyan-light: #4DFFFF;
+  --cyber-cyan-bright: #80FFFF;
+  --cyber-cyan-glow: rgba(0, 240, 255, 0.6);
+  --cyber-cyan-glow-soft: rgba(0, 240, 255, 0.3);
+
+  /* ==========================================
+     💜 PULSE VIOLET - XP/Magic/Secondary
+     The mystical energy of experience
+     ========================================== */
+  --pulse-violet-darkest: #1A0F2E;
+  --pulse-violet-darker: #2D1B4E;
+  --pulse-violet-dark: #4C2885;
+  --pulse-violet-medium: #6B3FA0;
+  --pulse-violet: #8B5CF6;
+  --pulse-violet-light: #A78BFA;
+  --pulse-violet-bright: #C4B5FD;
+  --pulse-violet-glow: rgba(139, 92, 246, 0.6);
+  --pulse-violet-glow-soft: rgba(139, 92, 246, 0.3);
+
+  /* ==========================================
+     🏆 NEON GOLD - Rewards/Achievements/Loot
+     The treasures earned through battle
+     ========================================== */
+  --neon-gold-darkest: #3D2E00;
+  --neon-gold-darker: #664D00;
+  --neon-gold-dark: #997300;
+  --neon-gold-medium: #CCA300;
+  --neon-gold: #FFD700;
+  --neon-gold-light: #FFED4E;
+  --neon-gold-bright: #FFF8B8;
+  --neon-gold-highlight: #FFF8DC;
+  --neon-gold-glow: rgba(255, 215, 0, 0.6);
+  --neon-gold-glow-soft: rgba(255, 215, 0, 0.3);
+
+  /* ==========================================
+     💚 HEALTH GREEN - HP/Success/Commits
+     The life force of the warrior
+     ========================================== */
+  --health-darkest: #052E16;
+  --health-darker: #0D3320;
+  --health-dark: #166534;
+  --health-medium: #16A34A;
+  --health-light: #22C55E;
+  --health-bright: #4ADE80;
+  --health-highlight: #86EFAC;
+  --health-glow: rgba(34, 197, 94, 0.6);
+  --health-glow-soft: rgba(34, 197, 94, 0.3);
+
+  /* ==========================================
+     ❤️ CRITICAL RED - Danger/Alerts/Errors
+     Warning: low health detected
+     ========================================== */
+  --critical-darkest: #2D0F0F;
+  --critical-darker: #450A0A;
+  --critical-dark: #7F1D1D;
+  --critical-medium: #B91C1C;
+  --critical-light: #EF4444;
+  --critical-bright: #F87171;
+  --critical-highlight: #FCA5A5;
+  --critical-glow: rgba(239, 68, 68, 0.6);
+  --critical-glow-soft: rgba(239, 68, 68, 0.3);
+
+  /* ==========================================
+     💖 NEON PINK - Rare/Epic/Special Items
+     The color of legendary drops
+     ========================================== */
+  --neon-pink-darkest: #2D0A1E;
+  --neon-pink-darker: #500724;
+  --neon-pink-dark: #9D174D;
+  --neon-pink-medium: #DB2777;
+  --neon-pink: #FF0080;
+  --neon-pink-light: #F472B6;
+  --neon-pink-bright: #FF80C0;
+  --neon-pink-glow: rgba(255, 0, 128, 0.6);
+  --neon-pink-glow-soft: rgba(255, 0, 128, 0.3);
+
+  /* ==========================================
+     🔘 CYBER GRAYS - Neutral UI Elements
+     The interface scaffolding
+     ========================================== */
+  --gray-abyss: #0D0D0F;
+  --gray-darkest: #18181B;
+  --gray-darker: #1F1F23;
+  --gray-dark: #27272A;
+  --gray-medium: #3F3F46;
+  --gray-DEFAULT: #52525B;
+  --gray-light: #71717A;
+  --gray-lighter: #A1A1AA;
+  --gray-highlight: #D4D4D8;
+  --gray-muted: #E4E4E7;
+  --gray-bright: #F4F4F5;
+
+  /* ==========================================
+     🪟 GLASSMORPHISM SYSTEM
+     Modern semi-transparent panels
+     ========================================== */
+  --glass-bg: rgba(10, 10, 11, 0.85);
+  --glass-bg-light: rgba(255, 255, 255, 0.03);
+  --glass-bg-medium: rgba(10, 10, 11, 0.75);
+  --glass-bg-dark: rgba(5, 5, 7, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-border-active: rgba(255, 255, 255, 0.25);
+  --glass-blur: 20px;
+  --glass-blur-sm: 12px;
+  --glass-blur-lg: 32px;
+  --glass-blur-xl: 48px;
+
+  /* ==========================================
+     📐 PIXEL GRID SYSTEM
+     16-bit aesthetic measurements
+     ========================================== */
+  --pixel-unit: 4px;
+  --pixel-2: 8px;
+  --pixel-3: 12px;
+  --pixel-4: 16px;
+  --pixel-5: 20px;
+  --pixel-6: 24px;
+  --pixel-8: 32px;
+  --pixel-10: 40px;
+  --pixel-12: 48px;
+  --pixel-16: 64px;
+
+  /* Border system */
+  --pixel-border-thin: 2px;
+  --pixel-border: 4px;
+  --pixel-border-thick: 6px;
+  --pixel-border-heavy: 8px;
+
+  /* ==========================================
+     🔲 BORDER RADIUS SYSTEM
+     From pixel-perfect to glass-smooth
+     ========================================== */
+  --radius-none: 0px;
+  --radius-pixel: 2px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius-full: 9999px;
+  --radius-glass: var(--radius-lg);
+  --radius-glass-lg: var(--radius-xl);
+
+  /* ==========================================
+     📝 TYPOGRAPHY SCALE
+     Pixel headers + Readable body text
+     ========================================== */
+  --font-size-2xs: 8px;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+  --font-size-5xl: 48px;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ==========================================
+     ⏱️ ANIMATION TIMING
+     Smooth cyber-powered transitions
+     ========================================== */
+  --duration-instant: 0ms;
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+  --duration-slowest: 800ms;
+
+  /* Easing curves */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-cyber: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* ==========================================
+     📏 SPACING SCALE
+     Consistent rhythm throughout
+     ========================================== */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ==========================================
+     🌟 SHADOW SYSTEM
+     Layered depth and neon glows
+     ========================================== */
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.6);
+  
+  /* Glass shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glass-active: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* ==========================================
+     🎮 Z-INDEX LAYERS
+     Proper stacking context
+     ========================================== */
+  --z-behind: -1;
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky: 20;
+  --z-overlay: 30;
+  --z-dropdown: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+  --z-max: 9999;
+}
+
+/* ============================================
+   🎨 ENHANCED GLASSMORPHISM PANELS
+   ============================================ */
+
+/* Base glass panel - Enhanced */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  transition: all var(--duration-normal) var(--ease-cyber);
+}
+
+.glass-panel:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow:
+    var(--shadow-glass-hover),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Cyan accent glass panel */
+.glass-panel-cyan {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 240, 255, 0.03) 0%,
+    var(--glass-bg) 50%,
+    rgba(0, 240, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    var(--shadow-glass),
+    0 0 0 1px rgba(0, 240, 255, 0.1),
+    0 0 30px rgba(0, 240, 255, 0.08),
+    inset 0 1px 0 rgba(0, 240, 255, 0.15);
+}
+
+.glass-panel-cyan:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow:
+    var(--shadow-glass-hover),
+    0 0 0 2px rgba(0, 240, 255, 0.15),
+    0 0 40px rgba(0, 240, 255, 0.15),
+    inset 0 1px 0 rgba(0, 240, 255, 0.2);
+}
+
+/* Violet accent glass panel */
+.glass-panel-violet {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.03) 0%,
+    var(--glass-bg) 50%,
+    rgba(139, 92, 246, 0.02) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    var(--shadow-glass),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    0 0 30px rgba(139, 92, 246, 0.08),
+    inset 0 1px 0 rgba(139, 92, 246, 0.15);
+}
+
+/* Gold accent glass panel */
+.glass-panel-gold {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.03) 0%,
+    var(--glass-bg) 50%,
+    rgba(255, 215, 0, 0.02) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    var(--shadow-glass),
+    0 0 0 1px rgba(255, 215, 0, 0.1),
+    0 0 30px rgba(255, 215, 0, 0.08),
+    inset 0 1px 0 rgba(255, 215, 0, 0.15);
+}
+
+/* ============================================
+   ⚔️ QUEST-STYLE BUTTONS
+   RPG Action Buttons with Neon Effects
+   ============================================ */
+
+/* Base quest button structure */
+.btn-quest {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  min-height: 48px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-bounce);
+  user-select: none;
+}
+
+/* Quest button - Primary Gold (Accept Quest) */
+.btn-quest-gold {
+  background: linear-gradient(
+    180deg,
+    var(--neon-gold-light) 0%,
+    var(--neon-gold) 30%,
+    var(--neon-gold-dark) 100%
+  );
+  color: var(--obsidian-darkest);
+  border: 2px solid var(--neon-gold);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.4),
+    0 4px 0 var(--neon-gold-darker),
+    0 6px 20px rgba(0, 0, 0, 0.4),
+    0 0 25px var(--neon-gold-glow-soft),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-quest-gold::before {
+  content: '⚔';
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  margin-right: var(--space-2);
+}
+
+.btn-quest-gold:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.6),
+    0 7px 0 var(--neon-gold-darker),
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 40px var(--neon-gold-glow),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.btn-quest-gold:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.4),
+    0 1px 0 var(--neon-gold-darker),
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--neon-gold-glow-soft),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Quest button - Mana Blue (Special Action) */
+.btn-quest-mana {
+  background: linear-gradient(
+    180deg,
+    var(--cyber-cyan-light) 0%,
+    var(--cyber-cyan) 30%,
+    var(--cyber-cyan-dark) 100%
+  );
+  color: var(--obsidian-darkest);
+  border: 2px solid var(--cyber-cyan);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.4),
+    0 4px 0 var(--cyber-cyan-darker),
+    0 6px 20px rgba(0, 0, 0, 0.4),
+    0 0 25px var(--cyber-cyan-glow-soft),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-quest-mana::before {
+  content: '✨';
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  margin-right: var(--space-2);
+}
+
+.btn-quest-mana:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 2px rgba(0, 240, 255, 0.6),
+    0 7px 0 var(--cyber-cyan-darker),
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 40px var(--cyber-cyan-glow),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Quest button - Claim Reward */
+.btn-quest-claim {
+  background: linear-gradient(
+    180deg,
+    #FFE066 0%,
+    var(--neon-gold) 30%,
+    #CC9900 100%
+  );
+  color: var(--obsidian-darkest);
+  border: 3px solid var(--neon-gold);
+  animation: quest-glow-pulse 2s ease-in-out infinite;
+}
+
+.btn-quest-claim::before {
+  content: '🏆';
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  margin-right: var(--space-2);
+}
+
+@keyframes quest-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 215, 0, 0.4),
+      0 4px 0 var(--neon-gold-darker),
+      0 6px 20px rgba(0, 0, 0, 0.4),
+      0 0 30px var(--neon-gold-glow-soft);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(255, 215, 0, 0.6),
+      0 4px 0 var(--neon-gold-darker),
+      0 6px 25px rgba(0, 0, 0, 0.5),
+      0 0 50px var(--neon-gold-glow);
+  }
+}
+
+/* Disabled quest button */
+.btn-quest:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  transform: none !important;
+  box-shadow: 
+    0 2px 0 rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ============================================
+   ❤️💙 RPG HEALTH/MANA STAT BARS
+   16-bit inspired progress visualization
+   ============================================ */
+
+/* Base stat bar container */
+.rpg-bar {
+  position: relative;
+  height: 24px;
+  background: var(--obsidian-abyss);
+  border: 2px solid var(--gray-dark);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow:
+    var(--shadow-inset),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.rpg-bar-sm { height: 16px; }
+.rpg-bar-md { height: 24px; }
+.rpg-bar-lg { height: 32px; }
+.rpg-bar-xl { height: 40px; }
+
+/* Stat bar fill - animated */
+.rpg-bar-fill {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  border-radius: var(--radius-pixel);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+/* 16-bit pixel segments overlay */
+.rpg-bar-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 6px,
+    rgba(0, 0, 0, 0.15) 6px,
+    rgba(0, 0, 0, 0.15) 8px
+  );
+  border-radius: inherit;
+}
+
+/* Shine effect */
+.rpg-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  border-radius: inherit;
+}
+
+/* Health Bar - Green gradient */
+.rpg-bar-health .rpg-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--health-bright) 0%,
+    var(--health-light) 40%,
+    var(--health-medium) 70%,
+    var(--health-dark) 100%
+  );
+  box-shadow: 0 0 15px var(--health-glow-soft);
+}
+
+.rpg-bar-health {
+  border-color: var(--health-dark);
+}
+
+/* Mana Bar - Cyan gradient */
+.rpg-bar-mana .rpg-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--cyber-cyan-bright) 0%,
+    var(--cyber-cyan-light) 40%,
+    var(--cyber-cyan) 70%,
+    var(--cyber-cyan-dark) 100%
+  );
+  box-shadow: 0 0 15px var(--cyber-cyan-glow-soft);
+}
+
+.rpg-bar-mana {
+  border-color: var(--cyber-cyan-dark);
+}
+
+/* XP Bar - Gold gradient */
+.rpg-bar-xp .rpg-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--neon-gold-bright) 0%,
+    var(--neon-gold-light) 40%,
+    var(--neon-gold) 70%,
+    var(--neon-gold-dark) 100%
+  );
+  box-shadow: 0 0 15px var(--neon-gold-glow-soft);
+}
+
+.rpg-bar-xp {
+  border-color: var(--neon-gold-dark);
+}
+
+/* Strength Bar - Red gradient */
+.rpg-bar-strength .rpg-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--critical-highlight) 0%,
+    var(--critical-bright) 40%,
+    var(--critical-light) 70%,
+    var(--critical-dark) 100%
+  );
+  box-shadow: 0 0 15px var(--critical-glow-soft);
+}
+
+.rpg-bar-strength {
+  border-color: var(--critical-dark);
+}
+
+/* Wisdom Bar - Violet gradient */
+.rpg-bar-wisdom .rpg-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--pulse-violet-bright) 0%,
+    var(--pulse-violet-light) 40%,
+    var(--pulse-violet) 70%,
+    var(--pulse-violet-dark) 100%
+  );
+  box-shadow: 0 0 15px var(--pulse-violet-glow-soft);
+}
+
+.rpg-bar-wisdom {
+  border-color: var(--pulse-violet-dark);
+}
+
+/* Stat bar label */
+.rpg-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: white;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 1),
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    -1px -1px 0 rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ============================================
+   🎯 VERTICAL RPG STAT BARS
+   For character stat display panels
+   ============================================ */
+
+.rpg-vbar {
+  position: relative;
+  width: 40px;
+  background: var(--obsidian-abyss);
+  border: 2px solid var(--gray-dark);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-inset);
+}
+
+.rpg-vbar-sm { height: 80px; }
+.rpg-vbar-md { height: 120px; }
+.rpg-vbar-lg { height: 160px; }
+.rpg-vbar-xl { height: 200px; }
+
+.rpg-vbar-fill {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  border-radius: var(--radius-pixel);
+  transition: height var(--duration-slower) var(--ease-out);
+}
+
+/* Vertical bar pixel segments */
+.rpg-vbar-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 6px,
+    rgba(0, 0, 0, 0.12) 6px,
+    rgba(0, 0, 0, 0.12) 8px
+  );
+}
+
+/* Vertical bar shine */
+.rpg-vbar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    transparent 100%
+  );
+}
+
+/* Vertical bar variants - inherit from horizontal */
+.rpg-vbar-health .rpg-vbar-fill {
+  background: linear-gradient(
+    0deg,
+    var(--health-dark) 0%,
+    var(--health-light) 50%,
+    var(--health-bright) 100%
+  );
+  box-shadow: 0 0 12px var(--health-glow-soft);
+}
+
+.rpg-vbar-mana .rpg-vbar-fill {
+  background: linear-gradient(
+    0deg,
+    var(--cyber-cyan-dark) 0%,
+    var(--cyber-cyan) 50%,
+    var(--cyber-cyan-bright) 100%
+  );
+  box-shadow: 0 0 12px var(--cyber-cyan-glow-soft);
+}
+
+.rpg-vbar-strength .rpg-vbar-fill {
+  background: linear-gradient(
+    0deg,
+    var(--critical-dark) 0%,
+    var(--critical-light) 50%,
+    var(--critical-highlight) 100%
+  );
+  box-shadow: 0 0 12px var(--critical-glow-soft);
+}
+
+.rpg-vbar-charisma .rpg-vbar-fill {
+  background: linear-gradient(
+    0deg,
+    var(--neon-gold-dark) 0%,
+    var(--neon-gold) 50%,
+    var(--neon-gold-light) 100%
+  );
+  box-shadow: 0 0 12px var(--neon-gold-glow-soft);
+}
+
+.rpg-vbar-wisdom .rpg-vbar-fill {
+  background: linear-gradient(
+    0deg,
+    var(--pulse-violet-dark) 0%,
+    var(--pulse-violet) 50%,
+    var(--pulse-violet-bright) 100%
+  );
+  box-shadow: 0 0 12px var(--pulse-violet-glow-soft);
+}
+
+/* ============================================
+   🎴 ENHANCED PIXEL FRAMES
+   RPG-styled containers with neon edges
+   ============================================ */
+
+.frame-cyber {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-glass);
+  overflow: hidden;
+}
+
+/* Animated border glow effect */
+.frame-cyber::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    45deg,
+    var(--cyber-cyan) 0%,
+    var(--pulse-violet) 50%,
+    var(--neon-gold) 100%
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cyber-border-rotate 4s linear infinite;
+}
+
+@keyframes cyber-border-rotate {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Static frame variants */
+.frame-neon-cyan {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--cyber-cyan);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.3),
+    0 0 30px rgba(0, 240, 255, 0.15),
+    inset 0 1px 0 rgba(0, 240, 255, 0.1),
+    var(--shadow-glass);
+}
+
+.frame-neon-violet {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--pulse-violet);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 0 30px rgba(139, 92, 246, 0.15),
+    inset 0 1px 0 rgba(139, 92, 246, 0.1),
+    var(--shadow-glass);
+}
+
+.frame-neon-gold {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--neon-gold);
+  border-radius: var(--radius-glass);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.3),
+    0 0 30px rgba(255, 215, 0, 0.15),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1),
+    var(--shadow-glass);
+}
+
+/* ============================================
+   🌟 NEON TEXT GLOW EFFECTS
+   ============================================ */
+
+.text-neon-cyan {
+  color: var(--cyber-cyan);
+  text-shadow:
+    0 0 5px var(--cyber-cyan),
+    0 0 10px var(--cyber-cyan-glow),
+    0 0 20px var(--cyber-cyan-glow-soft),
+    0 0 40px var(--cyber-cyan-glow-soft);
+}
+
+.text-neon-violet {
+  color: var(--pulse-violet);
+  text-shadow:
+    0 0 5px var(--pulse-violet),
+    0 0 10px var(--pulse-violet-glow),
+    0 0 20px var(--pulse-violet-glow-soft),
+    0 0 40px var(--pulse-violet-glow-soft);
+}
+
+.text-neon-gold {
+  color: var(--neon-gold);
+  text-shadow:
+    0 0 5px var(--neon-gold),
+    0 0 10px var(--neon-gold-glow),
+    0 0 20px var(--neon-gold-glow-soft),
+    0 0 40px var(--neon-gold-glow-soft);
+}
+
+.text-neon-pink {
+  color: var(--neon-pink);
+  text-shadow:
+    0 0 5px var(--neon-pink),
+    0 0 10px var(--neon-pink-glow),
+    0 0 20px var(--neon-pink-glow-soft);
+}
+
+/* ============================================
+   🎬 CYBER ANIMATIONS
+   ============================================ */
+
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 20px currentColor;
+  }
+  20%, 24%, 55% {
+    opacity: 0.6;
+    text-shadow: none;
+  }
+}
+
+@keyframes cyber-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-neon-flicker {
+  animation: neon-flicker 3s infinite;
+}
+
+.animate-cyber-scan {
+  animation: cyber-scan 2s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float-bob {
+  animation: float-bob 3s ease-in-out infinite;
+}
+
+/* ============================================
+   📱 RESPONSIVE ENHANCEMENTS
+   ============================================ */
+
+@media (max-width: 640px) {
+  :root {
+    --glass-blur: 12px;
+    --font-size-xs: 9px;
+    --font-size-sm: 11px;
+  }
+
+  .btn-quest {
+    padding: var(--space-2) var(--space-4);
+    min-height: 44px;
+    font-size: 9px;
+  }
+
+  .rpg-bar {
+    height: 20px;
+  }
+
+  .rpg-bar-lg {
+    height: 28px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --glass-blur: 24px;
+  }
+}
