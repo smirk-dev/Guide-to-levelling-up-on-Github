@@ -17,6 +17,16 @@ export {
   CyberAvatar,
 } from './ui/RPGComponents';
 
+// Dashboard Components (v2 Tab Architecture)
+export {
+  TabNavigation,
+  HeroSidebar,
+  QuickViewTab,
+  ActivityViewTab,
+  QuestsViewTab,
+  type DashboardTab,
+} from './dashboard';
+
 // RPG Components
 export { CharacterSheet } from './rpg/CharacterSheet';
 export { QuestCard, QuestLog } from './rpg/QuestCard';
