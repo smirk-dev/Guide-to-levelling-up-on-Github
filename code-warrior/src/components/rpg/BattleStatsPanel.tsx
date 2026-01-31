@@ -25,6 +25,8 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
   className = '',
   barHeight = 'lg',
 }) => {
+  const powerLevel = Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -32,13 +34,13 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
       transition={{ duration: 0.4, delay: 0.1 }}
       className={className}
     >
-      <PixelFrame variant="stone" padding="lg" className="overflow-hidden">
-        <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-4 text-center">
-          Battle Stats
+      <PixelFrame variant="violet" padding="lg" className="overflow-hidden">
+        <h3 className="font-pixel text-xs text-[var(--pulse-violet-light)] mb-5 text-center uppercase tracking-wider">
+          ⚔ Battle Stats
         </h3>
 
-        {/* 5-column grid of vertical stat bars - classic FF style */}
-        <div className="flex justify-center items-end gap-4">
+        {/* 5-column grid of vertical stat bars - RPG style with neon glow */}
+        <div className="battle-stats-grid">
           <PixelTooltip content={STAT_TOOLTIPS.health} position="top">
             <VerticalStatBar
               label="HP"
@@ -90,31 +92,27 @@ export const BattleStatsPanel: React.FC<BattleStatsPanelProps> = ({
           </PixelTooltip>
         </div>
 
-        {/* Optional: Show total power level */}
-        <div className="mt-4 pt-4 border-t-2 border-dashed border-[var(--gray-dark)]">
+        {/* Power Level Display - Enhanced */}
+        <div className="mt-5 pt-4 border-t border-[var(--glass-border)]">
           <PixelTooltip
             content="Power Level = Average of all 5 stats (HP + MP + STR + CHA + WIS) / 5"
             position="top"
           >
-            <div className="flex justify-between items-center cursor-help">
-              <span className="font-pixel text-[9px] text-[var(--gray-medium)] flex items-center gap-1">
-                Power Level
-                <span className="text-[var(--mana-light)] opacity-60">?</span>
+            <div className="flex justify-between items-center cursor-help mb-2">
+              <span className="font-sans text-xs text-[var(--gray-lighter)] flex items-center gap-2">
+                ⚡ Power Level
+                <span className="text-[var(--cyber-cyan)] text-[10px]">?</span>
               </span>
-              <span className="font-pixel-heading text-[14px] text-[var(--gold-light)]">
-                {Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}
+              <span className="font-pixel text-base text-[var(--neon-gold)] text-glow-gold">
+                {powerLevel}
               </span>
             </div>
           </PixelTooltip>
-          <div className="mt-2">
-            <div className="h-2 bg-[var(--void-darker)] border border-[var(--gray-dark)] overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[var(--gold-dark)] to-[var(--gold-light)] transition-all duration-500"
-                style={{
-                  width: `${Math.round((stats.health + stats.mana + stats.strength + stats.charisma + stats.wisdom) / 5)}%`,
-                }}
-              />
-            </div>
+          <div className="stat-bar stat-bar-xp">
+            <div
+              className="stat-bar-fill"
+              style={{ width: `${powerLevel}%` }}
+            />
           </div>
         </div>
       </PixelFrame>
