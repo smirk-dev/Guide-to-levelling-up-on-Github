@@ -33,14 +33,17 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   showProfile = true,
 }) => {
   const xpInLevel = xp % 1000;
-  const xpProgress = (xpInLevel / 1000) * 100;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full bg-[var(--void-darker)] border-b-4 border-[var(--gray-dark)] px-4 py-3"
+      className="w-full glass-panel border-b border-[var(--glass-border)] px-4 py-3 sticky top-0 z-50"
+      style={{
+        background: 'rgba(10, 10, 11, 0.9)',
+        backdropFilter: 'blur(16px)',
+      }}
     >
       {/* Screen reader announcements for sync status */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
@@ -51,11 +54,13 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         {/* Left: Avatar + User Info */}
         {showProfile ? (
           <div className="flex items-center gap-3">
-            <PixelAvatar src={avatarUrl} alt={username} size="md" glow />
+            <div className="relative">
+              <PixelAvatar src={avatarUrl} alt={username} size="md" glow />
+            </div>
 
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="font-pixel text-[11px] text-white truncate max-w-[120px]">
+                <span className="font-sans text-sm font-medium text-white truncate max-w-[140px]">
                   {username}
                 </span>
                 <PixelBadge variant="gold" size="sm">
@@ -64,7 +69,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-pixel text-[9px] text-[var(--gray-highlight)]">
+                <span className="font-mono text-xs text-[var(--cyber-cyan)]">
                   Lv.{level}
                 </span>
                 <div className="w-24">
@@ -82,18 +87,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           <div className="flex-1" />
         )}
 
-        {/* Center: XP Display */}
-        <div className="hidden md:flex items-center gap-2">
-          <IconXP size={20} color="#ffd700" />
-          <span className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
-            {xp.toLocaleString()}
-          </span>
-          <span className="font-pixel text-[9px] text-[var(--gray-medium)]">
-            XP
-          </span>
+        {/* Center: XP Display with Neon Glow */}
+        <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-lg glass-panel-gold">
+          <IconXP size={20} color="#FFD700" />
+          <div className="flex items-baseline gap-1">
+            <span className="font-pixel text-base text-[var(--neon-gold)] text-glow-gold">
+              {xp.toLocaleString()}
+            </span>
+            <span className="font-mono text-xs text-[var(--gray-lighter)]">
+              XP
+            </span>
+          </div>
         </div>
 
-        {/* Right: Sync Button */}
+        {/* Right: Sync Button - Quest Style */}
         <div className="flex items-center gap-3">
           <PixelButton
             variant="mana"
@@ -106,7 +113,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           >
             <span className="flex items-center gap-2">
               <IconSync size={14} className={syncing ? 'animate-spin' : ''} />
-              <span className="hidden sm:inline">SYNC</span>
+              <span className="hidden sm:inline font-pixel text-[10px]">SYNC</span>
             </span>
           </PixelButton>
         </div>
