@@ -231,11 +231,11 @@ export default function DashboardPage() {
       totalIssues: user.github_stats?.issues ?? 0,
       totalReviews: user.github_stats?.reviews ?? 0,
     }) : { health: 0, mana: 0, strength: 0, charisma: 0, wisdom: 0 },
-    [user?.github_stats]
+    [user]
   );
 
   // Calculate level from XP
-  const level = useMemo(() => user ? Math.floor(user.xp / 1000) + 1 : 1, [user?.xp]);
+  const level = useMemo(() => user ? Math.floor(user.xp / 1000) + 1 : 1, [user]);
 
   // Get next rank threshold
   const rankThresholds: Record<RankTier, number> = useMemo(
