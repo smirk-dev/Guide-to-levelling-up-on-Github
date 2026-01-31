@@ -525,10 +525,10 @@ body {
 }
 
 /* ============================================
-   PIXEL BUTTONS
+   QUEST-STYLE BUTTONS - RPG Action Buttons
    ============================================ */
 
-/* Base pixel button */
+/* Base pixel button with glass effect */
 .btn-pixel {
   position: relative;
   display: inline-flex;
@@ -540,141 +540,255 @@ body {
   font-size: 10px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: none;
+  transition: all 0.2s ease;
   border: none;
   outline: none;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* Gold button (primary) */
+/* Quest button decorative corners */
+.btn-pixel::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 8px 8px 0 0;
+  pointer-events: none;
+}
+
+/* Gold button (primary/quest) - Neon Gold */
 .btn-gold {
-  background: var(--gold-medium);
-  color: var(--void-darkest);
-  box-shadow: 
-    inset -4px -4px 0 var(--gold-dark),
-    inset 4px 4px 0 var(--gold-light),
-    4px 4px 0 var(--void-darkest);
+  background: linear-gradient(180deg, var(--neon-gold) 0%, var(--neon-gold-dark) 100%);
+  color: var(--obsidian-darkest);
+  border: 2px solid var(--neon-gold);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 215, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-gold:hover {
-  background: var(--gold-light);
-  box-shadow: 
-    inset -4px -4px 0 var(--gold-medium),
-    inset 4px 4px 0 var(--gold-highlight),
-    0 0 0 2px var(--gold-highlight),
-    4px 4px 0 var(--void-darkest);
+  background: linear-gradient(180deg, var(--neon-gold-light) 0%, var(--neon-gold) 100%);
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn-gold:active {
-  transform: translate(4px, 4px);
-  box-shadow: 
-    inset 4px 4px 0 var(--gold-dark),
-    inset -4px -4px 0 var(--gold-medium);
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(255, 215, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Blue button (secondary) */
+/* Cyan button (secondary/mana) - Electric Cyan */
 .btn-mana {
-  background: var(--mana-medium);
+  background: linear-gradient(180deg, var(--cyber-cyan-medium) 0%, var(--cyber-cyan-dark) 100%);
   color: #ffffff;
-  box-shadow: 
-    inset -4px -4px 0 var(--mana-dark),
-    inset 4px 4px 0 var(--mana-light),
-    4px 4px 0 var(--void-darkest);
+  border: 2px solid var(--cyber-cyan);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 240, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-mana:hover {
-  background: var(--mana-light);
-  box-shadow: 
-    inset -4px -4px 0 var(--mana-medium),
-    inset 4px 4px 0 var(--mana-highlight),
-    0 0 0 2px var(--mana-highlight),
-    4px 4px 0 var(--void-darkest);
+  background: linear-gradient(180deg, var(--cyber-cyan) 0%, var(--cyber-cyan-medium) 100%);
+  box-shadow:
+    0 0 0 2px rgba(0, 240, 255, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 240, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-mana:active {
-  transform: translate(4px, 4px);
-  box-shadow: 
-    inset 4px 4px 0 var(--mana-dark),
-    inset -4px -4px 0 var(--mana-medium);
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(0, 240, 255, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Green button (success) */
+/* Green button (success/health) */
 .btn-health {
-  background: var(--health-medium);
+  background: linear-gradient(180deg, var(--health-light) 0%, var(--health-dark) 100%);
   color: #ffffff;
-  box-shadow: 
-    inset -4px -4px 0 var(--health-dark),
-    inset 4px 4px 0 var(--health-light),
-    4px 4px 0 var(--void-darkest);
+  border: 2px solid var(--health-light);
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-health:hover {
-  background: var(--health-light);
-  box-shadow: 
-    inset -4px -4px 0 var(--health-medium),
-    inset 4px 4px 0 var(--health-highlight),
-    0 0 0 2px var(--health-highlight),
-    4px 4px 0 var(--void-darkest);
+  background: linear-gradient(180deg, var(--health-highlight) 0%, var(--health-light) 100%);
+  box-shadow:
+    0 0 0 2px rgba(34, 197, 94, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(34, 197, 94, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-health:active {
-  transform: translate(4px, 4px);
-  box-shadow: 
-    inset 4px 4px 0 var(--health-dark),
-    inset -4px -4px 0 var(--health-medium);
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Red button (danger) */
+/* Red button (danger/critical) */
 .btn-critical {
-  background: var(--critical-medium);
+  background: linear-gradient(180deg, var(--critical-light) 0%, var(--critical-dark) 100%);
   color: #ffffff;
-  box-shadow: 
-    inset -4px -4px 0 var(--critical-dark),
-    inset 4px 4px 0 var(--critical-light),
-    4px 4px 0 var(--void-darkest);
+  border: 2px solid var(--critical-light);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-critical:hover {
-  background: var(--critical-light);
-  box-shadow: 
-    inset -4px -4px 0 var(--critical-medium),
-    inset 4px 4px 0 var(--critical-highlight),
-    0 0 0 2px var(--critical-highlight),
-    4px 4px 0 var(--void-darkest);
+  background: linear-gradient(180deg, var(--critical-highlight) 0%, var(--critical-light) 100%);
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(239, 68, 68, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-critical:active {
-  transform: translate(4px, 4px);
-  box-shadow: 
-    inset 4px 4px 0 var(--critical-dark),
-    inset -4px -4px 0 var(--critical-medium);
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Ghost/outline button */
+/* Violet button (XP/special) */
+.btn-violet {
+  background: linear-gradient(180deg, var(--pulse-violet) 0%, var(--pulse-violet-dark) 100%);
+  color: #ffffff;
+  border: 2px solid var(--pulse-violet);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(139, 92, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-violet:hover {
+  background: linear-gradient(180deg, var(--pulse-violet-light) 0%, var(--pulse-violet) 100%);
+  box-shadow:
+    0 0 0 2px rgba(139, 92, 246, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(139, 92, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-violet:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Ghost/outline button - glass effect */
 .btn-ghost {
-  background: transparent;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--gray-highlight);
-  border: 4px solid var(--gray-medium);
-  box-shadow: 4px 4px 0 var(--void-darkest);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .btn-ghost:hover {
-  color: var(--gold-light);
-  border-color: var(--gold-medium);
-  box-shadow: 
-    0 0 0 2px var(--gold-light),
-    4px 4px 0 var(--void-darkest);
+  color: var(--cyber-cyan);
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.2),
+    0 6px 20px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(0, 240, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .btn-ghost:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Quest Action Button - Special RPG style */
+.btn-quest {
+  position: relative;
+  background: linear-gradient(180deg, var(--neon-gold) 0%, var(--neon-gold-dark) 100%);
+  color: var(--obsidian-darkest);
+  border: 2px solid var(--neon-gold);
+  border-radius: 8px;
+  padding: 14px 28px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-quest::before {
+  content: '⚔';
+  margin-right: 8px;
+}
+
+.btn-quest:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 0 3px rgba(255, 215, 0, 0.5),
+    0 8px 25px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 215, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.btn-quest:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 /* Disabled button state */
 .btn-pixel:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  filter: grayscale(1);
+  filter: grayscale(0.5);
+  transform: none !important;
+}
+
+.btn-pixel:disabled:hover {
+  transform: none !important;
+  box-shadow: inherit;
 }
 
 /* ============================================
