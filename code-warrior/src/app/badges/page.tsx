@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import {
 } from '@/components';
 import { soundManager } from '@/lib/sound';
 import type { Badge, UserBadge } from '@/types/database';
+import type { ApiError, BadgeInventoryItem } from '@/types/api';
 
 interface BadgesData {
   badges: Badge[];
@@ -29,7 +30,7 @@ export default function BadgesPage() {
   const [loadingBadgeId, setLoadingBadgeId] = useState<string | null>(null);
 
   // Helper function to handle API errors including session timeout
-  const handleApiError = (error: any, defaultMessage: string) => {
+  const handleApiError = useCallback((error: ApiError, defaultMessage: string) => {
     if (error.status === 401 || error.message?.includes('Unauthorized')) {
       // Session expired
       signOut({ callbackUrl: '/?session=expired' });
@@ -46,7 +47,7 @@ export default function BadgesPage() {
         visible: true,
       });
     }
-  };
+  }, []);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -64,7 +65,9 @@ export default function BadgesPage() {
       const apiData = await res.json();
 
       // Transform API response { inventory, equippedBadges } to { badges, userBadges }
-      const badges: Badge[] = (apiData.inventory || []).map((item: any) => ({
+      const inventory = (apiData.inventory || []) as BadgeInventoryItem[];
+      
+      const badges: Badge[] = inventory.map((item) => ({
         id: item.id,
         name: item.name,
         icon_slug: item.icon_slug,
@@ -72,14 +75,14 @@ export default function BadgesPage() {
         created_at: item.created_at,
       }));
 
-      const userBadges: UserBadge[] = (apiData.inventory || [])
-        .filter((item: any) => item.owned)
-        .map((item: any) => ({
+      const userBadges: UserBadge[] = inventory
+        .filter((item) => item.owned)
+        .map((item) => ({
           id: item.id,
           user_id: '',
           badge_id: item.id,
           equipped: item.equipped || false,
-          earned_at: item.earned_at,
+          earned_at: item.earned_at || '',
         }));
 
       return { badges, userBadges };
@@ -97,7 +100,7 @@ export default function BadgesPage() {
         body: JSON.stringify({ badgeId }),
       });
       if (!res.ok) {
-        const error: any = new Error('Equip failed');
+        const error: ApiError = new Error('Equip failed');
         error.status = res.status;
         throw error;
       }
@@ -105,21 +108,23 @@ export default function BadgesPage() {
       
       // API returns { inventory, equippedBadges, equippedCount }
       // but we need { badges, userBadges }
-      const badges: Badge[] = apiData.inventory?.map((item: any) => ({
+      const inventory = (apiData.inventory || []) as BadgeInventoryItem[];
+      
+      const badges: Badge[] = inventory.map((item) => ({
         id: item.id,
         name: item.name,
         icon_slug: item.icon_slug,
         stat_boost: item.stat_boost,
         created_at: item.created_at,
-      })) || [];
+      }));
       
-      const userBadges: UserBadge[] = apiData.inventory?.filter((item: any) => item.owned).map((item: any) => ({
+      const userBadges: UserBadge[] = inventory.filter((item) => item.owned).map((item) => ({
         id: item.id,
         user_id: '', // Not needed for client
         badge_id: item.id,
         equipped: item.equipped,
-        earned_at: item.earned_at,
-      })) || [];
+        earned_at: item.earned_at || '',
+      }));
       
       return { badges, userBadges };
     },
@@ -133,9 +138,9 @@ export default function BadgesPage() {
       });
       setLoadingBadgeId(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       setLoadingBadgeId(null);
-      handleApiError(error, 'Failed to equip badge');
+      handleApiError(error as ApiError, 'Failed to equip badge');
     },
   });
 
@@ -149,7 +154,7 @@ export default function BadgesPage() {
         body: JSON.stringify({ badgeId }),
       });
       if (!res.ok) {
-        const error: any = new Error('Unequip failed');
+        const error: ApiError = new Error('Unequip failed');
         error.status = res.status;
         throw error;
       }
@@ -165,9 +170,9 @@ export default function BadgesPage() {
       });
       setLoadingBadgeId(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       setLoadingBadgeId(null);
-      handleApiError(error, 'Failed to unequip badge');
+      handleApiError(error as ApiError, 'Failed to unequip badge');
     },
   });
 
