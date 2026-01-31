@@ -7,8 +7,7 @@ import { PixelFrame, PixelBadge } from '../ui/PixelComponents';
 import { BattleStatsPanel } from '../rpg/BattleStatsPanel';
 import { AchievementBadges } from '../rpg/AchievementBadges';
 import { IconScroll } from '../icons/PixelIcons';
-import type { RPGStats } from '@/lib/game-logic';
-import type { GitHubAchievementBadge } from '@/types/database';
+import type { RPGStats, GitHubAchievementBadge } from '@/types/database';
 
 interface QuickViewTabProps {
   xp: number;
