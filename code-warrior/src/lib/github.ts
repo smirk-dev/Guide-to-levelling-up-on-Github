@@ -22,7 +22,18 @@ interface GitHubRepo {
 interface GitHubEvent {
   type: string;
   created_at: string;
-  payload: any;
+  payload: GitHubEventPayload;
+}
+
+interface GitHubEventPayload {
+  action?: string;
+  ref?: string;
+  ref_type?: string;
+  commits?: Array<{ sha: string; message: string }>;
+  pull_request?: { merged?: boolean };
+  issue?: { number: number };
+  review?: { state: string };
+  size?: number;
 }
 
 export interface GitHubStats {
