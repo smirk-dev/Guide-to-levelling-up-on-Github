@@ -30,6 +30,8 @@ export {
 // RPG Components
 export { CharacterSheet } from './rpg/CharacterSheet';
 export { QuestCard, QuestLog } from './rpg/QuestCard';
+export { QuestMap } from './rpg/QuestMap';
+export type { MapRegion } from './rpg/QuestMap';
 export { BadgeSlot, BadgeGrid } from './rpg/BadgeSlot';
 export { LeaderboardCard, LeaderboardTable } from './rpg/LeaderboardCard';
 export { GameHUD } from './rpg/GameHUD';
