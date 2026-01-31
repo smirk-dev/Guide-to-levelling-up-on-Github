@@ -106,7 +106,6 @@ interface QuestCheckpointProps {
   isClaimed: boolean;
   isLocked: boolean;
   onSelect: (quest: Quest) => void;
-  pathProgress: number;
 }
 
 const QuestCheckpoint: React.FC<QuestCheckpointProps> = ({
@@ -119,7 +118,6 @@ const QuestCheckpoint: React.FC<QuestCheckpointProps> = ({
   isClaimed,
   isLocked,
   onSelect,
-  pathProgress,
 }) => {
   const checkpointVariant = isClaimed
     ? 'claimed'
@@ -729,7 +727,6 @@ export const QuestMap: React.FC<QuestMapProps> = ({
               isClaimed={isClaimed}
               isLocked={isLocked}
               onSelect={handleQuestSelect}
-              pathProgress={totalProgress}
             />
           );
         })}
