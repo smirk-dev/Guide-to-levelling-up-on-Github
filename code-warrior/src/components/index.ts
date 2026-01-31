@@ -5,6 +5,18 @@ export * from './icons/PixelIcons';
 export * from './ui/PixelComponents';
 export * from './ui/LoadingSkeletons';
 
+// New RPG UI Components (Cyber-Fantasy Overhaul)
+export {
+  QuestButton,
+  RPGStatBar,
+  RPGVerticalBar,
+  GlassPanel,
+  NeonFrame,
+  NeonText,
+  PixelTag,
+  CyberAvatar,
+} from './ui/RPGComponents';
+
 // RPG Components
 export { CharacterSheet } from './rpg/CharacterSheet';
 export { QuestCard, QuestLog } from './rpg/QuestCard';
