@@ -262,7 +262,7 @@ export default function DashboardPage() {
   const hasNeverSynced = !user.last_synced_at;
 
   return (
-    <div className="min-h-screen bg-[var(--void-darkest)]">
+    <div className="min-h-screen bg-[var(--obsidian-darkest)] bg-neon-radial">
       {/* Screen reader announcement for page load completion */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         Dashboard content loaded successfully
@@ -301,27 +301,27 @@ export default function DashboardPage() {
         showProfile={false}
       />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Main Content - CSS Grid Layout */}
+      <div className="dashboard-grid container-safe">
         {/* First Sync Banner */}
         {hasNeverSynced && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="col-span-full"
           >
             <PixelFrame variant="mana" padding="md">
               <div className="flex items-center justify-center gap-4">
-                <span className="font-pixel text-[11px] text-[var(--mana-light)]">
-                  Welcome, Warrior! Click SYNC above to load your GitHub stats and start your adventure!
+                <span className="font-sans text-sm text-[var(--cyber-cyan)] font-medium">
+                  ⚡ Welcome, Warrior! Click <span className="font-pixel text-[10px]">SYNC</span> above to load your GitHub stats and start your adventure!
                 </span>
               </div>
             </PixelFrame>
           </motion.div>
         )}
 
-        {/* Two-Column Layout with Flexbox - Fixed Structure */}
-        <div className="flex flex-col lg:flex-row gap-6 overflow-hidden">
+        {/* Two-Column CSS Grid Layout */}
+        <div className="dashboard-sidebar">
           {/* Left Column: Character Portrait + Achievements + Battle Stats */}
           <div className="w-full lg:w-1/3 flex flex-col gap-3 min-w-0">
             {/* Character Portrait Card */}
