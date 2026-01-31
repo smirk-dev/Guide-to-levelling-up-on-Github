@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PixelFrame, PixelBadge, PixelButton } from '../ui/PixelComponents';
 import { QuestCard } from '../rpg/QuestCard';
@@ -163,6 +164,54 @@ export const QuestsViewTab: React.FC<QuestsViewTabProps> = ({
       aria-labelledby="tab-quests"
       className="tab-panel quests-view-tab"
     >
+      {/* Quest Map Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
+        <Link href="/quests" className="block">
+          <div className="
+            relative overflow-hidden
+            bg-gradient-to-r from-[#1a1a2e] via-[#16213e] to-[#0f3460]
+            border-2 border-[var(--gold-dark)] hover:border-[var(--gold-light)]
+            rounded-lg p-4 mb-4
+            cursor-pointer transition-all duration-300
+            hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]
+            group
+          ">
+            {/* Decorative map pattern background */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-2 left-4 text-2xl">🏠</div>
+              <div className="absolute top-4 right-8 text-2xl">🌲</div>
+              <div className="absolute bottom-2 left-1/4 text-2xl">⛰️</div>
+              <div className="absolute bottom-4 right-4 text-2xl">⭐</div>
+              <div className="absolute top-1/2 left-1/2 text-2xl">🏔️</div>
+            </div>
+            
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl group-hover:animate-bounce">🗺️</span>
+                <div>
+                  <h3 className="font-pixel text-[12px] text-[var(--gold-light)] group-hover:text-white transition-colors">
+                    EXPLORE QUEST MAP
+                  </h3>
+                  <p className="font-pixel text-[8px] text-[var(--gray-medium)]">
+                    Journey through 5 unique regions • {totalQuests} quests await
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-pixel text-[9px] text-[var(--gray-highlight)] group-hover:text-[var(--gold-light)] transition-colors">
+                  VIEW MAP
+                </span>
+                <span className="text-lg group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+
       {/* Quest Stats Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
