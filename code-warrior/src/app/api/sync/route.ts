@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     const supabase = getServiceSupabase();
 
     // Get GitHub ID and username from session
-    const githubId = (session as any).user?.id;
-    const username = (session as any).user?.username || session.user?.name;
+    const githubId = session.user.id;
+    const username = session.user.username || session.user.name;
     
     if (!username && !githubId) {
       return NextResponse.json(
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Fetch GitHub stats
     console.log('Fetching GitHub stats for:', user.username);
-    const accessToken = (session as any).accessToken;
+    const accessToken = session.accessToken;
 
     // Fetch stats, contributions, and calculate achievements in parallel
     const [githubStats, contributions] = await Promise.all([
