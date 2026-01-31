@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -32,31 +32,45 @@ interface DashboardData {
   userQuests: UserQuest[];
 }
 
+interface ApiError extends Error {
+  status?: number;
+}
+
+interface LeaderboardUser {
+  id: string;
+  username: string;
+  xp: number;
+  rank_tier: RankTier;
+  avatar_url: string; // Required by HeroSidebar component
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const queryClient = useQueryClient();
   
-  // Tab state with localStorage persistence
-  const [activeTab, setActiveTab] = useState<DashboardTab>('quick');
+  // Tab state with localStorage persistence - using lazy initialization to avoid setState in useEffect
+  const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('dashboard_tab') as DashboardTab | null;
+      if (savedTab && ['quick', 'activity', 'quests'].includes(savedTab)) {
+        return savedTab;
+      }
+    }
+    return 'quick';
+  });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
   const [floatingXP, setFloatingXP] = useState<{ amount: number; key: number } | null>(null);
 
-  // Restore tab preference from localStorage
-  useEffect(() => {
-    const savedTab = localStorage.getItem('dashboard_tab') as DashboardTab | null;
-    if (savedTab && ['quick', 'activity', 'quests'].includes(savedTab)) {
-      setActiveTab(savedTab);
-    }
-  }, []);
-
   // Save tab preference to localStorage
   useEffect(() => {
-    localStorage.setItem('dashboard_tab', activeTab);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dashboard_tab', activeTab);
+    }
   }, [activeTab]);
 
   // Helper function to handle API errors including session timeout
-  const handleApiError = (error: any, defaultMessage: string) => {
+  const handleApiError = useCallback((error: ApiError, defaultMessage: string) => {
     if (error.status === 401 || error.message?.includes('Unauthorized')) {
       signOut({ callbackUrl: '/?session=expired' });
       setToast({
@@ -72,26 +86,27 @@ export default function DashboardPage() {
         visible: true,
       });
     }
-  };
+  }, []);
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated - prevent race conditions
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
     }
   }, [status, router]);
 
+  // Early return prevents queries from running during redirect
+  const shouldFetchData = status === 'authenticated';
+
   // Fetch dashboard data
   const { data, isLoading, refetch, error } = useQuery<DashboardData>({
     queryKey: ['dashboard', session?.user?.id],
     queryFn: async () => {
-      if (status === 'unauthenticated') {
-        throw new Error('Not authenticated');
-      }
-
       const questsRes = await fetch('/api/quests');
       if (!questsRes.ok) {
-        throw new Error(`Failed to fetch data: ${questsRes.status}`);
+        const error: ApiError = new Error(`Failed to fetch data: ${questsRes.status}`);
+        error.status = questsRes.status;
+        throw error;
       }
 
       const questsData = await questsRes.json();
@@ -101,8 +116,13 @@ export default function DashboardPage() {
         userQuests: questsData.userQuests || [],
       };
     },
-    enabled: status !== 'loading' && status !== 'unauthenticated',
-    retry: 3,
+    enabled: shouldFetchData,
+    retry: (failureCount, error) => {
+      // Don't retry on auth errors
+      if ((error as ApiError).status === 401) return false;
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Fetch leaderboard data
@@ -122,7 +142,7 @@ export default function DashboardPage() {
     mutationFn: async () => {
       const res = await fetch('/api/sync', { method: 'POST' });
       if (!res.ok) {
-        const error: any = new Error('Sync failed');
+        const error: ApiError = new Error('Sync failed');
         error.status = res.status;
         throw error;
       }
@@ -142,8 +162,8 @@ export default function DashboardPage() {
         visible: true,
       });
     },
-    onError: (error: any) => {
-      handleApiError(error, 'Failed to sync stats');
+    onError: (error: Error) => {
+      handleApiError(error as ApiError, 'Failed to sync stats');
     },
   });
 
@@ -156,7 +176,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ questId }),
       });
       if (!res.ok) {
-        const error: any = new Error('Claim failed');
+        const error: ApiError = new Error('Claim failed');
         error.status = res.status;
         throw error;
       }
@@ -177,12 +197,132 @@ export default function DashboardPage() {
         visible: true,
       });
     },
-    onError: (error: any) => {
-      handleApiError(error, 'Failed to claim quest');
+    onError: (error: Error) => {
+      handleApiError(error as ApiError, 'Failed to claim quest');
     },
   });
 
-  // Loading states
+  // Memoize callbacks and computations before any early returns (React hooks rules)
+  const navigateToQuests = useCallback(() => {
+    setActiveTab('quests');
+  }, []);
+
+  // Derived data - compute after data is available but before any conditional returns
+  const user = data?.user;
+  
+  // Memoize expensive computations - using optional chaining for safety
+  const contributions: ContributionDay[] = useMemo(
+    () => user?.github_stats?.contributions || [],
+    [user?.github_stats?.contributions]
+  );
+  
+  const badges: GitHubAchievementBadge[] = useMemo(
+    () => user?.github_stats?.badges || [],
+    [user?.github_stats?.badges]
+  );
+
+  // Calculate RPG stats from github_stats
+  const rpgStats = useMemo(
+    () => user ? calculateRPGStats({
+      totalStars: user.github_stats?.stars ?? 0,
+      totalRepos: user.github_stats?.repos ?? 0,
+      totalCommits: user.github_stats?.commits ?? 0,
+      totalPRs: user.github_stats?.prs ?? 0,
+      totalIssues: user.github_stats?.issues ?? 0,
+      totalReviews: user.github_stats?.reviews ?? 0,
+    }) : { health: 0, mana: 0, strength: 0, charisma: 0, wisdom: 0 },
+    [user?.github_stats]
+  );
+
+  // Calculate level from XP
+  const level = useMemo(() => user ? Math.floor(user.xp / 1000) + 1 : 1, [user?.xp]);
+
+  // Get next rank threshold
+  const rankThresholds: Record<RankTier, number> = useMemo(
+    () => ({
+      C: 1000, B: 3000, A: 6000, AA: 10000, AAA: 15000, S: 25000, SS: 50000, SSS: Infinity,
+    }),
+    []
+  );
+  const xpToNextRank = user ? rankThresholds[user.rank_tier] : 1000;
+
+  // Quest stats
+  const completedQuests = useMemo(
+    () => data?.userQuests.filter((uq) => uq.status === 'COMPLETED').length ?? 0,
+    [data?.userQuests]
+  );
+  const claimableQuests = useMemo(
+    () => data?.userQuests.filter((uq) => uq.status === 'COMPLETED' && !uq.claimed_at).length ?? 0,
+    [data?.userQuests]
+  );
+  const hasNeverSynced = !user?.last_synced_at;
+
+  // Leaderboard data for sidebar
+  const leaderboardUsers = (leaderboardData?.users || []) as LeaderboardUser[];
+  const userRankIndex = user ? leaderboardUsers.findIndex((u) => u.id === user.id) : -1;
+  const userRank = userRankIndex >= 0 ? userRankIndex + 1 : undefined;
+  const totalUsers = leaderboardUsers.length || undefined;
+
+  // Render active tab content - memoized to prevent recreation on every render
+  const renderTabContent = useCallback(() => {
+    if (!user) return null;
+
+    switch (activeTab) {
+      case 'quick':
+        return (
+          <QuickViewTab
+            xp={user.xp}
+            level={level}
+            completedQuests={completedQuests}
+            reposCount={user.github_stats?.repos ?? 0}
+            claimableQuests={claimableQuests}
+            rpgStats={rpgStats}
+            badges={badges}
+            hasNeverSynced={hasNeverSynced}
+            onNavigateToQuests={navigateToQuests}
+          />
+        );
+      case 'activity':
+        return (
+          <ActivityViewTab
+            contributions={contributions}
+            xp={user.xp}
+            rankTier={user.rank_tier}
+            lastSyncedAt={user.last_synced_at}
+          />
+        );
+      case 'quests':
+        return (
+          <QuestsViewTab
+            quests={data?.quests ?? []}
+            userQuests={data?.userQuests ?? []}
+            onClaim={(questId) => claimMutation.mutate(questId)}
+            claimLoading={claimMutation.isPending}
+            onSync={() => syncMutation.mutate()}
+            syncing={syncMutation.isPending}
+          />
+        );
+      default:
+        return null;
+    }
+  }, [
+    user,
+    activeTab,
+    level,
+    completedQuests,
+    claimableQuests,
+    rpgStats,
+    badges,
+    hasNeverSynced,
+    navigateToQuests,
+    contributions,
+    data?.quests,
+    data?.userQuests,
+    claimMutation,
+    syncMutation,
+  ]);
+
+  // Loading states - early returns AFTER all hooks
   if (status === 'loading') {
     return <LoadingScreen message="INITIALIZING" />;
   }
@@ -215,95 +355,11 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data?.user) {
+  if (!user) {
     return <LoadingScreen message="PREPARING ADVENTURE" />;
   }
 
-  const user = data.user;
-
-  // Get contributions and badges from github_stats
-  const contributions: ContributionDay[] = user.github_stats?.contributions || [];
-  const badges: GitHubAchievementBadge[] = user.github_stats?.badges || [];
-
-  // Calculate RPG stats from github_stats
-  const rpgStats = calculateRPGStats({
-    totalStars: user.github_stats?.stars ?? 0,
-    totalRepos: user.github_stats?.repos ?? 0,
-    totalCommits: user.github_stats?.commits ?? 0,
-    totalPRs: user.github_stats?.prs ?? 0,
-    totalIssues: user.github_stats?.issues ?? 0,
-    totalReviews: user.github_stats?.reviews ?? 0,
-  });
-
-  // Calculate level from XP
-  const level = Math.floor(user.xp / 1000) + 1;
-
-  // Get next rank threshold
-  const rankThresholds: Record<RankTier, number> = {
-    C: 1000, B: 3000, A: 6000, AA: 10000, AAA: 15000, S: 25000, SS: 50000, SSS: Infinity,
-  };
-  const xpToNextRank = rankThresholds[user.rank_tier];
-
-  // Quest stats
-  const completedQuests = data.userQuests.filter((uq) => uq.status === 'COMPLETED').length;
-  const claimableQuests = data.userQuests.filter(
-    (uq) => uq.status === 'COMPLETED' && !uq.claimed_at
-  ).length;
-  const hasNeverSynced = !user.last_synced_at;
-
-  // Leaderboard data for sidebar
-  const leaderboardUsers = leaderboardData?.users || [];
-  const userRankIndex = leaderboardUsers.findIndex((u: any) => u.id === user.id);
-  const userRank = userRankIndex >= 0 ? userRankIndex + 1 : undefined;
-  const totalUsers = leaderboardUsers.length || undefined;
-
-  // Navigate to quests tab
-  const navigateToQuests = () => {
-    setActiveTab('quests');
-  };
-
-  // Render active tab content
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'quick':
-        return (
-          <QuickViewTab
-            xp={user.xp}
-            level={level}
-            completedQuests={completedQuests}
-            reposCount={user.github_stats?.repos ?? 0}
-            claimableQuests={claimableQuests}
-            rpgStats={rpgStats}
-            badges={badges}
-            hasNeverSynced={hasNeverSynced}
-            onNavigateToQuests={navigateToQuests}
-          />
-        );
-      case 'activity':
-        return (
-          <ActivityViewTab
-            contributions={contributions}
-            xp={user.xp}
-            rankTier={user.rank_tier}
-            lastSyncedAt={user.last_synced_at}
-          />
-        );
-      case 'quests':
-        return (
-          <QuestsViewTab
-            quests={data.quests}
-            userQuests={data.userQuests}
-            onClaim={(questId) => claimMutation.mutate(questId)}
-            claimLoading={claimMutation.isPending}
-            onSync={() => syncMutation.mutate()}
-            syncing={syncMutation.isPending}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
+  // Component render
   return (
     <div className="min-h-screen bg-[var(--obsidian-darkest)] bg-neon-radial">
       {/* Screen reader announcements */}
