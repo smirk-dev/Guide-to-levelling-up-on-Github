@@ -1,125 +1,218 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Pixel Cursor */
-body {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="0" y="0" width="8" height="8" fill="%23ffd700"/><rect x="2" y="2" width="4" height="4" fill="%23000"/></svg>') 8 8, auto;
-}
-
-button, a, [role="button"], .clickable {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="0" width="8" height="12" fill="%2358a6ff"/><rect x="6" y="2" width="4" height="8" fill="%23fff"/></svg>') 8 8, pointer;
-}
-
-input, textarea {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="7" y="0" width="2" height="16" fill="%23ffd700"/></svg>') 8 8, text;
-}
-
 /* ============================================
-   16-BIT PIXEL ART DESIGN SYSTEM
-   Code Warrior - Retro Gaming UI
+   CYBER-FANTASY RPG DESIGN SYSTEM
+   Code Warrior - Neon RPG UI Overhaul
    ============================================ */
 
-/* CSS Variables - 16-bit Color Palette (max 64 colors) */
+/* CSS Variables - Cyber-Neon Color Palette */
 :root {
-  /* Midnight Void (Backgrounds) */
-  --void-darkest: #0a0a0f;
-  --void-darker: #0d1117;
-  --void-dark: #161b22;
-  --void-medium: #21262d;
-  --void-light: #30363d;
-  
-  /* Loot Gold (Primary/Rewards) */
-  --gold-darkest: #5c4a00;
-  --gold-dark: #8b7000;
-  --gold-medium: #b8960f;
-  --gold-light: #ffd700;
-  --gold-highlight: #ffed4a;
-  
-  /* Mana Blue (Secondary/Stats) */
-  --mana-darkest: #0d2137;
-  --mana-dark: #1a3a5c;
-  --mana-medium: #2d5a87;
-  --mana-light: #58a6ff;
-  --mana-highlight: #79c0ff;
-  
-  /* Health Green (Positive) */
-  --health-darkest: #0d2818;
-  --health-dark: #1a4d2e;
-  --health-medium: #238636;
-  --health-light: #2ea043;
-  --health-highlight: #56d364;
-  
-  /* Critical Red (Alerts/Errors) */
-  --critical-darkest: #2d0f0f;
-  --critical-dark: #5c1a1a;
-  --critical-medium: #8b2d2d;
-  --critical-light: #da3633;
-  --critical-highlight: #f85149;
-  
-  /* Experience Purple */
-  --xp-darkest: #1f0d2e;
-  --xp-dark: #3d1a5c;
-  --xp-medium: #6e40aa;
-  --xp-light: #a371f7;
-  --xp-highlight: #bc8cff;
-  
-  /* Neutral Grays */
-  --gray-darkest: #1a1a1f;
-  --gray-dark: #2d2d35;
-  --gray-medium: #484848;
-  --gray-light: #6e6e76;
-  --gray-highlight: #8b949e;
-  
-  /* Pixel sizing */
+  /* ==========================================
+     PRIMARY: Deep Obsidian (Backgrounds)
+     ========================================== */
+  --obsidian-darkest: #050507;
+  --obsidian-darker: #0A0A0B;
+  --obsidian-dark: #0F0F12;
+  --obsidian-medium: #151518;
+  --obsidian-light: #1A1A1F;
+  --obsidian-lighter: #222228;
+
+  /* ==========================================
+     ACCENT 1: Electric Cyan (Mana/Tech/Primary)
+     ========================================== */
+  --cyber-cyan-darkest: #003844;
+  --cyber-cyan-dark: #006677;
+  --cyber-cyan: #00F0FF;
+  --cyber-cyan-medium: #00D4E6;
+  --cyber-cyan-light: #4DFFFF;
+  --cyber-cyan-glow: rgba(0, 240, 255, 0.5);
+
+  /* ==========================================
+     ACCENT 2: Pulse Violet (XP/Magic/Secondary)
+     ========================================== */
+  --pulse-violet-darkest: #2D1B4E;
+  --pulse-violet-dark: #4C2885;
+  --pulse-violet: #8B5CF6;
+  --pulse-violet-medium: #7C3AED;
+  --pulse-violet-light: #A78BFA;
+  --pulse-violet-glow: rgba(139, 92, 246, 0.5);
+
+  /* ==========================================
+     ACCENT 3: Neon Gold (Rewards/Achievements)
+     ========================================== */
+  --neon-gold-darkest: #664D00;
+  --neon-gold-dark: #997300;
+  --neon-gold: #FFD700;
+  --neon-gold-medium: #E6C200;
+  --neon-gold-light: #FFED4E;
+  --neon-gold-highlight: #FFF8DC;
+  --neon-gold-glow: rgba(255, 215, 0, 0.5);
+
+  /* ==========================================
+     STATUS: Health Green (HP/Success)
+     ========================================== */
+  --health-darkest: #0D3320;
+  --health-dark: #166534;
+  --health-medium: #16A34A;
+  --health-light: #22C55E;
+  --health-highlight: #4ADE80;
+  --health-glow: rgba(34, 197, 94, 0.5);
+
+  /* ==========================================
+     STATUS: Critical Red (Danger/Alerts)
+     ========================================== */
+  --critical-darkest: #450A0A;
+  --critical-dark: #7F1D1D;
+  --critical-medium: #DC2626;
+  --critical-light: #EF4444;
+  --critical-highlight: #F87171;
+  --critical-glow: rgba(239, 68, 68, 0.5);
+
+  /* ==========================================
+     ACCENT 4: Neon Pink (Special/Rare)
+     ========================================== */
+  --neon-pink-darkest: #500724;
+  --neon-pink-dark: #9D174D;
+  --neon-pink: #FF0080;
+  --neon-pink-medium: #DB2777;
+  --neon-pink-light: #F472B6;
+  --neon-pink-glow: rgba(255, 0, 128, 0.5);
+
+  /* ==========================================
+     NEUTRAL: Cyber Grays (UI Elements)
+     ========================================== */
+  --gray-darkest: #18181B;
+  --gray-dark: #27272A;
+  --gray-medium: #3F3F46;
+  --gray-light: #52525B;
+  --gray-lighter: #71717A;
+  --gray-highlight: #A1A1AA;
+  --gray-muted: #D4D4D8;
+
+  /* ==========================================
+     LEGACY ALIASES (for backward compatibility)
+     ========================================== */
+  --void-darkest: var(--obsidian-darkest);
+  --void-darker: var(--obsidian-darker);
+  --void-dark: var(--obsidian-dark);
+  --void-medium: var(--obsidian-medium);
+  --void-light: var(--obsidian-light);
+
+  --gold-darkest: var(--neon-gold-darkest);
+  --gold-dark: var(--neon-gold-dark);
+  --gold-medium: var(--neon-gold-medium);
+  --gold-light: var(--neon-gold);
+  --gold-highlight: var(--neon-gold-light);
+
+  --mana-darkest: var(--cyber-cyan-darkest);
+  --mana-dark: var(--cyber-cyan-dark);
+  --mana-medium: var(--cyber-cyan-medium);
+  --mana-light: var(--cyber-cyan);
+  --mana-highlight: var(--cyber-cyan-light);
+
+  --xp-darkest: var(--pulse-violet-darkest);
+  --xp-dark: var(--pulse-violet-dark);
+  --xp-medium: var(--pulse-violet-medium);
+  --xp-light: var(--pulse-violet);
+  --xp-highlight: var(--pulse-violet-light);
+
+  /* ==========================================
+     GLASSMORPHISM VARIABLES
+     ========================================== */
+  --glass-bg: rgba(10, 10, 11, 0.75);
+  --glass-bg-light: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-blur: 16px;
+  --glass-blur-lg: 24px;
+
+  /* ==========================================
+     PIXEL SIZING
+     ========================================== */
   --pixel-size: 4px;
   --pixel-border: 4px;
   --pixel-border-thick: 8px;
+  --pixel-radius: 2px;
+  --glass-radius: 12px;
+  --glass-radius-lg: 16px;
+  --glass-radius-xl: 24px;
 }
 
-/* Base Styles - Pixel Perfect Rendering */
+/* Custom Pixel Cursor - Updated Cyan Theme */
+body {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="0" y="0" width="8" height="8" fill="%2300F0FF"/><rect x="2" y="2" width="4" height="4" fill="%23000"/></svg>') 8 8, auto;
+}
+
+button, a, [role="button"], .clickable {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="0" width="8" height="12" fill="%238B5CF6"/><rect x="6" y="2" width="4" height="8" fill="%23fff"/></svg>') 8 8, pointer;
+}
+
+input, textarea {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="7" y="0" width="2" height="16" fill="%2300F0FF"/></svg>') 8 8, text;
+}
+
+/* Base Styles - Pixel Perfect + Modern Rendering */
 * {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+/* Modern text rendering for readability */
+body, p, span, div {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Pixel text for headers only */
+.font-pixel, .font-display, h1, h2, h3 {
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
 }
 
 html {
-  font-family: 'Press Start 2P', monospace;
-  background: var(--void-darkest);
-  color: #e6edf3;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--obsidian-darkest);
+  color: #E4E4E7;
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
-  background: var(--void-darker);
-  /* Scanline pattern overlay */
-  background-image: 
+  background: var(--obsidian-darker);
+  /* Cyber grid pattern overlay */
+  background-image:
+    /* Subtle scanlines */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 0, 0, 0.1) 2px,
-      rgba(0, 0, 0, 0.1) 4px
+      rgba(0, 240, 255, 0.02) 2px,
+      rgba(0, 240, 255, 0.02) 4px
     ),
-    /* Subtle grid pattern */
+    /* Cyber grid pattern - cyan accent */
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 64px,
-      rgba(88, 166, 255, 0.02) 64px,
-      rgba(88, 166, 255, 0.02) 65px
+      transparent 80px,
+      rgba(0, 240, 255, 0.03) 80px,
+      rgba(0, 240, 255, 0.03) 81px
     ),
     repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 64px,
-      rgba(88, 166, 255, 0.02) 64px,
-      rgba(88, 166, 255, 0.02) 65px
+      transparent 80px,
+      rgba(0, 240, 255, 0.03) 80px,
+      rgba(0, 240, 255, 0.03) 81px
+    ),
+    /* Gradient overlay for depth */
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(139, 92, 246, 0.08) 0%,
+      transparent 50%
     );
 }
 
