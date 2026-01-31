@@ -13,64 +13,129 @@ const config: Config = {
         xs: '375px', // iPhone SE and up
       },
       colors: {
-        // Cyber-Fantasy Theme from docs/ux-design.md
+        // Cyber-Fantasy Theme - Neon RPG Aesthetic
         background: "var(--background)",
         foreground: "var(--foreground)",
 
-        // 16-bit Pixel Art Color Palette
-        // Midnight Void spectrum (4 shades)
-        'midnight-void': {
-          0: '#000000', // Pure black
-          1: '#0d1117', // Original dark background
-          2: '#161b22', // Light dark
-          3: '#21262d', // Border dark
-          DEFAULT: '#0d1117',
+        // ==========================================
+        // CYBER-NEON COLOR PALETTE
+        // ==========================================
+
+        // Deep Obsidian (Primary Backgrounds)
+        'obsidian': {
+          darkest: '#050507',
+          darker: '#0A0A0B',
+          dark: '#0F0F12',
+          DEFAULT: '#0A0A0B',
+          medium: '#151518',
+          light: '#1A1A1F',
+          lighter: '#222228',
         },
 
-        // Loot Gold spectrum (5 shades)
-        'loot-gold': {
-          0: '#8b7500', // Dark gold
-          1: '#b8a000', // Mid-dark gold
-          2: '#ffd700', // Original gold
-          3: '#ffed4e', // Bright gold
-          4: '#fffacd', // Pale gold
-          DEFAULT: '#ffd700',
+        // Electric Cyan (Primary Accent - Mana/Tech)
+        'cyber-cyan': {
+          darkest: '#003844',
+          dark: '#006677',
+          DEFAULT: '#00F0FF',
+          medium: '#00D4E6',
+          light: '#4DFFFF',
+          glow: '#00F0FF',
         },
 
-        // Mana Blue spectrum (4 shades)
-        'mana-blue': {
-          0: '#1e3a5f', // Dark blue
-          1: '#2e4a6f', // Mid blue
-          2: '#58a6ff', // Original blue
-          3: '#79c0ff', // Light blue
-          DEFAULT: '#58a6ff',
+        // Pulse Violet (Secondary Accent - XP/Magic)
+        'pulse-violet': {
+          darkest: '#2D1B4E',
+          dark: '#4C2885',
+          DEFAULT: '#8B5CF6',
+          medium: '#7C3AED',
+          light: '#A78BFA',
+          glow: '#8B5CF6',
         },
 
-        // Health Green spectrum (3 shades)
+        // Neon Gold (Rewards/Achievements)
+        'neon-gold': {
+          darkest: '#664D00',
+          dark: '#997300',
+          DEFAULT: '#FFD700',
+          medium: '#E6C200',
+          light: '#FFED4E',
+          highlight: '#FFF8DC',
+        },
+
+        // Health Green (HP/Success)
         'health-green': {
-          0: '#1b5e2f', // Dark green
-          1: '#2ea043', // Original green
-          2: '#3fb950', // Light green
-          DEFAULT: '#2ea043',
+          darkest: '#0D3320',
+          dark: '#166534',
+          DEFAULT: '#22C55E',
+          medium: '#16A34A',
+          light: '#4ADE80',
+          highlight: '#86EFAC',
         },
 
-        // Critical Red spectrum (2 shades)
+        // Critical Red (Danger/Alerts)
         'critical-red': {
-          0: '#a32828', // Dark red
-          1: '#da3633', // Original red
-          DEFAULT: '#da3633',
+          darkest: '#450A0A',
+          dark: '#7F1D1D',
+          DEFAULT: '#EF4444',
+          medium: '#DC2626',
+          light: '#F87171',
+          highlight: '#FCA5A5',
         },
 
-        // Pixel Grays (2 shades)
+        // Neon Pink (Special/Rare)
+        'neon-pink': {
+          darkest: '#500724',
+          dark: '#9D174D',
+          DEFAULT: '#FF0080',
+          medium: '#DB2777',
+          light: '#F472B6',
+          glow: '#FF0080',
+        },
+
+        // Neutral Grays (UI Elements)
+        'cyber-gray': {
+          darkest: '#18181B',
+          dark: '#27272A',
+          DEFAULT: '#3F3F46',
+          medium: '#52525B',
+          light: '#71717A',
+          lighter: '#A1A1AA',
+          highlight: '#D4D4D8',
+        },
+
+        // Legacy compatibility aliases
+        'midnight-void': {
+          0: '#050507',
+          1: '#0A0A0B',
+          2: '#0F0F12',
+          3: '#151518',
+          DEFAULT: '#0A0A0B',
+        },
+        'loot-gold': {
+          0: '#664D00',
+          1: '#997300',
+          2: '#FFD700',
+          3: '#FFED4E',
+          4: '#FFF8DC',
+          DEFAULT: '#FFD700',
+        },
+        'mana-blue': {
+          0: '#003844',
+          1: '#006677',
+          2: '#00F0FF',
+          3: '#4DFFFF',
+          DEFAULT: '#00F0FF',
+        },
         'gray-pixel': {
-          0: '#30363d', // Mid gray
-          1: '#484f58', // Light gray
+          0: '#3F3F46',
+          1: '#52525B',
         },
       },
       fontFamily: {
-        'pixel': ['var(--font-press-start)', 'cursive'], // Headers/titles
-        'mono': ['var(--font-fira-code)', 'monospace'], // Body text
-        'sans': ['var(--font-inter)', 'sans-serif'], // UI elements
+        'pixel': ['var(--font-press-start)', 'Press Start 2P', 'cursive'],
+        'mono': ['var(--font-fira-code)', 'Fira Code', 'Consolas', 'monospace'],
+        'sans': ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        'display': ['var(--font-press-start)', 'Press Start 2P', 'cursive'],
       },
       boxShadow: {
         // Pixel art hard-edged shadows
@@ -78,15 +143,31 @@ const config: Config = {
         'pixel-md': '4px 4px 0 rgba(0, 0, 0, 0.5)',
         'pixel-lg': '6px 6px 0 rgba(0, 0, 0, 0.5)',
 
+        // Cyber neon glow effects
+        'neon-cyan': '0 0 5px #00F0FF, 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.2)',
+        'neon-violet': '0 0 5px #8B5CF6, 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.2)',
+        'neon-gold': '0 0 5px #FFD700, 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2)',
+        'neon-pink': '0 0 5px #FF0080, 0 0 20px rgba(255, 0, 128, 0.5), 0 0 40px rgba(255, 0, 128, 0.2)',
+        'neon-green': '0 0 5px #22C55E, 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(34, 197, 94, 0.2)',
+        'neon-red': '0 0 5px #EF4444, 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.2)',
+
+        // Glass panel shadows
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'glass-hover': '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+
         // Layered border glows (no blur)
-        'pixel-glow-gold': '0 0 0 2px #ffd700, 0 0 0 4px #b8a000',
-        'pixel-glow-blue': '0 0 0 2px #58a6ff, 0 0 0 4px #2e4a6f',
+        'pixel-glow-gold': '0 0 0 2px #FFD700, 0 0 0 4px #997300',
+        'pixel-glow-cyan': '0 0 0 2px #00F0FF, 0 0 0 4px #006677',
+        'pixel-glow-violet': '0 0 0 2px #8B5CF6, 0 0 0 4px #4C2885',
 
         // Inset shadow for depth
         'pixel-inset': 'inset 2px 2px 0 rgba(0, 0, 0, 0.3)',
 
         // 3D button effect
         'pixel-button': 'inset -4px -4px 0 rgba(0, 0, 0, 0.2), 4px 4px 0 rgba(0, 0, 0, 0.5)',
+
+        // Quest button glow
+        'quest-glow': '0 0 0 2px rgba(255, 215, 0, 0.3), 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
       },
       borderWidth: {
         '3': '3px',
@@ -94,13 +175,50 @@ const config: Config = {
         '8': '8px',
       },
       borderRadius: {
-        'pixel': '0px', // No rounding for pixel elements
-        'pixel-sm': '2px', // Minimal rounding
+        'pixel': '0px',
+        'pixel-sm': '2px',
+        'glass': '12px',
+        'glass-lg': '16px',
+        'glass-xl': '24px',
+      },
+      backdropBlur: {
+        'glass': '16px',
+        'glass-lg': '24px',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'scanline': 'scanline 8s linear infinite',
+        'flicker': 'flicker 0.15s infinite',
+        'cyber-pulse': 'cyber-pulse 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'glow-pulse': {
+          '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
+          '50%': { opacity: '0.8', filter: 'brightness(1.2)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'scanline': {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100vh)' },
+        },
+        'flicker': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.95' },
+        },
+        'cyber-pulse': {
+          '0%, 100%': { boxShadow: '0 0 5px currentColor, 0 0 10px currentColor' },
+          '50%': { boxShadow: '0 0 20px currentColor, 0 0 30px currentColor' },
+        },
       },
     },
   },
   plugins: [
-    // Custom plugin for pixel art utilities
+    // Custom plugin for pixel art and glassmorphism utilities
     function({ addUtilities }: any) {
       addUtilities({
         '.pixel-perfect': {
@@ -116,6 +234,46 @@ const config: Config = {
         },
         '.pixel-border-notch-all': {
           'clip-path': 'polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px)',
+        },
+        // Glassmorphism utilities
+        '.glass-panel': {
+          'background': 'rgba(10, 10, 11, 0.8)',
+          'backdrop-filter': 'blur(16px)',
+          '-webkit-backdrop-filter': 'blur(16px)',
+          'border': '1px solid rgba(255, 255, 255, 0.05)',
+          'border-radius': '12px',
+        },
+        '.glass-panel-light': {
+          'background': 'rgba(255, 255, 255, 0.05)',
+          'backdrop-filter': 'blur(16px)',
+          '-webkit-backdrop-filter': 'blur(16px)',
+          'border': '1px solid rgba(255, 255, 255, 0.1)',
+          'border-radius': '12px',
+        },
+        '.glass-border': {
+          'border': '1px solid rgba(255, 255, 255, 0.1)',
+        },
+        '.glass-border-cyan': {
+          'border': '1px solid rgba(0, 240, 255, 0.3)',
+        },
+        '.glass-border-violet': {
+          'border': '1px solid rgba(139, 92, 246, 0.3)',
+        },
+        '.glass-border-gold': {
+          'border': '1px solid rgba(255, 215, 0, 0.3)',
+        },
+        // Text glow utilities
+        '.text-glow-cyan': {
+          'text-shadow': '0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.5)',
+        },
+        '.text-glow-violet': {
+          'text-shadow': '0 0 10px rgba(139, 92, 246, 0.7), 0 0 20px rgba(139, 92, 246, 0.5)',
+        },
+        '.text-glow-gold': {
+          'text-shadow': '0 0 10px rgba(255, 215, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.5)',
+        },
+        '.text-glow-pink': {
+          'text-shadow': '0 0 10px rgba(255, 0, 128, 0.7), 0 0 20px rgba(255, 0, 128, 0.5)',
         },
       })
     }
