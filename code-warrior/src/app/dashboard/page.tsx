@@ -322,155 +322,149 @@ export default function DashboardPage() {
 
         {/* Two-Column CSS Grid Layout */}
         <div className="dashboard-sidebar">
-          {/* Left Column: Character Portrait + Achievements + Battle Stats */}
-          <div className="w-full lg:w-1/3 flex flex-col gap-3 min-w-0">
-            {/* Character Portrait Card */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <PixelFrame variant="gold" padding="md">
-                <div className="flex flex-col items-center">
-                  {/* Avatar - Constrained Size */}
-                  <div className="w-32 h-32 max-w-full flex-shrink-0">
-                    <PixelAvatar src={user.avatar_url} alt={user.username} size="lg" glow />
-                  </div>
+          {/* Character Portrait Card - Glassmorphism */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <PixelFrame variant="gold" padding="md">
+              <div className="flex flex-col items-center">
+                {/* Avatar - Constrained Size with Neon Ring */}
+                <div className="w-28 h-28 relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[var(--cyber-cyan)] to-[var(--pulse-violet)] opacity-30 blur-xl"></div>
+                  <PixelAvatar src={user.avatar_url} alt={user.username} size="lg" glow />
+                </div>
 
-                  {/* Username */}
-                  <h2 className="font-pixel text-[14px] text-white mt-3 text-center">
-                    {user.username}
-                  </h2>
+                {/* Username with Glow */}
+                <h2 className="font-pixel text-[13px] text-white mt-4 text-center text-glow-cyan">
+                  {user.username}
+                </h2>
 
-                  {/* Rank */}
-                  <div className="flex items-center gap-2 mt-2">
-                    <IconRank size={16} />
-                    <span className="font-pixel text-[11px] text-[var(--gold-light)]">
-                      {getRankDisplayName(user.rank_tier)}
+                {/* Rank with Icon */}
+                <div className="flex items-center gap-2 mt-2">
+                  <IconRank size={16} />
+                  <span className="font-mono text-sm font-semibold text-[var(--neon-gold)]">
+                    {getRankDisplayName(user.rank_tier)}
+                  </span>
+                </div>
+
+                {/* Rank Badge */}
+                <PixelBadge variant="gold" size="sm" className="mt-3">
+                  {user.rank_tier} Rank
+                </PixelBadge>
+
+                {/* XP Progress to next rank - Enhanced */}
+                <div className="w-full mt-4">
+                  <div className="flex justify-between text-xs font-mono mb-2">
+                    <span className="text-[var(--gray-lighter)]">Rank Progress</span>
+                    <span className="text-[var(--neon-gold)] font-semibold">
+                      {user.xp.toLocaleString()} / {xpToNextRank === Infinity ? 'MAX' : xpToNextRank.toLocaleString()}
                     </span>
                   </div>
-
-                  {/* Rank Badge */}
-                  <PixelBadge variant="gold" size="sm" className="mt-3">
-                    {user.rank_tier} Rank
-                  </PixelBadge>
-
-                  {/* XP Progress to next rank */}
-                  <div className="w-full mt-3">
-                    <div className="flex justify-between text-[9px] font-pixel mb-1">
-                      <span className="text-[var(--gray-highlight)]">Rank Progress</span>
-                      <span className="text-[var(--gold-light)]">
-                        {user.xp.toLocaleString()} / {xpToNextRank === Infinity ? 'MAX' : xpToNextRank.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="stat-bar stat-bar-xp">
-                      <div
-                        className="stat-bar-fill"
-                        style={{
-                          width: `${xpToNextRank === Infinity ? 100 : (user.xp / xpToNextRank) * 100}%`,
-                        }}
-                      />
-                    </div>
+                  <div className="stat-bar stat-bar-xp stat-bar-lg">
+                    <div
+                      className="stat-bar-fill"
+                      style={{
+                        width: `${xpToNextRank === Infinity ? 100 : (user.xp / xpToNextRank) * 100}%`,
+                      }}
+                    />
                   </div>
                 </div>
+              </div>
 
-                {/* Achievement Badges */}
-                <div className="mt-4 pt-3 border-t-2 border-dashed border-[var(--gold-dark)]">
-                  <h4 className="font-pixel text-[9px] text-[var(--gray-highlight)] text-center mb-3">
-                    Achievements
-                  </h4>
-                  <AchievementBadges badges={badges} size="lg" />
-                </div>
+              {/* Achievement Badges Section */}
+              <div className="mt-5 pt-4 border-t border-[var(--glass-border)]">
+                <h4 className="font-pixel text-[9px] text-[var(--gray-lighter)] text-center mb-3 uppercase tracking-wider">
+                  Achievements
+                </h4>
+                <AchievementBadges badges={badges} size="lg" />
+              </div>
 
-                {/* Leaderboard Showcase - Compact */}
-                {leaderboardData?.users && leaderboardData.users.length > 0 && (
-                  <div className="mt-3 pt-3 border-t-2 border-dashed border-[var(--gold-dark)]">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                        Leaderboard
-                      </h4>
-                      <a
-                        href="/leaderboard"
-                        className="font-pixel text-[7px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)]"
-                      >
-                        ALL
-                      </a>
-                    </div>
-                    <div className="space-y-1">
-                      {(() => {
-                        const users = leaderboardData.users;
-                        const userIndex = users.findIndex((u: any) => u.id === user.id);
-                        const userRank = userIndex + 1;
+              {/* Leaderboard Showcase */}
+              {leaderboardData?.users && leaderboardData.users.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-pixel text-[8px] text-[var(--gray-lighter)] uppercase tracking-wider">
+                      Leaderboard
+                    </h4>
+                    <a
+                      href="/leaderboard"
+                      className="font-mono text-xs text-[var(--cyber-cyan)] hover:text-[var(--cyber-cyan-light)] transition-colors"
+                    >
+                      View All →
+                    </a>
+                  </div>
+                  <div className="space-y-1.5">
+                    {(() => {
+                      const users = leaderboardData.users;
+                      const userIndex = users.findIndex((u: any) => u.id === user.id);
+                      const userRank = userIndex + 1;
 
-                        // Build display list: preceding, current, succeeding
-                        const displayUsers: { user: any; rank: number }[] = [];
+                      const displayUsers: { user: any; rank: number }[] = [];
 
-                        if (userIndex === -1) {
-                          // User not found, show top 3
-                          users.slice(0, 3).forEach((u: any, idx: number) => {
-                            displayUsers.push({ user: u, rank: idx + 1 });
-                          });
-                        } else {
-                          // Add preceding user if exists
-                          if (userIndex > 0) {
-                            displayUsers.push({ user: users[userIndex - 1], rank: userRank - 1 });
-                          }
-                          // Add current user
-                          displayUsers.push({ user: users[userIndex], rank: userRank });
-                          // Add succeeding user if exists
-                          if (userIndex < users.length - 1) {
-                            displayUsers.push({ user: users[userIndex + 1], rank: userRank + 1 });
-                          }
+                      if (userIndex === -1) {
+                        users.slice(0, 3).forEach((u: any, idx: number) => {
+                          displayUsers.push({ user: u, rank: idx + 1 });
+                        });
+                      } else {
+                        if (userIndex > 0) {
+                          displayUsers.push({ user: users[userIndex - 1], rank: userRank - 1 });
                         }
+                        displayUsers.push({ user: users[userIndex], rank: userRank });
+                        if (userIndex < users.length - 1) {
+                          displayUsers.push({ user: users[userIndex + 1], rank: userRank + 1 });
+                        }
+                      }
 
-                        return displayUsers.map(({ user: rankedUser, rank }) => {
-                          const isCurrentUser = rankedUser.id === user.id;
-                          return (
-                            <div
-                              key={rankedUser.id}
-                              className={`flex items-center gap-1.5 px-1.5 py-1 rounded ${
-                                isCurrentUser
-                                  ? 'bg-[var(--gold-dark)]/30 border border-[var(--gold-medium)]'
-                                  : 'bg-transparent'
+                      return displayUsers.map(({ user: rankedUser, rank }) => {
+                        const isCurrentUser = rankedUser.id === user.id;
+                        return (
+                          <div
+                            key={rankedUser.id}
+                            className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all ${
+                              isCurrentUser
+                                ? 'glass-panel-gold'
+                                : 'hover:bg-[var(--glass-bg-light)]'
+                            }`}
+                          >
+                            <span
+                              className={`font-mono text-xs w-6 text-right flex-shrink-0 font-semibold ${
+                                isCurrentUser ? 'text-[var(--neon-gold)]' : 'text-[var(--gray-light)]'
                               }`}
                             >
-                              <span
-                                className={`font-pixel text-[8px] w-5 text-right flex-shrink-0 ${
-                                  isCurrentUser ? 'text-[var(--gold-light)]' : 'text-[var(--gray-medium)]'
-                                }`}
-                              >
-                                #{rank}
-                              </span>
-                              <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
-                                <img
-                                  src={rankedUser.avatar_url}
-                                  alt={`${rankedUser.username}'s avatar`}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <span
-                                className={`font-pixel text-[7px] truncate flex-1 ${
-                                  isCurrentUser ? 'text-white' : 'text-[var(--gray-light)]'
-                                }`}
-                              >
-                                {rankedUser.username}
-                              </span>
-                              <span
-                                className={`font-pixel text-[7px] flex-shrink-0 ${
-                                  isCurrentUser ? 'text-[var(--gold-light)]' : 'text-[var(--gray-medium)]'
-                                }`}
-                              >
-                                {rankedUser.xp >= 1000 ? `${(rankedUser.xp / 1000).toFixed(1)}k` : rankedUser.xp}
-                              </span>
+                              #{rank}
+                            </span>
+                            <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-[var(--glass-border)]">
+                              <img
+                                src={rankedUser.avatar_url}
+                                alt={`${rankedUser.username}'s avatar`}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                          );
-                        });
-                      })()}
-                    </div>
+                            <span
+                              className={`font-sans text-xs truncate flex-1 ${
+                                isCurrentUser ? 'text-white font-medium' : 'text-[var(--gray-lighter)]'
+                              }`}
+                            >
+                              {rankedUser.username}
+                            </span>
+                            <span
+                              className={`font-mono text-xs flex-shrink-0 font-semibold ${
+                                isCurrentUser ? 'text-[var(--neon-gold)]' : 'text-[var(--gray-light)]'
+                              }`}
+                            >
+                              {rankedUser.xp >= 1000 ? `${(rankedUser.xp / 1000).toFixed(1)}k` : rankedUser.xp}
+                            </span>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
-                )}
-              </PixelFrame>
-            </motion.div>
-          </div>
+                </div>
+              )}
+            </PixelFrame>
+          </motion.div>
+        </div>
 
           {/* Right Column: Quick Stats + Quests + Stats + Activity */}
           <div className="w-full lg:w-2/3 flex flex-col gap-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: 'calc(100vh - 300px)' }}>
