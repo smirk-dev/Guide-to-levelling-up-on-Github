@@ -345,88 +345,183 @@ body {
 }
 
 /* ============================================
-   PIXEL BORDERS & FRAMES
+   GLASSMORPHISM PANELS - Cyber-Fantasy Theme
    ============================================ */
 
-/* Stone frame - chiseled effect */
+/* Base glass panel */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-panel:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Glass panel with cyan accent */
+.glass-panel-cyan {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 240, 255, 0.1),
+    inset 0 1px 0 rgba(0, 240, 255, 0.1);
+}
+
+/* Glass panel with violet accent */
+.glass-panel-violet {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 rgba(139, 92, 246, 0.1);
+}
+
+/* Glass panel with gold accent */
+.glass-panel-gold {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 215, 0, 0.1),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+
+/* ============================================
+   PIXEL BORDERS & FRAMES (Legacy + Enhanced)
+   ============================================ */
+
+/* Stone frame - chiseled effect with glass */
 .frame-stone {
-  background: var(--void-dark);
-  border: var(--pixel-border-thick) solid;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--pixel-border) solid;
   border-color: var(--gray-light) var(--gray-darkest) var(--gray-darkest) var(--gray-light);
-  box-shadow: 
-    inset 4px 4px 0 var(--gray-dark),
-    inset -4px -4px 0 var(--gray-medium),
-    8px 8px 0 rgba(0, 0, 0, 0.4);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Metal plating frame */
+/* Metal plating frame with neon edge */
 .frame-metal {
-  background: linear-gradient(180deg, var(--gray-medium) 0%, var(--gray-dark) 50%, var(--gray-medium) 100%);
-  background-size: 100% 8px;
-  border: var(--pixel-border-thick) solid;
-  border-color: var(--gray-highlight) var(--gray-darkest) var(--gray-darkest) var(--gray-highlight);
-  box-shadow: 
-    inset 4px 4px 0 rgba(255, 255, 255, 0.1),
-    inset -4px -4px 0 rgba(0, 0, 0, 0.3),
-    0 0 0 4px var(--void-darkest);
+  background: linear-gradient(180deg, var(--obsidian-light) 0%, var(--obsidian-dark) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--gray-medium);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(0, 240, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Gold ornate frame */
+/* Gold ornate frame - neon gold glow */
 .frame-gold {
-  background: var(--void-dark);
-  border: var(--pixel-border-thick) solid;
-  border-color: var(--gold-highlight) var(--gold-darkest) var(--gold-darkest) var(--gold-highlight);
-  box-shadow: 
-    inset 4px 4px 0 var(--gold-light),
-    inset -4px -4px 0 var(--gold-dark),
-    0 0 0 4px var(--void-darkest),
-    8px 8px 0 rgba(0, 0, 0, 0.5);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--neon-gold);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.3),
+    0 0 20px rgba(255, 215, 0, 0.2),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Mana blue frame */
+/* Mana/Cyan frame - electric cyan glow */
 .frame-mana {
-  background: var(--void-dark);
-  border: var(--pixel-border-thick) solid;
-  border-color: var(--mana-highlight) var(--mana-darkest) var(--mana-darkest) var(--mana-highlight);
-  box-shadow: 
-    inset 4px 4px 0 var(--mana-light),
-    inset -4px -4px 0 var(--mana-dark),
-    0 0 0 4px var(--void-darkest);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--cyber-cyan);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.3),
+    0 0 20px rgba(0, 240, 255, 0.2),
+    inset 0 1px 0 rgba(0, 240, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Health green frame */
 .frame-health {
-  background: var(--void-dark);
-  border: var(--pixel-border-thick) solid;
-  border-color: var(--health-highlight) var(--health-darkest) var(--health-darkest) var(--health-highlight);
-  box-shadow: 
-    inset 4px 4px 0 var(--health-light),
-    inset -4px -4px 0 var(--health-dark);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--health-light);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 0 15px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(34, 197, 94, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Critical/warning frame */
+/* Critical/warning frame - red glow */
 .frame-critical {
-  background: var(--void-dark);
-  border: var(--pixel-border-thick) solid;
-  border-color: var(--critical-highlight) var(--critical-darkest) var(--critical-darkest) var(--critical-highlight);
-  box-shadow: 
-    inset 4px 4px 0 var(--critical-light),
-    inset -4px -4px 0 var(--critical-dark);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--critical-light);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.3),
+    0 0 15px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(239, 68, 68, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Violet/XP frame */
+.frame-violet {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid var(--pulse-violet);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 0 20px rgba(139, 92, 246, 0.2),
+    inset 0 1px 0 rgba(139, 92, 246, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Simple pixel border */
 .pixel-border {
-  border: 4px solid var(--gray-light);
-  box-shadow: 
-    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--gray-medium);
+  border-radius: var(--pixel-radius);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.1),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Double pixel border (parchment style) */
 .pixel-border-double {
-  border: 4px double var(--gold-medium);
-  outline: 4px solid var(--void-dark);
-  outline-offset: 4px;
+  border: 2px double var(--neon-gold-medium);
+  border-radius: var(--pixel-radius);
+  outline: 2px solid var(--obsidian-dark);
+  outline-offset: 2px;
 }
 
 /* ============================================
