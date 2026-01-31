@@ -521,3 +521,42 @@ Unit tests are in `src/lib/__tests__/`. Run tests with:
 ```bash
 npm test  # (or configure as needed in package.json)
 ```
+
+## Development Workflow
+
+### Local Development
+
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env.local` and configure with actual credentials
+3. Start dev server: `npm run dev` (runs on http://localhost:3000)
+4. Changes hot-reload automatically
+
+### Code Quality
+
+- Run linter before committing: `npm run lint`
+- TypeScript strict mode catches most errors during development
+- All environment variables in `.env.local` are loaded automatically
+
+### Deployment
+
+**To Vercel (Production):**
+
+- Push to main branch (CI/CD automatically deploys)
+- Or use: `vercel deploy --prod`
+- See `VERCEL_DEPLOYMENT.md` for detailed instructions
+
+**Environment Setup for Deployment:**
+
+- All sensitive keys go in Vercel Environment Variables dashboard
+- Never commit `.env.local` or credentials to git
+- Use `.env.example` as template for required variables
+
+## Architecture Decision: Why Sync Engine?
+
+The application separates GitHub data fetching from display via a "Sync Engine" pattern because:
+
+1. **Rate Limiting** - GitHub API has strict limits; caching results prevents abuse
+2. **Performance** - Frontend reads from Supabase cache instead of hitting GitHub API
+3. **Offline Support** - Cached data available even if GitHub API is down
+4. **Consistency** - All calculations (XP, rank) happen server-side in one place
+5. **User Control** - Users manually trigger syncs instead of constant polling
