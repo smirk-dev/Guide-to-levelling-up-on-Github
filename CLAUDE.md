@@ -39,13 +39,14 @@ npm run lint         # Run ESLint
 ## Code Warrior Architecture
 
 ### Tech Stack
-- **Framework:** Next.js 14+ with App Router
-- **Language:** TypeScript (strict mode)
+- **Framework:** Next.js 16.1.1 with App Router
+- **Language:** TypeScript 5 (strict mode)
 - **Styling:** Tailwind CSS v4
 - **Database:** Supabase (PostgreSQL)
-- **Auth:** NextAuth.js with GitHub OAuth
-- **State Management:** TanStack Query (React Query)
-- **Animations:** Framer Motion
+- **Auth:** NextAuth.js 4.24.13 with GitHub OAuth
+- **State Management:** TanStack Query (React Query) v5
+- **Animations:** Framer Motion v12
+- **UI/Utilities:** Lucide React (icons), dnd-kit (drag-and-drop), html2canvas (export)
 
 ### Core Architecture Patterns
 refer to docs/architecture.md
@@ -127,33 +128,112 @@ Quests track specific GitHub milestones:
 ```
 code-warrior/
 ├── src/
-│   ├── app/                    # Next.js App Router pages
+│   ├── app/                         # Next.js App Router pages & API routes
 │   │   ├── api/
-│   │   │   ├── auth/[...nextauth]/  # NextAuth config
-│   │   │   ├── sync/                # Sync Engine
-│   │   │   └── quests/              # Quest API
-│   │   ├── dashboard/          # Main game dashboard
-│   │   └── page.tsx            # Landing page
+│   │   │   ├── auth/[...nextauth]/
+│   │   │   │   └── route.ts         # NextAuth.js configuration & GitHub OAuth
+│   │   │   ├── sync/
+│   │   │   │   └── route.ts         # Sync Engine - fetch & cache GitHub data
+│   │   │   ├── quests/
+│   │   │   │   ├── route.ts         # GET /api/quests - Fetch user quests
+│   │   │   │   └── claim/
+│   │   │   │       └── route.ts     # POST /api/quests/claim - Claim rewards
+│   │   │   ├── badges/
+│   │   │   │   ├── inventory/
+│   │   │   │   │   └── route.ts     # GET /api/badges/inventory - User badges
+│   │   │   │   ├── equip/
+│   │   │   │   │   └── route.ts     # POST /api/badges/equip - Equip badge
+│   │   │   │   └── unequip/
+│   │   │   │       └── route.ts     # POST /api/badges/unequip - Unequip badge
+│   │   │   └── leaderboard/
+│   │   │       └── route.ts         # GET /api/leaderboard - Top players
+│   │   ├── layout.tsx               # Root layout wrapper
+│   │   ├── page.tsx                 # Landing page
+│   │   ├── error.tsx                # Global error boundary
+│   │   ├── not-found.tsx            # 404 page
+│   │   ├── providers.tsx            # Context providers (Auth, Query, Notifications)
+│   │   ├── dashboard/
+│   │   │   ├── page.tsx             # Main game dashboard (protected)
+│   │   │   ├── layout.tsx           # Dashboard layout wrapper
+│   │   │   ├── loading.tsx          # Loading state
+│   │   │   └── error.tsx            # Error boundary
+│   │   ├── quests/
+│   │   │   ├── page.tsx             # Quests/missions view
+│   │   │   ├── layout.tsx           # Quests layout wrapper
+│   │   │   ├── loading.tsx          # Loading state
+│   │   │   └── error.tsx            # Error boundary
+│   │   ├── badges/
+│   │   │   ├── page.tsx             # Badges/achievements inventory
+│   │   │   ├── layout.tsx           # Badges layout wrapper
+│   │   │   ├── loading.tsx          # Loading state
+│   │   │   └── error.tsx            # Error boundary
+│   │   └── leaderboard/
+│   │       ├── page.tsx             # Global leaderboard view
+│   │       ├── layout.tsx           # Leaderboard layout wrapper
+│   │       ├── loading.tsx          # Loading state
+│   │       └── error.tsx            # Error boundary
+│   │
 │   ├── components/
-│   │   ├── rpg/                # RPG UI components
-│   │   │   ├── CharacterSheet.tsx
-│   │   │   ├── StatBar.tsx
-│   │   │   ├── QuestCard.tsx
-│   │   │   └── QuestLog.tsx
-│   │   └── effects/            # Visual effects (Confetti, FloatingXP)
+│   │   ├── rpg/
+│   │   │   ├── CharacterSheet.tsx   # Character stats & profile display
+│   │   │   ├── GameHUD.tsx          # Head-up display with stats
+│   │   │   ├── BattleStatsPanel.tsx # Combat stats panel
+│   │   │   ├── QuestCard.tsx        # Quest card component
+│   │   │   ├── AchievementBadges.tsx # Badge display component
+│   │   │   ├── BadgeSlot.tsx        # Equippable badge slot
+│   │   │   ├── LeaderboardCard.tsx  # Leaderboard entry component
+│   │   │   └── ActivityHeatmap.tsx  # GitHub contribution heatmap
+│   │   ├── ui/
+│   │   │   ├── PixelComponents.tsx  # Pixel-art styled UI (buttons, frames, badges)
+│   │   │   └── LoadingSkeletons.tsx # Loading skeleton screens
+│   │   ├── layout/
+│   │   │   └── Navigation.tsx       # Navigation header/menu
+│   │   ├── effects/
+│   │   │   └── Effects.tsx          # Visual effects (particles, animations)
+│   │   ├── icons/
+│   │   │   └── PixelIcons.tsx       # SVG icons (pixel art style)
+│   │   ├── notifications/
+│   │   │   └── NotificationProvider.tsx # Toast notifications context
+│   │   ├── profile/
+│   │   │   └── ProfileCustomization.tsx # Profile personalization settings
+│   │   ├── onboarding/
+│   │   │   └── OnboardingTutorial.tsx # First-time user tutorial
+│   │   ├── export/
+│   │   │   └── ShareableCard.tsx    # Shareable profile card component
+│   │   ├── ErrorBoundary.tsx        # Global error boundary wrapper
+│   │   └── index.ts                 # Central component exports
+│   │
 │   ├── lib/
-│   │   ├── github.ts           # GitHub API wrapper
-│   │   ├── game-logic.ts       # XP/Rank calculations
-│   │   ├── quest-logic.ts      # Quest completion logic
-│   │   ├── supabase.ts         # Supabase client
-│   │   └── sound.ts            # Sound effects
+│   │   ├── game-logic.ts            # XP calculation & rank progression
+│   │   ├── github.ts                # GitHub API wrapper with caching
+│   │   ├── quest-logic.ts           # Quest completion detection logic
+│   │   ├── supabase.ts              # Supabase client initialization
+│   │   ├── sound.ts                 # Audio effects manager
+│   │   ├── pixel-utils.ts           # Pixel art & visual utilities
+│   │   ├── rate-limit.ts            # Rate limiting for API calls
+│   │   ├── hooks/
+│   │   │   ├── usePerformanceMode.ts   # Performance optimization hook
+│   │   │   └── useScreenShake.ts       # Screen shake effect hook
+│   │   └── __tests__/
+│   │       └── game-logic.test.ts   # Unit tests for game logic
+│   │
 │   └── types/
-│       ├── database.ts         # Supabase types
-│       └── next-auth.d.ts      # NextAuth type extensions
-├── public/                     # Static assets
-├── supabase-schema.sql         # Database schema
-├── .env.example                # Environment template
-└── tailwind.config.ts          # Theme (Cyber-Fantasy)
+│       ├── database.ts              # Core database types (User, Quest, etc.)
+│       ├── supabase.ts              # Auto-generated Supabase types
+│       └── next-auth.d.ts           # NextAuth session type extensions
+│
+├── public/                          # Static assets (SVG icons, images)
+├── migrations/                      # Database migration files
+├── supabase/                        # Supabase configuration
+├── supabase-schema.sql              # PostgreSQL schema & ENUM definitions
+├── .env.example                     # Environment variables template
+├── .env.local                       # Local environment (gitignored)
+├── tailwind.config.ts               # Tailwind theme (Cyber-Fantasy)
+├── tsconfig.json                    # TypeScript configuration (strict mode)
+├── next.config.ts                   # Next.js configuration
+├── postcss.config.mjs               # PostCSS configuration
+├── eslint.config.mjs                # ESLint configuration
+└── package.json                     # Dependencies & scripts
 ```
 
 ### Environment Setup
