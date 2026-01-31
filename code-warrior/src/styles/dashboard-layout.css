@@ -1,0 +1,717 @@
+/* ============================================
+   🎮 DASHBOARD LAYOUT SYSTEM
+   CSS Grid Architecture for Code Warrior
+   ============================================
+   
+   FIXES:
+   - Eliminates overlapping elements
+   - 100% responsive scaling
+   - Proper overflow handling
+   - Strict Grid/Flexbox system
+   ============================================ */
+
+/* ============================================
+   🏗️ MAIN DASHBOARD SHELL
+   Two-column responsive grid layout
+   ============================================ */
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--obsidian-darker);
+}
+
+/* Sticky HUD bar at top */
+.dashboard-hud {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  grid-column: 1 / -1;
+  background: var(--glass-bg-dark);
+  backdrop-filter: blur(var(--glass-blur-lg));
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Main content wrapper */
+.dashboard-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  container-type: inline-size;
+}
+
+/* Tablet and up: Two column layout */
+@media (min-width: 768px) {
+  .dashboard-wrapper {
+    grid-template-columns: 320px 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+}
+
+/* Large screens: Wider sidebar */
+@media (min-width: 1280px) {
+  .dashboard-wrapper {
+    grid-template-columns: 360px 1fr;
+    gap: var(--space-8);
+    padding: var(--space-8);
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1536px) {
+  .dashboard-wrapper {
+    grid-template-columns: 400px 1fr;
+  }
+}
+
+/* ============================================
+   📜 LEFT SIDEBAR - Character Panel
+   Sticky, scrollable character info
+   ============================================ */
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0; /* Prevent overflow */
+}
+
+@media (min-width: 768px) {
+  .dashboard-sidebar {
+    position: sticky;
+    top: calc(80px + var(--space-6)); /* Account for HUD height */
+    height: fit-content;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-medium) transparent;
+  }
+
+  .dashboard-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: var(--gray-medium);
+    border-radius: 3px;
+  }
+}
+
+/* ============================================
+   📊 MAIN CONTENT AREA
+   Flexible content region with sections
+   ============================================ */
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0; /* Critical: prevents grid blowout */
+  overflow: hidden;
+}
+
+/* Full width items that span both columns on mobile */
+.dashboard-full-width {
+  grid-column: 1 / -1;
+}
+
+/* ============================================
+   📈 STATS GRID - Quick metrics display
+   ============================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Stat card item */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  text-align: center;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-normal) var(--ease-cyber);
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+}
+
+.stat-card-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  color: var(--gray-lighter);
+  margin-top: var(--space-2);
+}
+
+/* ============================================
+   ⚔️ QUEST LIST - Vertical card stack
+   ============================================ */
+
+.quest-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-xs);
+  color: var(--neon-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.section-link {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  color: var(--cyber-cyan);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.section-link:hover {
+  color: var(--cyber-cyan-light);
+}
+
+/* ============================================
+   🗡️ BATTLE STATS PANEL
+   5-column vertical stat bars
+   ============================================ */
+
+.battle-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.battle-stats-bars {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+}
+
+@media (min-width: 480px) {
+  .battle-stats-bars {
+    gap: var(--space-6);
+  }
+}
+
+/* Stat bar column */
+.stat-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stat-column-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-column-value {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+/* Power level display */
+.power-level {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-border);
+}
+
+.power-level-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-xs);
+  color: var(--pulse-violet);
+}
+
+.power-level-value {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--pulse-violet-light);
+}
+
+/* ============================================
+   🗓️ ACTIVITY HEATMAP CONTAINER
+   Prevents overflow issues
+   ============================================ */
+
+.heatmap-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-2);
+  border-radius: var(--radius-glass);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+
+.heatmap-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.heatmap-container::-webkit-scrollbar-thumb {
+  background: var(--gray-medium);
+  border-radius: 3px;
+}
+
+/* ============================================
+   🏆 RANK PROGRESSION GRID
+   Full-width rank display
+   ============================================ */
+
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .rank-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+.rank-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  text-align: center;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-normal) var(--ease-cyber);
+}
+
+.rank-item-current {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: var(--neon-gold);
+  box-shadow: 0 0 20px var(--neon-gold-glow-soft);
+}
+
+.rank-item-passed {
+  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.rank-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-xs);
+}
+
+.rank-xp {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  color: var(--gray-light);
+  margin-top: var(--space-1);
+}
+
+/* ============================================
+   👤 CHARACTER PORTRAIT CARD
+   ============================================ */
+
+.character-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.character-avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.character-avatar-glow {
+  position: absolute;
+  inset: -8px;
+  background: radial-gradient(
+    circle,
+    var(--cyber-cyan-glow-soft) 0%,
+    var(--pulse-violet-glow-soft) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: avatar-pulse 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes avatar-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.character-avatar {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--cyber-cyan);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px rgba(0, 240, 255, 0.3),
+    0 0 20px var(--cyber-cyan-glow-soft);
+}
+
+.character-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.character-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-sm);
+  color: white;
+  text-align: center;
+}
+
+.character-rank {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.character-rank-icon {
+  color: var(--neon-gold);
+}
+
+.character-rank-name {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--neon-gold);
+}
+
+/* XP Progress bar in character card */
+.character-xp {
+  width: 100%;
+}
+
+.character-xp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.character-xp-label {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  color: var(--gray-lighter);
+}
+
+.character-xp-value {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--neon-gold);
+}
+
+/* ============================================
+   🎖️ ACHIEVEMENT BADGES GRID
+   ============================================ */
+
+.badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-size: 20px;
+  transition: all var(--duration-normal) var(--ease-bounce);
+}
+
+.badge-item:hover {
+  transform: scale(1.1);
+  border-color: var(--neon-gold);
+  box-shadow: 0 0 15px var(--neon-gold-glow-soft);
+}
+
+/* ============================================
+   📊 LEADERBOARD PREVIEW
+   ============================================ */
+
+.leaderboard-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast);
+}
+
+.leaderboard-item:hover {
+  background: var(--glass-bg-light);
+}
+
+.leaderboard-item-current {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.leaderboard-rank {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  width: 28px;
+  text-align: right;
+  color: var(--gray-light);
+}
+
+.leaderboard-rank-current {
+  color: var(--neon-gold);
+}
+
+.leaderboard-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.leaderboard-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leaderboard-name {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  color: var(--gray-lighter);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderboard-name-current {
+  color: white;
+  font-weight: 500;
+}
+
+.leaderboard-xp {
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--gray-light);
+}
+
+.leaderboard-xp-current {
+  color: var(--neon-gold);
+}
+
+/* ============================================
+   🔔 ALERT BANNERS
+   ============================================ */
+
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-cyber);
+}
+
+.alert-banner-gold {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.08) 0%,
+    rgba(255, 215, 0, 0.03) 100%
+  );
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.alert-banner-gold:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.12) 0%,
+    rgba(255, 215, 0, 0.05) 100%
+  );
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 20px var(--neon-gold-glow-soft);
+}
+
+.alert-banner-cyan {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 240, 255, 0.08) 0%,
+    rgba(0, 240, 255, 0.03) 100%
+  );
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.alert-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.alert-icon-gold {
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--neon-gold);
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: var(--font-size-xs);
+  color: var(--neon-gold);
+}
+
+.alert-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  color: var(--gray-lighter);
+  margin-top: 2px;
+}
+
+/* ============================================
+   🎯 UTILITY CLASSES
+   ============================================ */
+
+/* Prevent content from overflowing */
+.overflow-safe {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Container with safe padding */
+.container-safe {
+  width: 100%;
+  max-width: 100%;
+  padding-left: max(env(safe-area-inset-left), var(--space-4));
+  padding-right: max(env(safe-area-inset-right), var(--space-4));
+}
+
+/* Flex utilities */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Gap utilities */
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+.gap-6 { gap: var(--space-6); }
+
+/* Padding utilities */
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+.p-6 { padding: var(--space-6); }
+
+/* ============================================
+   📱 CONTAINER QUERIES
+   Modern responsive components
+   ============================================ */
+
+@container (min-width: 400px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@container (min-width: 600px) {
+  .battle-stats-bars {
+    gap: var(--space-8);
+  }
+}
