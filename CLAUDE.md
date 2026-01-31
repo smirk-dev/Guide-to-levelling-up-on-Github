@@ -377,6 +377,23 @@ GITHUB_API_TOKEN=
 
 **Implementation:** `src/lib/github.ts`
 
+### Utility Libraries
+
+**Core Business Logic:**
+- **`game-logic.ts`** - XP calculation, rank progression, RPG stat conversion
+- **`github.ts`** - GitHub API wrapper with response caching and error handling
+- **`quest-logic.ts`** - Quest eligibility checks and progress calculation
+- **`supabase.ts`** - Supabase client factory (anonymous and service role keys)
+
+**Visual & Effects:**
+- **`sound.ts`** - Audio effects manager for game events
+- **`pixel-utils.ts`** - Pixel art rendering utilities and styling helpers
+- **`rate-limit.ts`** - Client-side rate limiting for API calls
+
+**Custom React Hooks:**
+- **`usePerformanceMode.ts`** - Detects low-end devices and disables animations
+- **`useScreenShake.ts`** - Camera shake effect for combat feedback
+
 ### TypeScript Patterns
 
 **Important Type Definitions:**
@@ -384,9 +401,12 @@ GITHUB_API_TOKEN=
 - `GitHubStats` - Aggregated GitHub metrics
 - `RPGStats` - Health, Mana, Strength, Charisma, Wisdom
 - `Quest`, `UserQuest` - Quest system types
+- `Badge` - Badge definition with stat boosts
 
 **Session Extension:**
+
 NextAuth session is extended to include GitHub-specific fields:
+
 ```typescript
 // src/types/next-auth.d.ts
 session.user.id          // GitHub ID
