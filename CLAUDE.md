@@ -446,13 +446,16 @@ session.accessToken      // OAuth token for API calls
 
 ### When Working on the Code Warrior App:
 
-1. **Always use the Sync Engine** - Never bypass the sync cooldown or cache
-2. **GitHub API Rate Limits** - Be mindful of API calls; use caching aggressively
-3. **Type Safety** - Strict TypeScript mode is enabled; all types must be properly defined
-4. **Database Queries** - Use Supabase service role key for admin operations in API routes
-5. **Authentication** - All `/api/*` routes (except `/api/auth`) should verify session
-6. **Quest Logic** - Quest completion is automatic during sync; claiming is manual via API
-7. **XP Calculations** - XP formulas are in `game-logic.ts`; don't duplicate logic elsewhere
+1. **Always use the Sync Engine** - Never bypass the sync cooldown or cache. All GitHub data comes through `POST /api/sync`
+2. **GitHub API Rate Limits** - GitHub API limit is 5,000 requests/hour (authenticated). Sync cooldown is 5 minutes between user syncs
+3. **Type Safety** - Strict TypeScript mode is enabled; all types must be properly defined in `src/types/`
+4. **Database Queries** - Use service role key for admin operations in API routes; use anonymous key on client-side
+5. **Authentication** - All `/api/*` routes (except `/api/auth`) should verify session before accessing user data
+6. **Quest Logic** - Quest completion is automatic during sync; claiming rewards is manual via `/api/quests/claim`
+7. **XP Calculations** - XP formulas are in `game-logic.ts`; don't duplicate logic elsewhere. Update XP_WEIGHTS in one place
+8. **Badge Management** - Badges are collectible items that can be equipped for stat boosts; equip/unequip via dedicated endpoints
+9. **Component Performance** - Use `usePerformanceMode` hook to detect low-end devices and disable heavy animations
+10. **Real-time Updates** - Leaderboard updates on sync; use Supabase Real-time subscriptions for live stat changes (optional)
 
 ### Common Patterns:
 
