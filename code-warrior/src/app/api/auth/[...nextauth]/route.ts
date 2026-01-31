@@ -2,6 +2,15 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import { getServiceSupabase } from '@/lib/supabase';
 
+// GitHub profile type for type safety
+interface GitHubProfile {
+  id: number;
+  login: string;
+  avatar_url: string;
+  name?: string;
+  email?: string;
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
@@ -22,7 +31,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'github' && profile) {
         const supabase = getServiceSupabase();
-        const githubProfile = profile as any;
+        const githubProfile = profile as GitHubProfile;
 
         // Check if user exists in our database
         const { data: existingUser } = await supabase
@@ -53,32 +62,26 @@ export const authOptions: NextAuthOptions = {
       // Add GitHub data to session for easier access
       if (token.sub) {
         session.user.id = token.sub;
-        console.log('[NextAuth] Session ID set to:', token.sub);
       }
       if (token.username) {
-        (session.user as any).username = token.username;
+        session.user.username = token.username as string;
       }
       // Pass access token to session for API calls
       if (token.accessToken) {
-        (session as any).accessToken = token.accessToken;
+        session.accessToken = token.accessToken as string;
       }
-      console.log('[NextAuth] Session callback returning:', { userId: session.user.id, username: (session.user as any).username });
       return session;
     },
     async jwt({ token, account, profile }) {
       // Store GitHub access token for API calls
       if (account?.access_token) {
         token.accessToken = account.access_token;
-        console.log('Stored access token in JWT');
       }
       if (profile) {
-        const githubProfile = profile as any;
+        const githubProfile = profile as GitHubProfile;
         token.githubId = githubProfile.id.toString();
         token.username = githubProfile.login;
-        console.log('Stored GitHub profile in JWT:', { 
-          githubId: token.githubId, 
-          username: token.username 
-        });
+        token.id = githubProfile.id.toString();
       }
       return token;
     },
