@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,6 +18,7 @@ import {
 } from '@/components';
 import { soundManager } from '@/lib/sound';
 import type { Quest, UserQuest } from '@/types/database';
+import type { ApiError } from '@/types/api';
 
 interface QuestsData {
   quests: Quest[];
@@ -34,7 +35,7 @@ export default function QuestsPage() {
   const [loadingQuestId, setLoadingQuestId] = useState<string | null>(null);
 
   // Helper function to handle API errors including session timeout
-  const handleApiError = (error: any, defaultMessage: string) => {
+  const handleApiError = useCallback((error: ApiError, defaultMessage: string) => {
     if (error.status === 401 || error.message?.includes('Unauthorized')) {
       // Session expired
       signOut({ callbackUrl: '/?session=expired' });
@@ -51,7 +52,7 @@ export default function QuestsPage() {
         visible: true,
       });
     }
-  };
+  }, []);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function QuestsPage() {
     mutationFn: async () => {
       const res = await fetch('/api/sync', { method: 'POST' });
       if (!res.ok) {
-        const error: any = new Error('Sync failed');
+        const error: ApiError = new Error('Sync failed');
         error.status = res.status;
         throw error;
       }
@@ -96,8 +97,8 @@ export default function QuestsPage() {
         visible: true,
       });
     },
-    onError: (error: any) => {
-      handleApiError(error, 'Failed to sync progress');
+    onError: (error: Error) => {
+      handleApiError(error as ApiError, 'Failed to sync progress');
     },
   });
 
@@ -111,7 +112,7 @@ export default function QuestsPage() {
         body: JSON.stringify({ questId }),
       });
       if (!res.ok) {
-        const error: any = new Error('Claim failed');
+        const error: ApiError = new Error('Claim failed');
         error.status = res.status;
         throw error;
       }
@@ -129,9 +130,9 @@ export default function QuestsPage() {
 
       setLoadingQuestId(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       setLoadingQuestId(null);
-      handleApiError(error, 'Failed to claim quest reward');
+      handleApiError(error as ApiError, 'Failed to claim quest reward');
     },
   });
 
