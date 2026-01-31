@@ -115,11 +115,24 @@ Quests track specific GitHub milestones:
 
 ### Database Schema
 
-**Tables:**
-1. `users` - Core RPG character data (github_id, username, avatar_url, xp, rank_tier, last_synced_at)
-2. `quests` - Quest templates (title, description, xp_reward, criteria_type, criteria_threshold)
-3. `user_quests` - Join table for quest progress (user_id, quest_id, status, completed_at)
-4. `badges` - Badge definitions with stat boosts (name, icon_slug, stat_boost as JSONB)
+**Core Tables:**
+
+1. **`users`** - RPG character data
+   - Columns: id, github_id, username, avatar_url, xp, rank_tier, github_stats (JSONB), last_synced_at, created_at, updated_at
+
+2. **`quests`** - Quest templates and definitions
+   - Columns: id, title, description, xp_reward, criteria_type, criteria_threshold, is_active, badge_reward, created_at
+
+3. **`user_quests`** - Quest progress tracking (join table)
+   - Columns: id, user_id, quest_id, status, progress, completed_at, claimed_at, created_at
+
+4. **`badges`** - Collectible badge definitions
+   - Columns: id, name, icon_slug, stat_boost (JSONB), created_at
+
+**ENUM Types:**
+- `rank_tier`: C, B, A, AA, AAA, S, SS, SSS
+- `quest_status`: ACTIVE, COMPLETED
+- `criteria_type`: REPO_COUNT, PR_MERGED, STAR_COUNT, COMMIT_COUNT, ISSUE_COUNT, REVIEW_COUNT
 
 **Schema file:** `code-warrior/supabase-schema.sql`
 
