@@ -244,8 +244,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const saved = localStorage.getItem('notifications');
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        setNotifications(parsed.map((n: any) => ({ ...n, timestamp: new Date(n.timestamp) })));
+        const parsed = JSON.parse(saved) as Array<Omit<Notification, 'timestamp'> & { timestamp: string }>;
+        setNotifications(parsed.map((n) => ({ ...n, timestamp: new Date(n.timestamp) })));
       } catch (e) {
         // Invalid data, ignore
       }
