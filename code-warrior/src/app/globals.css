@@ -995,50 +995,130 @@ body {
 }
 
 /* ============================================
-   CARDS & PANELS
+   CARDS & PANELS - Glassmorphism Style
    ============================================ */
 
 .pixel-card {
-  background: var(--void-dark);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 16px;
-  border: 4px solid;
-  border-color: var(--gray-light) var(--gray-darkest) var(--gray-darkest) var(--gray-light);
-  box-shadow: 
-    inset 4px 4px 0 rgba(255, 255, 255, 0.05),
-    8px 8px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.pixel-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .pixel-card-gold {
-  background: var(--void-dark);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 16px;
-  border: 8px solid;
-  border-color: var(--gold-light) var(--gold-darkest) var(--gold-darkest) var(--gold-light);
-  box-shadow: 
-    inset 4px 4px 0 var(--gold-medium),
-    inset -4px -4px 0 var(--gold-dark),
-    8px 8px 0 rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--neon-gold);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.2),
+    0 0 20px rgba(255, 215, 0, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+
+.pixel-card-gold:hover {
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.3),
+    0 0 30px rgba(255, 215, 0, 0.2),
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 215, 0, 0.15);
+}
+
+/* Cyan accent card */
+.pixel-card-cyan {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: 16px;
+  border: 2px solid var(--cyber-cyan);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.2),
+    0 0 20px rgba(0, 240, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(0, 240, 255, 0.1);
+}
+
+/* Violet accent card */
+.pixel-card-violet {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: 16px;
+  border: 2px solid var(--pulse-violet);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.2),
+    0 0 20px rgba(139, 92, 246, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(139, 92, 246, 0.1);
 }
 
 /* ============================================
-   PIXEL AVATAR
+   CYBER AVATAR - Neon Ring Effect
    ============================================ */
 
 .pixel-avatar {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  border: 4px solid var(--gold-medium);
-  box-shadow: 
-    inset 0 0 0 2px var(--gold-light),
-    4px 4px 0 var(--void-darkest);
+  border: 2px solid var(--cyber-cyan);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(0, 240, 255, 0.3),
+    0 0 15px rgba(0, 240, 255, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .pixel-avatar-glow {
-  animation: avatar-glow 2s infinite;
+  animation: avatar-glow 3s ease-in-out infinite;
 }
 
 @keyframes avatar-glow {
-  0%, 100% { box-shadow: 0 0 0 4px var(--gold-dark), 0 0 20px var(--gold-medium); }
-  50% { box-shadow: 0 0 0 4px var(--gold-light), 0 0 30px var(--gold-light); }
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(0, 240, 255, 0.3),
+      0 0 15px rgba(0, 240, 255, 0.3),
+      0 0 30px rgba(0, 240, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(0, 240, 255, 0.5),
+      0 0 25px rgba(0, 240, 255, 0.5),
+      0 0 50px rgba(0, 240, 255, 0.2),
+      0 0 80px rgba(139, 92, 246, 0.1);
+  }
+}
+
+/* Gold avatar variant */
+.pixel-avatar-gold {
+  border-color: var(--neon-gold);
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.3),
+    0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* Violet avatar variant */
+.pixel-avatar-violet {
+  border-color: var(--pulse-violet);
+  box-shadow:
+    0 0 0 2px rgba(139, 92, 246, 0.3),
+    0 0 15px rgba(139, 92, 246, 0.3);
 }
 
 /* ============================================
@@ -1251,62 +1331,104 @@ body.performance-mode .pixel-avatar-glow {
 }
 
 /* ============================================
-   BACKGROUNDS & PATTERNS
+   BACKGROUNDS & PATTERNS - Cyber Theme
    ============================================ */
 
-/* Starfield background */
+/* Cyber starfield with neon particles */
 .bg-starfield {
-  background-color: var(--void-darkest);
-  background-image: 
-    radial-gradient(2px 2px at 20px 30px, #ffffff 50%, transparent 50%),
-    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8) 50%, transparent 50%),
-    radial-gradient(2px 2px at 50px 160px, rgba(255, 255, 255, 0.6) 50%, transparent 50%),
-    radial-gradient(2px 2px at 90px 40px, #ffffff 50%, transparent 50%),
-    radial-gradient(2px 2px at 130px 80px, rgba(255, 255, 255, 0.7) 50%, transparent 50%),
-    radial-gradient(2px 2px at 160px 120px, #ffffff 50%, transparent 50%);
+  background-color: var(--obsidian-darkest);
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, var(--cyber-cyan) 50%, transparent 50%),
+    radial-gradient(2px 2px at 40px 70px, rgba(0, 240, 255, 0.6) 50%, transparent 50%),
+    radial-gradient(2px 2px at 50px 160px, var(--pulse-violet) 50%, transparent 50%),
+    radial-gradient(2px 2px at 90px 40px, rgba(139, 92, 246, 0.6) 50%, transparent 50%),
+    radial-gradient(2px 2px at 130px 80px, rgba(255, 255, 255, 0.5) 50%, transparent 50%),
+    radial-gradient(2px 2px at 160px 120px, var(--neon-gold) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70px 100px, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 110px 150px, rgba(0, 240, 255, 0.4) 50%, transparent 50%);
   background-size: 200px 200px;
 }
 
-/* Dungeon brickwork */
+/* Cyber grid floor */
+.bg-cyber-grid {
+  background-color: var(--obsidian-darker);
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Tech grid with violet accent */
+.bg-tech-grid {
+  background-color: var(--obsidian-darker);
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 80px 80px, 80px 80px;
+}
+
+/* Dungeon with neon edges */
 .bg-dungeon {
-  background-color: var(--gray-darkest);
-  background-image: 
-    linear-gradient(90deg, var(--gray-dark) 1px, transparent 1px),
-    linear-gradient(var(--gray-dark) 1px, transparent 1px);
+  background-color: var(--obsidian-dark);
+  background-image:
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px);
   background-size: 32px 16px;
 }
 
-/* Tech grid */
-.bg-tech-grid {
-  background-color: var(--void-darker);
-  background-image: 
-    linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
+/* Dark gradient with subtle neon */
+.bg-obsidian-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--obsidian-darkest) 0%,
+    var(--obsidian-darker) 50%,
+    var(--obsidian-dark) 100%
+  );
 }
 
-/* Parchment texture */
-.bg-parchment {
-  background-color: #2a2420;
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 4px,
-      rgba(0, 0, 0, 0.05) 4px,
-      rgba(0, 0, 0, 0.05) 8px
-    );
+/* Radial neon glow background */
+.bg-neon-radial {
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(139, 92, 246, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 100%,
+      rgba(0, 240, 255, 0.1) 0%,
+      transparent 40%
+    ),
+    var(--obsidian-darker);
 }
 
-/* Dithered dark fade */
+/* Scanline overlay effect */
+.bg-scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Dithered dark fade - cyber version */
 .bg-dither-fade {
-  background: 
+  background:
     repeating-linear-gradient(
       0deg,
-      var(--void-darkest) 0px,
-      var(--void-darkest) 2px,
-      var(--void-darker) 2px,
-      var(--void-darker) 4px
+      var(--obsidian-darkest) 0px,
+      var(--obsidian-darkest) 2px,
+      var(--obsidian-darker) 2px,
+      var(--obsidian-darker) 4px
     );
 }
 
@@ -1418,34 +1540,122 @@ body.performance-mode .pixel-avatar-glow {
 }
 
 /* ============================================
-   LAYOUT & OVERFLOW FIXES
+   LAYOUT SYSTEM - CSS Grid Dashboard
    ============================================ */
 
-/* Activity Log Container - Prevent bleeding into sidebar */
+/* Dashboard Grid Container */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dashboard-grid {
+    grid-template-columns: 350px 1fr;
+    gap: 2.5rem;
+    padding: 2rem;
+  }
+}
+
+/* Activity Log Container - Prevent bleeding */
 .activity-heatmap-container {
   overflow: hidden;
   z-index: 10;
+  border-radius: var(--glass-radius);
 }
 
-/* Main content area - Prevent absolute positioning collisions */
+/* Main content area */
 .dashboard-main-content {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-/* Left sidebar - Ensure proper stacking context */
+/* Left sidebar - Character panel */
 .dashboard-sidebar {
   position: relative;
   z-index: 5;
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-/* Right content area - Scrollable container */
+@media (min-width: 768px) {
+  .dashboard-sidebar {
+    position: sticky;
+    top: 1.5rem;
+    height: fit-content;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+}
+
+/* Right content area */
 .dashboard-content {
   position: relative;
   z-index: 2;
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0; /* Prevent grid blowout */
+}
+
+/* Stats grid - 4 columns */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Quest list grid */
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Battle stats grid - 5 columns for RPG stats */
+.battle-stats-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+@media (min-width: 640px) {
+  .battle-stats-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Utility: Container with overflow protection */
+.container-safe {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ============================================
