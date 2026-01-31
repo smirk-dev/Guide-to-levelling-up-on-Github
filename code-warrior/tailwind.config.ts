@@ -219,7 +219,7 @@ const config: Config = {
   },
   plugins: [
     // Custom plugin for pixel art and glassmorphism utilities
-    function({ addUtilities }: any) {
+    function({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void }) {
       addUtilities({
         '.pixel-perfect': {
           'image-rendering': 'pixelated',
