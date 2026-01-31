@@ -21,7 +21,7 @@ import {
   IconScroll,
   IconRank,
 } from '@/components';
-import { calculateRPGStats, getRankDisplayName, getNextRank } from '@/lib/game-logic';
+import { calculateRPGStats, getRankDisplayName } from '@/lib/game-logic';
 import { soundManager } from '@/lib/sound';
 import { DashboardSkeleton } from '@/components/ui/LoadingSkeletons';
 import type { User, Quest, UserQuest, RankTier, ContributionDay, GitHubAchievementBadge } from '@/types/database';
@@ -466,153 +466,160 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-          {/* Right Column: Quick Stats + Quests + Stats + Activity */}
-          <div className="w-full lg:w-2/3 flex flex-col gap-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: 'calc(100vh - 300px)' }}>
-            {/* Quick Stats Row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex-shrink-0"
-            >
-              <PixelFrame variant="mana" padding="sm">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="text-center">
-                    <p className="font-pixel-heading text-[16px] text-[var(--gold-light)]">
-                      {user.xp.toLocaleString()}
-                    </p>
-                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                      Total XP
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-pixel-heading text-[16px] text-[var(--health-light)]">
-                      {completedQuests}
-                    </p>
-                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                      Quests Done
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-pixel-heading text-[16px] text-white">
-                      {level}
-                    </p>
-                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                      Level
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-pixel-heading text-[16px] text-[var(--mana-light)]">
-                      {user.github_stats?.repos ?? 0}
-                    </p>
-                    <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                      Repos
-                    </p>
-                  </div>
+        {/* Right Column: Quick Stats + Quests + Stats + Activity */}
+        <div className="dashboard-content">
+          {/* Quick Stats Row - Glassmorphism Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <PixelFrame variant="mana" padding="md">
+              <div className="stats-grid">
+                {/* Total XP Stat */}
+                <div className="text-center p-3 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)]">
+                  <p className="font-pixel text-lg text-[var(--neon-gold)] text-glow-gold">
+                    {user.xp.toLocaleString()}
+                  </p>
+                  <p className="font-sans text-xs text-[var(--gray-lighter)] mt-1">
+                    Total XP
+                  </p>
                 </div>
-              </PixelFrame>
-            </motion.div>
+                {/* Quests Done Stat */}
+                <div className="text-center p-3 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)]">
+                  <p className="font-pixel text-lg text-[var(--health-light)]">
+                    {completedQuests}
+                  </p>
+                  <p className="font-sans text-xs text-[var(--gray-lighter)] mt-1">
+                    Quests Done
+                  </p>
+                </div>
+                {/* Level Stat */}
+                <div className="text-center p-3 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)]">
+                  <p className="font-pixel text-lg text-[var(--pulse-violet)] text-glow-violet">
+                    {level}
+                  </p>
+                  <p className="font-sans text-xs text-[var(--gray-lighter)] mt-1">
+                    Level
+                  </p>
+                </div>
+                {/* Repos Stat */}
+                <div className="text-center p-3 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)]">
+                  <p className="font-pixel text-lg text-[var(--cyber-cyan)] text-glow-cyan">
+                    {user.github_stats?.repos ?? 0}
+                  </p>
+                  <p className="font-sans text-xs text-[var(--gray-lighter)] mt-1">
+                    Repos
+                  </p>
+                </div>
+              </div>
+            </PixelFrame>
+          </motion.div>
 
-            {/* Claimable Quests Alert */}
-            {claimableQuests > 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="flex-shrink-0"
+          {/* Claimable Quests Alert - Animated */}
+          {claimableQuests > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div
+                className="cursor-pointer group"
+                onClick={() => router.push('/quests')}
               >
-                <div 
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => router.push('/quests')}
-                >
-                  <PixelFrame variant="gold" padding="sm">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <IconScroll size={18} color="#ffd700" />
-                        <div>
-                          <p className="font-pixel text-[10px] text-[var(--gold-light)]">
-                            Rewards Available!
-                          </p>
-                          <p className="font-pixel text-[8px] text-[var(--gray-highlight)]">
-                            {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready
-                          </p>
-                        </div>
+                <PixelFrame variant="gold" padding="md">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-[var(--neon-gold)]/20 flex items-center justify-center">
+                        <IconScroll size={20} color="#FFD700" />
                       </div>
-                      <PixelBadge variant="gold">{claimableQuests}</PixelBadge>
+                      <div>
+                        <p className="font-pixel text-[11px] text-[var(--neon-gold)] group-hover:text-glow-gold transition-all">
+                          ⚔ Rewards Available!
+                        </p>
+                        <p className="font-sans text-xs text-[var(--gray-lighter)] mt-0.5">
+                          {claimableQuests} quest{claimableQuests > 1 ? 's' : ''} ready to claim
+                        </p>
+                      </div>
                     </div>
-                  </PixelFrame>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Active Quests Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex-shrink-0"
-              transition={{ delay: 0.3 }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-pixel text-[11px] text-[var(--gold-light)]">
-                  Quests
-                </h3>
-                <a
-                  href="/quests"
-                  className="font-pixel text-[8px] text-[var(--mana-light)] hover:text-[var(--mana-highlight)]"
-                >
-                  VIEW ALL
-                </a>
-              </div>
-
-              <div className="space-y-2">
-                {activeQuests.map(({ quest, userQuest }, index) => (
-                  <motion.div
-                    key={quest.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                  >
-                    <QuestCard
-                      quest={quest}
-                      userQuest={userQuest}
-                      onClaim={() => claimMutation.mutate(quest.id)}
-                      loading={claimMutation.isPending}
-                    />
-                  </motion.div>
-                ))}
-
-                {activeQuests.length === 0 && (
-                  <PixelFrame variant="stone" padding="lg">
-                    <div className="text-center py-4">
-                      <p className="font-pixel text-[10px] text-[var(--gray-highlight)]">
-                        {completedQuests > 0 ? 'All quests completed!' : 'No quests available'}
-                      </p>
-                      <p className="font-pixel text-[8px] text-[var(--gray-medium)] mt-2">
-                        {completedQuests > 0
-                          ? 'Check back later for new quests'
-                          : 'Sync your stats to discover quests'}
-                      </p>
-                    </div>
-                  </PixelFrame>
-                )}
+                    <PixelBadge variant="gold" size="md">{claimableQuests}</PixelBadge>
+                  </div>
+                </PixelFrame>
               </div>
             </motion.div>
+          )}
 
-            {/* Battle Stats Panel - Vertical Bars */}
-            <div className="flex-shrink-0 pt-2">
-              <BattleStatsPanel stats={rpgStats} barHeight="lg" />
+          {/* Active Quests Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-pixel text-xs text-[var(--neon-gold)] uppercase tracking-wider">
+                ⚔ Active Quests
+              </h3>
+              <a
+                href="/quests"
+                className="font-mono text-xs text-[var(--cyber-cyan)] hover:text-[var(--cyber-cyan-light)] transition-colors"
+              >
+                View All →
+              </a>
             </div>
 
-            {/* Activity Heatmap */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex-shrink-0 pb-4"
-            >
-              <ActivityHeatmap contributions={contributions} />
-            </motion.div>
-          </div>
+            <div className="quest-list">
+              {activeQuests.map(({ quest, userQuest }, index) => (
+                <motion.div
+                  key={quest.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                >
+                  <QuestCard
+                    quest={quest}
+                    userQuest={userQuest}
+                    onClaim={() => claimMutation.mutate(quest.id)}
+                    loading={claimMutation.isPending}
+                  />
+                </motion.div>
+              ))}
+
+              {activeQuests.length === 0 && (
+                <PixelFrame variant="stone" padding="lg">
+                  <div className="text-center py-6">
+                    <div className="text-4xl mb-3">🏆</div>
+                    <p className="font-pixel text-[10px] text-[var(--gray-lighter)]">
+                      {completedQuests > 0 ? 'All quests completed!' : 'No quests available'}
+                    </p>
+                    <p className="font-sans text-xs text-[var(--gray-light)] mt-2">
+                      {completedQuests > 0
+                        ? 'Check back later for new quests'
+                        : 'Sync your stats to discover quests'}
+                    </p>
+                  </div>
+                </PixelFrame>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Battle Stats Panel - Enhanced */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <BattleStatsPanel stats={rpgStats} barHeight="lg" />
+          </motion.div>
+
+          {/* Activity Heatmap - Enhanced */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="activity-heatmap-container"
+          >
+            <ActivityHeatmap contributions={contributions} />
+          </motion.div>
         </div>
 
         {/* Last Sync Info */}
@@ -621,45 +628,63 @@ export default function DashboardPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="text-center mt-6"
+            className="text-center col-span-full"
           >
-            <p className="font-pixel text-[9px] text-[var(--gray-medium)]">
+            <p className="font-sans text-xs text-[var(--gray-light)]">
               Last synced: {new Date(user.last_synced_at).toLocaleString()}
-             </p>
-           </motion.div>
-         )}
+            </p>
+          </motion.div>
+        )}
 
-         {/* Rank Progression Info */}
-         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 0.7 }}
-           className="mt-8"
-         >
-           <PixelFrame variant="stone" padding="md">
-             <h3 className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-3 text-center">
-               RANK PROGRESSION
-             </h3>
-             <div className="grid grid-cols-4 md:grid-cols-8 gap-2 text-center">
-               {['C', 'B', 'A', 'AA', 'AAA', 'S', 'SS', 'SSS'].map((rank, idx) => {
-                 const thresholds = [0, 1000, 3000, 6000, 10000, 15000, 25000, 50000];
-                 const isCurrent = rank === user.rank_tier;
-                 return (
-                   <div key={rank} className={`${isCurrent ? 'ring-2 ring-[var(--gold-light)] p-1' : ''}`}>
-                     <p className={`font-pixel text-[9px] ${isCurrent ? 'text-[var(--gold-highlight)] font-bold' : 'text-[var(--gray-highlight)]'}`}>
-                       {rank}
-                     </p>
-                     <p className="font-pixel text-[7px] text-[var(--gray-medium)]">
-                       {thresholds[idx].toLocaleString()}
-                     </p>
-                   </div>
-                 );
-               })}
-             </div>
-           </PixelFrame>
-         </motion.div>
-       </div>
-     </div>
-   );
- }
+        {/* Rank Progression Info - Full Width */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="col-span-full"
+        >
+          <PixelFrame variant="stone" padding="md">
+            <h3 className="font-pixel text-xs text-[var(--gray-lighter)] mb-4 text-center uppercase tracking-wider">
+              ⚔ Rank Progression
+            </h3>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+              {['C', 'B', 'A', 'AA', 'AAA', 'S', 'SS', 'SSS'].map((rank, idx) => {
+                const thresholds = [0, 1000, 3000, 6000, 10000, 15000, 25000, 50000];
+                const isCurrent = rank === user.rank_tier;
+                const isPassed = thresholds[idx] < user.xp;
+                return (
+                  <div
+                    key={rank}
+                    className={`text-center p-2 rounded-lg transition-all ${
+                      isCurrent
+                        ? 'glass-panel-gold bg-[var(--neon-gold)]/10'
+                        : isPassed
+                        ? 'bg-[var(--glass-bg-light)] border border-[var(--health-dark)]/30'
+                        : 'bg-[var(--glass-bg-light)] border border-[var(--glass-border)]'
+                    }`}
+                  >
+                    <p
+                      className={`font-pixel text-[10px] ${
+                        isCurrent
+                          ? 'text-[var(--neon-gold)] text-glow-gold'
+                          : isPassed
+                          ? 'text-[var(--health-light)]'
+                          : 'text-[var(--gray-light)]'
+                      }`}
+                    >
+                      {rank}
+                    </p>
+                    <p className="font-mono text-[9px] text-[var(--gray-light)] mt-1">
+                      {thresholds[idx].toLocaleString()}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </PixelFrame>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
 
