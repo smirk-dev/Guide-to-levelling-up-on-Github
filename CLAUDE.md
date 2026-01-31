@@ -457,28 +457,67 @@ session.accessToken      // OAuth token for API calls
 9. **Component Performance** - Use `usePerformanceMode` hook to detect low-end devices and disable heavy animations
 10. **Real-time Updates** - Leaderboard updates on sync; use Supabase Real-time subscriptions for live stat changes (optional)
 
-### Common Patterns:
+### Common Patterns
 
 **Server-side Supabase Access:**
+
 ```typescript
 import { getServiceSupabase } from '@/lib/supabase';
-const supabase = getServiceSupabase(); // Uses service role key
+const supabase = getServiceSupabase(); // Uses service role key for admin operations
 ```
 
 **Client-side Supabase Access:**
+
 ```typescript
 import { createClient } from '@/lib/supabase';
-const supabase = createClient(); // Uses anon key
+const supabase = createClient(); // Uses anon key (limited permissions)
 ```
 
 **Fetching User Data:**
+
 Always fetch by `github_id` (more reliable than username):
+
 ```typescript
 await supabase.from('users').select('*').eq('github_id', githubId).single();
 ```
 
 **GitHub API Calls:**
+
 Always pass access token when available:
+
 ```typescript
 await calculateGitHubStats(username, session.accessToken);
+```
+
+**API Route Authentication:**
+
+```typescript
+import { auth } from '@/lib/auth'; // NextAuth session
+
+export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  // Process request with session.user.id (GitHub ID)
+}
+```
+
+**TanStack Query Usage:**
+
+```typescript
+import { useQuery } from '@tanstack/react-query';
+
+const { data: quests, isLoading } = useQuery({
+  queryKey: ['quests', userId],
+  queryFn: () => fetch(`/api/quests?userId=${userId}`).then(r => r.json()),
+});
+```
+
+**Testing:**
+
+Unit tests are in `src/lib/__tests__/`. Run tests with:
+
+```bash
+npm test  # (or configure as needed in package.json)
 ```
