@@ -32,8 +32,19 @@ npm start            # Run production server
 ```
 
 **Linting:**
+
 ```bash
 npm run lint         # Run ESLint
+```
+
+**Database Management:**
+
+```bash
+npm run db:types     # Generate Supabase TypeScript types (from schema)
+npm run db:push      # Push schema changes to Supabase
+npm run db:pull      # Pull remote schema from Supabase
+npm run db:migration # Create a new migration file
+npm run db:status    # Check database connection status
 ```
 
 ## Code Warrior Architecture
@@ -385,13 +396,28 @@ session.accessToken      // OAuth token for API calls
 
 ## Documentation Structure
 
-The `/docs` directory contains project planning documents:
-- `project-brief.md` - Original concept and requirements
-- `prd.md` - Product Requirements Document
-- `ux-design.md` - UI/UX specifications
-- `architecture.md` - Technical architecture decisions
+### Project Root Documentation
 
-The main `README.md` is a comprehensive guide to GitHub profile enhancement systems (Stats, Trophies, Achievements) - not directly related to Code Warrior app development but serves as educational content.
+- **`README.md`** - Comprehensive guide to GitHub profile enhancement systems (Stats, Trophies, Achievements) - educational content
+- **`CLAUDE.md`** - This file: AI assistant guidance and project architecture
+
+### `/docs` Directory - Architecture & Planning
+
+- **`project-brief.md`** - Original concept and game mechanics
+- **`prd.md`** - Product Requirements Document
+- **`ux-design.md`** - UI/UX specifications and design system
+- **`architecture.md`** - Technical architecture decisions and patterns
+
+### `/code-warrior` Directory - Implementation Guides
+
+- **`README.md`** - Quick start guide for development
+- **`QUICKSTART.md`** - Fast setup instructions
+- **`SUPABASE_SETUP.md`** - Database configuration and initialization
+- **`DATABASE_MIGRATION.md`** - Guide for running migrations
+- **`TROUBLESHOOTING.md`** - Common issues and solutions
+- **`DASHBOARD_REDESIGN_REVIEW.md`** - Latest dashboard UI changes
+- **`IMPROVEMENTS.md`** - Planned enhancements and optimization notes
+- **`VERCEL_DEPLOYMENT.md`** - Production deployment procedures
 
 ## Important Notes
 
