@@ -1,12 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
 
+/* Import enhanced theme and layout systems */
+@import '../styles/cyber-theme.css';
+@import '../styles/dashboard-layout.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================
-   CYBER-FANTASY RPG DESIGN SYSTEM
-   Code Warrior - Neon RPG UI Overhaul
+   CYBER-FANTASY RPG DESIGN SYSTEM v2.0
+   Code Warrior - High-Fidelity Neon Overhaul
    ============================================ */
 
 /* CSS Variables - Cyber-Neon Color Palette */
