@@ -3,13 +3,23 @@
  * Retro 8-bit style sounds for the Code Warrior game
  */
 
+// Extend Window interface for webkit prefixed AudioContext
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
 class SoundManager {
   private audioContext: AudioContext | null = null;
   private enabled: boolean = true;
 
   constructor() {
     if (typeof window !== 'undefined') {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        this.audioContext = new AudioContextClass();
+      }
     }
   }
 
