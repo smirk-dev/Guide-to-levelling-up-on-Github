@@ -820,73 +820,126 @@ body {
 }
 
 /* ============================================
-   STAT BARS (Health, Mana, XP)
+   RPG STAT BARS (Health, Mana, XP) - Neon Style
    ============================================ */
 
 .stat-bar {
   position: relative;
-  height: 12px;
-  background: var(--void-darkest);
-  border: 2px solid;
-  border-color: var(--gray-darkest) var(--gray-light) var(--gray-light) var(--gray-darkest);
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.5);
+  height: 16px;
+  background: var(--obsidian-darkest);
+  border: 1px solid var(--gray-dark);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: hidden;
 }
 
 .stat-bar-fill {
   height: 100%;
-  transition: width 0.3s steps(20);
-  box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.2);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 3px;
+  position: relative;
 }
 
+/* Animated shine effect on stat bars */
+.stat-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: stat-bar-shine 2s infinite;
+}
+
+@keyframes stat-bar-shine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+/* Health Bar - Green with glow */
 .stat-bar-health .stat-bar-fill {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--health-light) 0px,
-    var(--health-light) 8px,
-    var(--health-medium) 8px,
-    var(--health-medium) 16px
+  background: linear-gradient(
+    180deg,
+    var(--health-highlight) 0%,
+    var(--health-light) 50%,
+    var(--health-medium) 100%
   );
+  box-shadow:
+    0 0 10px var(--health-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* Mana Bar - Cyan with glow */
 .stat-bar-mana .stat-bar-fill {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--mana-light) 0px,
-    var(--mana-light) 8px,
-    var(--mana-medium) 8px,
-    var(--mana-medium) 16px
+  background: linear-gradient(
+    180deg,
+    var(--cyber-cyan-light) 0%,
+    var(--cyber-cyan) 50%,
+    var(--cyber-cyan-medium) 100%
   );
+  box-shadow:
+    0 0 10px var(--cyber-cyan-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* XP Bar - Gold with glow */
 .stat-bar-xp .stat-bar-fill {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--gold-light) 0px,
-    var(--gold-light) 8px,
-    var(--gold-medium) 8px,
-    var(--gold-medium) 16px
+  background: linear-gradient(
+    180deg,
+    var(--neon-gold-light) 0%,
+    var(--neon-gold) 50%,
+    var(--neon-gold-medium) 100%
   );
+  box-shadow:
+    0 0 10px var(--neon-gold-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* Strength Bar - Red with glow */
 .stat-bar-strength .stat-bar-fill {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--critical-light) 0px,
-    var(--critical-light) 8px,
-    var(--critical-medium) 8px,
-    var(--critical-medium) 16px
+  background: linear-gradient(
+    180deg,
+    var(--critical-highlight) 0%,
+    var(--critical-light) 50%,
+    var(--critical-medium) 100%
   );
+  box-shadow:
+    0 0 10px var(--critical-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* Purple/Wisdom Bar - Violet with glow */
 .stat-bar-purple .stat-bar-fill {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--xp-light) 0px,
-    var(--xp-light) 8px,
-    var(--xp-medium) 8px,
-    var(--xp-medium) 16px
+  background: linear-gradient(
+    180deg,
+    var(--pulse-violet-light) 0%,
+    var(--pulse-violet) 50%,
+    var(--pulse-violet-medium) 100%
   );
+  box-shadow:
+    0 0 10px var(--pulse-violet-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Charisma Bar - Gold with glow (alias) */
+.stat-bar-charisma .stat-bar-fill {
+  background: linear-gradient(
+    180deg,
+    var(--neon-gold-light) 0%,
+    var(--neon-gold) 50%,
+    var(--neon-gold-dark) 100%
+  );
+  box-shadow:
+    0 0 10px var(--neon-gold-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Stat bar label overlay */
@@ -895,13 +948,50 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
+  font-weight: 600;
   color: #ffffff;
   text-shadow:
-    1px 1px 0 rgba(0, 0, 0, 0.8),
-    -1px -1px 0 rgba(0, 0, 0, 0.8);
+    0 0 4px rgba(0, 0, 0, 0.8),
+    0 1px 2px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* Large stat bar variant */
+.stat-bar-lg {
+  height: 24px;
+  border-radius: 6px;
+}
+
+.stat-bar-lg .stat-bar-fill {
+  border-radius: 5px;
+}
+
+.stat-bar-lg .stat-bar-label {
+  font-size: 12px;
+}
+
+/* Small stat bar variant */
+.stat-bar-sm {
+  height: 10px;
+  border-radius: 3px;
+}
+
+.stat-bar-sm .stat-bar-fill {
+  border-radius: 2px;
+}
+
+/* Segmented stat bar (retro style option) */
+.stat-bar-segmented .stat-bar-fill {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.2) 8px,
+    rgba(0, 0, 0, 0.2) 10px
+  );
 }
 
 /* ============================================
