@@ -113,6 +113,28 @@ Quests track specific GitHub milestones:
 - GET `/api/quests` - Fetch all quests with user progress
 - POST `/api/quests/claim` - Claim quest reward
 
+#### 5. Badge System
+
+Badges are collectible achievements that provide stat boosts:
+- Defined in `badges` table (name, icon_slug, stat_boost as JSONB)
+- Users can equip/unequip badges for active bonuses
+- Badge inventory tracked per user
+- Badges can be earned through quest rewards or direct completion
+
+**API Endpoints:**
+- GET `/api/badges/inventory` - Fetch user's collected badges
+- POST `/api/badges/equip` - Equip a badge (adds stat bonuses)
+- POST `/api/badges/unequip` - Unequip a badge (removes bonuses)
+
+#### 6. Leaderboard System
+
+Tracks top players globally based on XP and rank:
+- Real-time leaderboard with pagination
+- Displays username, rank tier, XP, and achievement stats
+
+**API Endpoint:**
+- GET `/api/leaderboard` - Fetch top players with stats
+
 ### Database Schema
 
 **Core Tables:**
