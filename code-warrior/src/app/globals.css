@@ -260,9 +260,10 @@ body {
 }
 
 /* ============================================
-   TYPOGRAPHY - Pixel Fonts
+   TYPOGRAPHY - Cyber-Fantasy Font System
    ============================================ */
 
+/* Pixel font for headers/titles - 16-bit aesthetic */
 .font-pixel {
   font-family: 'Press Start 2P', monospace;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
@@ -272,31 +273,75 @@ body {
 
 .font-pixel-heading {
   font-family: 'Press Start 2P', monospace;
-  text-shadow: 
-    3px 3px 0 var(--void-darkest),
-    4px 4px 0 rgba(0, 0, 0, 0.5);
-  letter-spacing: 1px;
+  text-shadow:
+    2px 2px 0 var(--obsidian-darkest),
+    3px 3px 0 rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
 }
 
+/* Monospace font for data/stats */
 .font-mono {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Sans-serif for body/UI text */
+.font-sans {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Cyber neon text effects */
+.text-glow-cyan {
+  text-shadow:
+    0 0 5px var(--cyber-cyan),
+    0 0 10px var(--cyber-cyan-glow),
+    0 0 20px var(--cyber-cyan-glow);
+}
+
+.text-glow-violet {
+  text-shadow:
+    0 0 5px var(--pulse-violet),
+    0 0 10px var(--pulse-violet-glow),
+    0 0 20px var(--pulse-violet-glow);
+}
+
+.text-glow-gold {
+  text-shadow:
+    0 0 5px var(--neon-gold),
+    0 0 10px var(--neon-gold-glow),
+    0 0 20px var(--neon-gold-glow);
+}
+
+.text-glow-pink {
+  text-shadow:
+    0 0 5px var(--neon-pink),
+    0 0 10px var(--neon-pink-glow),
+    0 0 20px var(--neon-pink-glow);
 }
 
 /* Text with pixel outline */
 .text-outline-dark {
-  text-shadow: 
-    -2px -2px 0 var(--void-darkest),
-    2px -2px 0 var(--void-darkest),
-    -2px 2px 0 var(--void-darkest),
-    2px 2px 0 var(--void-darkest);
+  text-shadow:
+    -2px -2px 0 var(--obsidian-darkest),
+    2px -2px 0 var(--obsidian-darkest),
+    -2px 2px 0 var(--obsidian-darkest),
+    2px 2px 0 var(--obsidian-darkest);
 }
 
 .text-outline-gold {
-  text-shadow: 
-    -2px -2px 0 var(--gold-dark),
-    2px -2px 0 var(--gold-dark),
-    -2px 2px 0 var(--gold-dark),
-    2px 2px 0 var(--gold-dark);
+  text-shadow:
+    -2px -2px 0 var(--neon-gold-dark),
+    2px -2px 0 var(--neon-gold-dark),
+    -2px 2px 0 var(--neon-gold-dark),
+    2px 2px 0 var(--neon-gold-dark);
+}
+
+.text-outline-cyan {
+  text-shadow:
+    -1px -1px 0 var(--cyber-cyan-dark),
+    1px -1px 0 var(--cyber-cyan-dark),
+    -1px 1px 0 var(--cyber-cyan-dark),
+    1px 1px 0 var(--cyber-cyan-dark);
 }
 
 /* ============================================
