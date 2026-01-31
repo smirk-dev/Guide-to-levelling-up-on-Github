@@ -6,7 +6,7 @@ import { soundManager } from '@/lib/sound';
 
 interface PixelFrameProps {
   children: React.ReactNode;
-  variant?: 'stone' | 'metal' | 'gold' | 'mana' | 'health' | 'critical';
+  variant?: 'stone' | 'metal' | 'gold' | 'mana' | 'health' | 'critical' | 'violet';
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg';
   animate?: boolean;
@@ -387,6 +387,7 @@ interface PixelAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   glow?: boolean;
+  variant?: 'cyan' | 'gold' | 'violet';
 }
 
 export const PixelAvatar: React.FC<PixelAvatarProps> = ({
@@ -395,18 +396,22 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
   size = 'md',
   className = '',
   glow = false,
+  variant = 'cyan',
 }) => {
   const [imageError, setImageError] = React.useState(false);
-  
+
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
-    lg: 'w-16 h-16',
+    lg: 'w-full h-full',
     xl: 'w-24 h-24',
   };
 
   const glowClass = glow ? 'pixel-avatar-glow' : '';
-  
+
+  // Variant-specific border colors
+  const variantClass = variant === 'gold' ? 'pixel-avatar-gold' : variant === 'violet' ? 'pixel-avatar-violet' : '';
+
   // Generate initials from alt text (e.g., "John Doe" -> "JD")
   const initials = alt
     .split(' ')
@@ -416,16 +421,16 @@ export const PixelAvatar: React.FC<PixelAvatarProps> = ({
     .toUpperCase();
 
   return (
-    <div className={`${sizeClasses[size]} ${glowClass} ${className}`}>
+    <div className={`${sizeClasses[size]} ${glowClass} ${variantClass} ${className} rounded-full overflow-hidden`}>
       {src && !imageError ? (
         <img
           src={src}
           alt={alt}
           onError={() => setImageError(true)}
-          className="w-full h-full pixel-avatar object-cover"
+          className="w-full h-full pixel-avatar object-cover rounded-full"
         />
       ) : (
-        <div className="w-full h-full pixel-avatar bg-[var(--gray-dark)] flex items-center justify-center">
+        <div className="w-full h-full pixel-avatar bg-[var(--obsidian-light)] flex items-center justify-center rounded-full">
           <span className="text-white font-pixel text-sm">{initials || '?'}</span>
         </div>
       )}
@@ -493,102 +498,111 @@ export const VerticalStatBar: React.FC<VerticalStatBarProps> = ({
 }) => {
   const percentage = Math.min((value / max) * 100, 100);
 
-  const heightClasses = {
-    sm: 'h-24',
-    md: 'h-32',
-    lg: 'h-40',
-    xl: 'h-64',
-  };
-
-  const variantColors = {
+  // Cyber-Neon color variants
+  const variantStyles = {
     health: {
-      bg: 'bg-[var(--health-dark)]',
-      fill: 'bg-[var(--health-light)]',
-      glow: 'shadow-[0_0_8px_var(--health-light)]',
-      text: 'text-[var(--health-light)]',
+      bgColor: 'rgba(13, 51, 32, 0.8)',
+      fillGradient: 'linear-gradient(180deg, #4ADE80 0%, #22C55E 50%, #166534 100%)',
+      glowColor: 'rgba(34, 197, 94, 0.6)',
+      textColor: '#4ADE80',
+      borderColor: 'rgba(34, 197, 94, 0.3)',
     },
     mana: {
-      bg: 'bg-[var(--mana-dark)]',
-      fill: 'bg-[var(--mana-light)]',
-      glow: 'shadow-[0_0_8px_var(--mana-light)]',
-      text: 'text-[var(--mana-light)]',
+      bgColor: 'rgba(0, 56, 68, 0.8)',
+      fillGradient: 'linear-gradient(180deg, #4DFFFF 0%, #00F0FF 50%, #006677 100%)',
+      glowColor: 'rgba(0, 240, 255, 0.6)',
+      textColor: '#00F0FF',
+      borderColor: 'rgba(0, 240, 255, 0.3)',
     },
     strength: {
-      bg: 'bg-[var(--critical-dark)]',
-      fill: 'bg-[var(--critical-light)]',
-      glow: 'shadow-[0_0_8px_var(--critical-light)]',
-      text: 'text-[var(--critical-light)]',
+      bgColor: 'rgba(69, 10, 10, 0.8)',
+      fillGradient: 'linear-gradient(180deg, #F87171 0%, #EF4444 50%, #7F1D1D 100%)',
+      glowColor: 'rgba(239, 68, 68, 0.6)',
+      textColor: '#F87171',
+      borderColor: 'rgba(239, 68, 68, 0.3)',
     },
     charisma: {
-      bg: 'bg-[var(--gold-dark)]',
-      fill: 'bg-[var(--gold-light)]',
-      glow: 'shadow-[0_0_8px_var(--gold-light)]',
-      text: 'text-[var(--gold-light)]',
+      bgColor: 'rgba(102, 77, 0, 0.8)',
+      fillGradient: 'linear-gradient(180deg, #FFED4E 0%, #FFD700 50%, #997300 100%)',
+      glowColor: 'rgba(255, 215, 0, 0.6)',
+      textColor: '#FFD700',
+      borderColor: 'rgba(255, 215, 0, 0.3)',
     },
     wisdom: {
-      bg: 'bg-[var(--xp-dark)]',
-      fill: 'bg-[var(--xp-light)]',
-      glow: 'shadow-[0_0_8px_var(--xp-light)]',
-      text: 'text-[var(--xp-light)]',
+      bgColor: 'rgba(45, 27, 78, 0.8)',
+      fillGradient: 'linear-gradient(180deg, #A78BFA 0%, #8B5CF6 50%, #4C2885 100%)',
+      glowColor: 'rgba(139, 92, 246, 0.6)',
+      textColor: '#A78BFA',
+      borderColor: 'rgba(139, 92, 246, 0.3)',
     },
   };
 
-  const colors = variantColors[variant];
+  const styles = variantStyles[variant];
 
   // Calculate actual pixel heights
   const heightPixels = {
     sm: 96,
     md: 128,
-    lg: 160,
-    xl: 256,
+    lg: 140,
+    xl: 180,
   }[height];
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Stat abbreviation label */}
-      <span className={`font-pixel text-[11px] ${colors.text} uppercase tracking-wider`}>
+    <div className="flex flex-col items-center gap-2">
+      {/* Stat abbreviation label with glow */}
+      <span
+        className="font-pixel text-[10px] uppercase tracking-wider"
+        style={{ color: styles.textColor, textShadow: `0 0 8px ${styles.glowColor}` }}
+      >
         {label.slice(0, 3)}
       </span>
 
-      {/* Vertical bar container */}
+      {/* Vertical bar container with glass effect */}
       <div
-        className={`relative ${colors.bg} border-2 border-[var(--gray-dark)] overflow-hidden`}
+        className="relative overflow-hidden rounded-md"
         style={{
-          width: '32px',
+          width: '36px',
           height: `${heightPixels}px`,
-          boxShadow: 'inset 2px 2px 0 rgba(0, 0, 0, 0.5)',
+          background: styles.bgColor,
+          border: `1px solid ${styles.borderColor}`,
+          boxShadow: `inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 15px ${styles.glowColor}`,
         }}
       >
-        {/* Fill from bottom */}
+        {/* Fill from bottom with gradient and glow */}
         <div
-          className={`absolute bottom-0 left-0 right-0 ${colors.fill} transition-all duration-500 ease-out`}
+          className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-b-sm"
           style={{
             height: `${percentage}%`,
-            boxShadow: percentage > 80 
-              ? `inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 0 8px ${
-                  variant === 'health' ? 'var(--health-light)' :
-                  variant === 'mana' ? 'var(--mana-light)' :
-                  variant === 'strength' ? 'var(--critical-light)' :
-                  variant === 'charisma' ? 'var(--gold-light)' :
-                  'var(--xp-light)'
-                }`
+            background: styles.fillGradient,
+            boxShadow: percentage > 50
+              ? `inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 0 ${percentage > 80 ? '20px' : '12px'} ${styles.glowColor}`
               : 'inset 0 2px 0 rgba(255, 255, 255, 0.3)',
           }}
         />
 
-        {/* Pixel grid overlay for retro feel */}
+        {/* Subtle scanline overlay */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-20"
+          className="absolute inset-0 pointer-events-none opacity-10"
           style={{
-            backgroundImage: 'linear-gradient(transparent 50%, rgba(0,0,0,0.3) 50%)',
-            backgroundSize: '100% 4px',
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px)',
+          }}
+        />
+
+        {/* Top highlight */}
+        <div
+          className="absolute top-0 left-0 right-0 h-1 pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)',
           }}
         />
       </div>
 
-      {/* Value display */}
+      {/* Value display with mono font */}
       {showValue && (
-        <span className={`font-pixel text-[10px] ${colors.text} tabular-nums`}>
+        <span
+          className="font-mono text-xs font-semibold tabular-nums"
+          style={{ color: styles.textColor }}
+        >
           {Math.round(value)}
         </span>
       )}
