@@ -354,15 +354,12 @@ const MapPath: React.FC<MapPathProps> = ({ checkpoints, progress }) => {
     for (let i = 1; i < checkpoints.length; i++) {
       const prev = checkpoints[i - 1];
       const curr = checkpoints[i];
-      const midX = (prev.x + curr.x) / 2;
-      const midY = (prev.y + curr.y) / 2;
-      
-      // Use quadratic bezier for smooth curves
-      path += ` Q ${prev.x + (curr.x - prev.x) * 0.5} ${prev.y}, ${midX} ${midY}`;
+      const controlX = (prev.x + curr.x) / 2;
+      const controlY = (prev.y + curr.y) / 2;
+
+      // Smoothly connect checkpoints while still passing through each node
+      path += ` Q ${controlX} ${controlY}, ${curr.x} ${curr.y}`;
     }
-    
-    const last = checkpoints[checkpoints.length - 1];
-    path += ` L ${last.x} ${last.y}`;
     
     return path;
   };
@@ -533,24 +530,24 @@ export const QuestMap: React.FC<QuestMapProps> = ({
   // Map quests to regions based on criteria type and threshold
   const getQuestRegion = useCallback((quest: Quest): MapRegion => {
     const threshold = quest.criteria_threshold;
-    
-    // Beginner quests (low thresholds)
-    if (threshold <= 10) return 'starting_village';
-    
+
     // Commit-focused quests
     if (quest.criteria_type === 'COMMIT_COUNT') {
+      if (threshold <= 10) return 'starting_village';
       if (threshold <= 100) return 'forest_of_commits';
       return 'legendary_summit';
     }
     
     // Collaboration quests (PR, Reviews)
     if (quest.criteria_type === 'PR_MERGED' || quest.criteria_type === 'REVIEW_COUNT') {
+      if (threshold <= 3) return 'starting_village';
       if (threshold <= 20) return 'collaboration_peaks';
       return 'legendary_summit';
     }
     
     // Star-based quests
     if (quest.criteria_type === 'STAR_COUNT') {
+      if (threshold <= 3) return 'starting_village';
       if (threshold <= 50) return 'star_valley';
       return 'legendary_summit';
     }
@@ -566,6 +563,9 @@ export const QuestMap: React.FC<QuestMapProps> = ({
       if (threshold <= 10) return 'forest_of_commits';
       return 'star_valley';
     }
+
+    // Fallback for unknown types
+    if (threshold <= 10) return 'starting_village';
     
     return 'starting_village';
   }, []);
@@ -660,7 +660,7 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     const prevQuest = questPositions[questIndex - 1]?.quest;
     if (!prevQuest) return false;
     const prevUserQuest = getUserQuestForQuest(prevQuest.id);
-    return !prevUserQuest?.claimed_at;
+    return !prevUserQuest || (prevUserQuest.status !== 'COMPLETED' && !prevUserQuest.claimed_at);
   }, [questPositions, getUserQuestForQuest]);
 
   // Early return if no quests - AFTER all hooks
