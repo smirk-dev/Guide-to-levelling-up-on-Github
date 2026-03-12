@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { DndContext, closestCenter, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import { PixelFrame, PixelButton, PixelBadge, PixelTooltip } from '../ui/PixelComponents';
-import { IconBadge, IconShield, IconCheck, IconLock, IconHeart, IconMana, IconSword, IconStar, IconReview, IconInfo } from '../icons/PixelIcons';
+import { IconBadge, IconShield, IconLock, IconHeart, IconMana, IconSword, IconStar, IconReview } from '../icons/PixelIcons';
 import { soundManager } from '@/lib/sound';
 import type { Badge, UserBadge } from '@/types/database';
 
@@ -60,7 +60,6 @@ interface BadgeSlotProps {
   loading?: boolean;
   className?: string;
   draggable?: boolean;
-  isDropTarget?: boolean;
 }
 
 export const BadgeSlot: React.FC<BadgeSlotProps> = ({
@@ -71,7 +70,6 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
   loading = false,
   className = '',
   draggable = false,
-  isDropTarget = false,
 }) => {
   const isOwned = !!userBadge;
   const isEquipped = userBadge?.equipped ?? false;
@@ -82,13 +80,6 @@ export const BadgeSlot: React.FC<BadgeSlotProps> = ({
     data: { badge, userBadge },
     disabled: !draggable || !isOwned || loading,
   });
-
-  const getBoostText = () => {
-    if (!statBoost) return null;
-    return Object.entries(statBoost)
-      .map(([stat, value]) => `+${value} ${stat.toUpperCase()}`)
-      .join(', ');
-  };
 
   const getStatIcon = (stat: string) => {
     switch (stat.toLowerCase()) {
@@ -357,14 +348,10 @@ export const BadgeGrid: React.FC<BadgeGridProps> = ({
               );
             };
             const equippedBadge = sortedBadges.find(
-              (b, i) =>
+              (b) =>
                 getUserBadge(b.id)?.equipped &&
                 safeUserBadges.filter((ub) => ub.equipped).indexOf(getUserBadge(b.id)!) === slot
             );
-            const badge = equippedBadge
-              ? safeBadges.find((b) => getUserBadge(b.id)?.equipped)
-              : null;
-
 
             if (equippedBadge) {
               return (
