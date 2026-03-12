@@ -50,9 +50,11 @@ export async function GET() {
       throw userBadgesError;
     }
 
+    const userBadgeMap = new Map((userBadges || []).map((userBadge) => [userBadge.badge_id, userBadge]));
+
     // Combine badge info with user's ownership status
     const inventory = (allBadges || []).map((badge) => {
-      const userBadge = (userBadges || []).find((ub) => ub.badge_id === badge.id);
+      const userBadge = userBadgeMap.get(badge.id);
       return {
         ...badge,
         owned: !!userBadge,
