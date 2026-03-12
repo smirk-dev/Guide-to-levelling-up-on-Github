@@ -142,7 +142,7 @@ export default function QuestsPage() {
   }, [status, router]);
 
   // Fetch quests data
-  const { data, isLoading, refetch } = useQuery<QuestsData>({
+  const { data, isLoading } = useQuery<QuestsData>({
     queryKey: ['quests'],
     queryFn: async () => {
       const res = await fetch('/api/quests');
@@ -202,7 +202,7 @@ export default function QuestsPage() {
       queryClient.invalidateQueries({ queryKey: ['quests'] });
       soundManager.questComplete();
 
-      const quest = data?.quests.find((q) => q.id === questId);
+      const quest = data?.quests?.find((q) => q.id === questId);
       if (quest) {
         setClaimedQuest({ title: quest.title, xp: quest.xp_reward });
         setFloatingXP({ amount: quest.xp_reward, key: Date.now() });
