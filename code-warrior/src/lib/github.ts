@@ -118,6 +118,12 @@ export async function fetchContributionCalendar(
     }
 
     const data = await response.json();
+
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      console.error('GraphQL contribution calendar errors:', data.errors);
+      return [];
+    }
+
     const weeks = data.data?.user?.contributionsCollection?.contributionCalendar?.weeks || [];
 
     // Flatten weeks into array of days
@@ -235,7 +241,7 @@ export async function fetchGitHubEvents(
   }
 
   const response = await fetch(
-    `https://api.github.com/users/${username}/events?per_page=100`,
+    `https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`,
     {
       headers,
       next: { revalidate: 900 },
@@ -277,13 +283,13 @@ export async function calculateGitHubStats(
   );
 
   // Use GitHub Search API for more accurate counts
-  const [prsResponse, issuesResponse, commitsResponse] = await Promise.all([
+  const [prsResult, issuesResult, eventsResult] = await Promise.allSettled([
     // Search for PRs created by user
-    fetch(`https://api.github.com/search/issues?q=type:pr+author:${username}`, {
+    fetch(`https://api.github.com/search/issues?${new URLSearchParams({ q: `type:pr author:${username}` }).toString()}`, {
       headers,
     }),
     // Search for issues created by user
-    fetch(`https://api.github.com/search/issues?q=type:issue+author:${username}`, {
+    fetch(`https://api.github.com/search/issues?${new URLSearchParams({ q: `type:issue author:${username}` }).toString()}`, {
       headers,
     }),
     // Get user's events for commit count (best effort from recent activity)
@@ -293,31 +299,46 @@ export async function calculateGitHubStats(
   let totalPRs = 0;
   let totalIssues = 0;
   
-  if (prsResponse.ok) {
-    const prsData = await prsResponse.json();
-    totalPRs = prsData.total_count || 0;
+  if (prsResult.status === 'fulfilled') {
+    if (prsResult.value.ok) {
+      const prsData = await prsResult.value.json();
+      totalPRs = prsData.total_count || 0;
+    } else {
+      console.error('GitHub PR search failed:', prsResult.value.status, prsResult.value.statusText);
+    }
+  } else {
+    console.error('GitHub PR search request failed:', prsResult.reason);
   }
 
-  if (issuesResponse.ok) {
-    const issuesData = await issuesResponse.json();
-    totalIssues = issuesData.total_count || 0;
+  if (issuesResult.status === 'fulfilled') {
+    if (issuesResult.value.ok) {
+      const issuesData = await issuesResult.value.json();
+      totalIssues = issuesData.total_count || 0;
+    } else {
+      console.error('GitHub issue search failed:', issuesResult.value.status, issuesResult.value.statusText);
+    }
+  } else {
+    console.error('GitHub issue search request failed:', issuesResult.reason);
   }
 
   // Count commits and reviews from recent events
   let totalCommits = 0;
   let totalReviews = 0;
 
-  commitsResponse.forEach((event) => {
-    switch (event.type) {
-      case 'PushEvent':
-        // Each PushEvent can contain multiple commits
-        totalCommits += event.payload.commits?.length || 0;
-        break;
-      case 'PullRequestReviewEvent':
-        totalReviews++;
-        break;
-    }
-  });
+  if (eventsResult.status === 'fulfilled') {
+    eventsResult.value.forEach((event) => {
+      switch (event.type) {
+        case 'PushEvent':
+          totalCommits += event.payload.commits?.length || 0;
+          break;
+        case 'PullRequestReviewEvent':
+          totalReviews++;
+          break;
+      }
+    });
+  } else {
+    console.error('GitHub events request failed:', eventsResult.reason);
+  }
 
   // If we have access token, use GraphQL API for accurate commit count
   if (accessToken) {
@@ -347,6 +368,11 @@ export async function calculateGitHubStats(
 
       if (graphqlResponse.ok) {
         const graphqlData = await graphqlResponse.json();
+
+        if (Array.isArray(graphqlData.errors) && graphqlData.errors.length > 0) {
+          console.error('GraphQL commit count errors:', graphqlData.errors);
+        }
+
         const contributions = graphqlData.data?.user?.contributionsCollection;
         if (contributions) {
           totalCommits = contributions.totalCommitContributions + (contributions.restrictedContributionsCount || 0);
