@@ -16,6 +16,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Server-side Supabase client (uses service role key for admin operations)
 export const getServiceSupabase = () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('getServiceSupabase() must only be called on the server');
+  }
+
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey) {
