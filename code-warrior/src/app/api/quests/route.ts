@@ -3,36 +3,31 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { getServiceSupabase } from '@/lib/supabase';
 import { calculateGitHubStats } from '@/lib/github';
-import { checkQuestCompletion, updateQuestProgress } from '@/lib/quest-logic';
+import { updateQuestProgress } from '@/lib/quest-logic';
+import { QUEST_STATUS } from '@/lib/constants';
 
 /**
  * GET /api/quests
  * Fetch all quests and user's quest progress
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    console.log('[Quests GET] Starting request');
     const session = await getServerSession(authOptions);
-    console.log('[Quests GET] Session object:', JSON.stringify(session, null, 2));
 
     if (!session) {
-      console.error('[Quests GET] No session at all');
       return NextResponse.json({ error: 'Unauthorized - no session' }, { status: 401 });
     }
 
     if (!session.user) {
-      console.error('[Quests GET] Session exists but no user');
       return NextResponse.json({ error: 'Unauthorized - no user in session' }, { status: 401 });
     }
 
     if (!session.user.id) {
-      console.error('[Quests GET] User exists but no ID. User object:', JSON.stringify(session.user));
       return NextResponse.json({ error: 'Unauthorized - no user ID in session' }, { status: 401 });
     }
 
     const githubId = session.user.id;
     const supabase = getServiceSupabase();
-    console.log('[Quests GET] Fetching user with github_id:', githubId);
 
     // Fetch user
     const { data: user, error: userError } = await supabase
@@ -41,10 +36,7 @@ export async function GET(request: Request) {
       .eq('github_id', githubId)
       .single();
 
-    console.log('[Quests GET] User fetch result:', { hasError: !!userError, hasUser: !!user, errorMessage: userError?.message });
-
     if (userError) {
-      console.error('[Quests GET] Supabase error fetching user:', userError.message);
       if (userError.code === 'PGRST116') {
         return NextResponse.json({ error: 'User not found in database. Please sync your GitHub stats first.' }, { status: 404 });
       }
@@ -52,7 +44,6 @@ export async function GET(request: Request) {
     }
 
     if (!user) {
-      console.error('[Quests GET] No user returned even though no error');
       return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
     }
 
@@ -64,7 +55,6 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: true });
 
     if (questsError) {
-      console.error('[Quests GET] Error fetching quests:', questsError.message);
       throw questsError;
     }
 
@@ -75,21 +65,18 @@ export async function GET(request: Request) {
       .eq('user_id', user.id);
 
     if (userQuestsError) {
-      console.error('[Quests GET] Error fetching user quests:', userQuestsError.message);
       throw userQuestsError;
     }
 
-    console.log('[Quests GET] Success. Returning quests:', { questCount: quests?.length, userQuestCount: userQuests?.length });
     return NextResponse.json({
       user,
       quests: quests || [],
       userQuests: userQuests || [],
     });
   } catch (error) {
-    console.error('[Quests GET] Caught error:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Quests GET] Failed to fetch quests:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch quests', details: errorMessage },
+      { error: 'Failed to fetch quests' },
       { status: 500 }
     );
   }
@@ -109,7 +96,7 @@ export async function POST() {
     }
 
     const githubId = session.user.id;
-    const accessToken = (session as any)?.accessToken;
+    const accessToken = session.accessToken;
     const supabase = getServiceSupabase();
 
     // Fetch user
@@ -162,7 +149,7 @@ export async function POST() {
           .from('user_quests')
           .update({
             progress: update.progress,
-            status: update.completed ? 'completed' : 'in_progress',
+            status: update.completed ? QUEST_STATUS.COMPLETED : QUEST_STATUS.ACTIVE,
             completed_at: update.completed ? new Date().toISOString() : null,
           })
           .eq('id', existingUserQuest.id)
@@ -179,7 +166,7 @@ export async function POST() {
           .insert({
             user_id: user.id,
             quest_id: update.questId,
-            status: update.completed ? 'completed' : 'in_progress',
+            status: update.completed ? QUEST_STATUS.COMPLETED : QUEST_STATUS.ACTIVE,
             progress: update.progress,
             completed_at: update.completed ? new Date().toISOString() : null,
           })
