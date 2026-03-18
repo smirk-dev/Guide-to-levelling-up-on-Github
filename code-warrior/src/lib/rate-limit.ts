@@ -28,9 +28,25 @@ export const RATE_LIMIT_CONFIGS = {
   leaderboard: { interval: 60 * 1000, maxRequests: 30 },
   // Badge equip - 30 requests per minute per user
   badgeEquip: { interval: 60 * 1000, maxRequests: 30 },
+  // Badge unequip - 30 requests per minute per user
+  badgeUnequip: { interval: 60 * 1000, maxRequests: 30 },
   // Default - 100 requests per minute per user
   default: { interval: 60 * 1000, maxRequests: 100 },
 } as const;
+
+export function getClientIp(request: Request): string {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    return forwardedFor.split(',')[0].trim();
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) {
+    return realIp.trim();
+  }
+
+  return 'unknown';
+}
 
 /**
  * Check if a request should be rate limited

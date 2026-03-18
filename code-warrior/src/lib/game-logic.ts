@@ -11,13 +11,29 @@ import { GitHubStats } from './github';
  * - Commits = Stamina/Health (Moderate XP)
  * - Issues/Reviews = Wisdom/Mana (Lower XP)
  */
-const XP_WEIGHTS = {
+export const XP_WEIGHTS = {
   STAR: 50,
   PR: 40,
   COMMIT: 10,
   ISSUE: 15,
   REVIEW: 20,
 };
+
+export interface XPBreakdownItem {
+  label: string;
+  count: number;
+  xp: number;
+}
+
+export function getXPBreakdown(stats: GitHubStats): XPBreakdownItem[] {
+  return [
+    { label: 'Stars', count: stats.totalStars, xp: stats.totalStars * XP_WEIGHTS.STAR },
+    { label: 'Pull Requests', count: stats.totalPRs, xp: stats.totalPRs * XP_WEIGHTS.PR },
+    { label: 'Commits', count: stats.totalCommits, xp: stats.totalCommits * XP_WEIGHTS.COMMIT },
+    { label: 'Issues', count: stats.totalIssues, xp: stats.totalIssues * XP_WEIGHTS.ISSUE },
+    { label: 'Reviews', count: stats.totalReviews, xp: stats.totalReviews * XP_WEIGHTS.REVIEW },
+  ];
+}
 
 /**
  * Calculate total XP from GitHub stats

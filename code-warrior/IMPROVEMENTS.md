@@ -4,6 +4,251 @@ This document outlines all the improvements made to fix issues and enhance the C
 
 ---
 
+## Week 1 Reliability Sprint (March 2026)
+
+### ✅ CI Quality Gates Added (CW-005)
+
+**What changed:**
+- Added CI workflow: `.github/workflows/code-warrior-ci.yml`
+- Added `typecheck`, `test`, and `test:watch` scripts in `package.json`
+- Installed Vitest tooling (`vitest`, `vite`, `vite-tsconfig-paths`)
+
+**Impact:**
+- Pull requests now run lint, typecheck, and test automatically for `code-warrior/` changes.
+
+### ✅ API Auth Guard Test Coverage Added (CW-001)
+
+**What changed:**
+- Added route-level auth tests in `src/app/api/__tests__/auth-guards.test.ts`
+- Covered unauthorized (`401`) behavior and authorized baseline path for:
+  - `/api/sync` (GET/POST)
+  - `/api/quests` (GET/POST)
+  - `/api/quests/claim` (POST)
+  - `/api/badges/equip` (POST)
+  - `/api/badges/unequip` (POST)
+
+**Impact:**
+- Auth regressions on protected endpoints are now caught quickly.
+
+### ✅ API Error Normalization Implemented (CW-009)
+
+**What changed:**
+- Added shared API error helper: `src/lib/api-response.ts`
+- Added standardized API error types: `src/types/api.ts`
+- Normalized error payloads in:
+  - `src/app/api/sync/route.ts`
+  - `src/app/api/quests/route.ts`
+  - `src/app/api/quests/claim/route.ts`
+  - `src/app/api/badges/equip/route.ts`
+  - `src/app/api/badges/unequip/route.ts`
+
+**Error payload shape:**
+- `success: false`
+- `error` (message alias for compatibility)
+- `message`
+- `code` (`UNAUTHORIZED`, `BAD_REQUEST`, `NOT_FOUND`, `FORBIDDEN`, `RATE_LIMITED`, `INTERNAL_ERROR`)
+- Optional: `details`, `retryable`, `retryAfter`
+
+**Impact:**
+- API consumers now receive a consistent, typed error contract.
+
+### ✅ Server-Side Rate Limiting Added (CW-003)
+
+**What changed:**
+- Added per-IP and per-user checks on high-risk endpoints:
+  - `src/app/api/sync/route.ts`
+  - `src/app/api/quests/claim/route.ts`
+  - `src/app/api/badges/equip/route.ts`
+  - `src/app/api/badges/unequip/route.ts`
+- Added `getClientIp()` helper and `badgeUnequip` rate-limit config in `src/lib/rate-limit.ts`
+- Extended `errorResponse()` to support custom headers so rate-limit metadata can be attached
+
+**429 response metadata now includes:**
+- JSON: `code: RATE_LIMITED`, `retryable: true`, `retryAfter`
+- Headers: `Retry-After`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+
+**Impact:**
+- Better protection from endpoint abuse and accidental request storms.
+- Clearer client-side handling and retry timing guidance.
+
+### ✅ Quest Claim Idempotency Added (CW-002)
+
+**What changed:**
+- Added persistent idempotency storage migration:
+  - `supabase/migrations/20260313000124_create_api_idempotency_keys.sql`
+- Added `Idempotency-Key` header validation helper:
+  - `src/lib/request-validation.ts`
+- Updated quest claim route to support:
+  - replay of completed responses for duplicate keys
+  - conflict response when identical request is still in progress
+  - persisted response snapshots for deterministic retries
+
+**Route updated:**
+- `src/app/api/quests/claim/route.ts`
+
+**Behavior summary:**
+- If a matching key is already completed, server returns the original response with `X-Idempotent-Replay: true`.
+- If a matching key is currently pending, server returns `409 CONFLICT` with retry guidance.
+
+**Tests added/updated:**
+- `src/lib/__tests__/request-validation.test.ts`
+- `src/app/api/__tests__/auth-guards.test.ts` (invalid idempotency key case)
+
+### ✅ Audit Events for Mutations Added (CW-004)
+
+**What changed:**
+- Added audit event schema and indexes in:
+  - `supabase/migrations/20260313000125_create_audit_events_and_atomic_logging.sql`
+- Added app-level audit helper for route-driven mutations:
+  - `src/lib/audit.ts`
+- Added sync mutation audit logging in:
+  - `src/app/api/sync/route.ts`
+
+**Transactional DB-level audit writes added to atomic functions:**
+- `claim_quest_reward_atomic(...)` now inserts `QUEST_REWARD_CLAIMED` event
+- `equip_badge_atomic(...)` now inserts `BADGE_EQUIPPED` event
+
+**Audit fields include:**
+- actor identity (`github_id`, `user_id`)
+- action and entity references
+- XP delta
+- metadata payload for investigation context
+
+### ✅ Quick Sync vs Full Sync Modes Added (CW-006)
+
+**What changed:**
+- Sync API now supports mode selection:
+  - `POST /api/sync?mode=quick` (default behavior)
+  - `POST /api/sync?mode=full` (force full refresh)
+- Quick sync uses cached GitHub stats when recent full-sync cache exists.
+- Full sync still performs full GitHub refresh.
+- Added stale-cache auto-escalation to full sync when needed.
+
+**Files updated:**
+- `src/app/api/sync/route.ts`
+- `src/app/dashboard/page.tsx`
+- `src/app/quests/page.tsx`
+- `src/types/api.ts`
+
+**Response metadata added:**
+- `syncMode`
+- `requestedMode`
+- `usedCachedStats`
+
+**Persisted metadata in `github_stats.sync_meta`:**
+- `last_requested_mode`
+- `last_effective_mode`
+- `last_sync_at`
+- `last_full_sync_at`
+- `last_quick_sync_at`
+
+**Impact:**
+- Lower API load for routine user-triggered syncs.
+- Explicit full-refresh path remains available for accuracy-sensitive runs.
+
+### ✅ Dashboard Stale-While-Revalidate + Sync State UX (CW-007)
+
+**What changed:**
+- Added local cache hydration for dashboard data using user-scoped `localStorage` keys.
+- Query now renders cached data immediately, then revalidates with fresh API data.
+- Added explicit dashboard sync state indicator: `idle`, `syncing`, `failed`, `updated`.
+
+**Files updated:**
+- `src/app/dashboard/page.tsx`
+
+**Impact:**
+- Faster first paint for returning users.
+- Clearer user feedback during and after sync operations.
+
+### ✅ Query Performance Indexing (CW-008)
+
+**What changed:**
+- Added leaderboard and quest lookup indexes in:
+  - `supabase/migrations/20260313000128_add_query_performance_indexes.sql`
+- Added seasonal quest window index in:
+  - `supabase/migrations/20260313000127_add_seasonal_quest_fields.sql`
+
+**Impact:**
+- Better query performance headroom for leaderboard sorting and quest progress scans.
+
+### ✅ Progression Insights + Streak System (CW-010, CW-011)
+
+**What changed:**
+- Added XP breakdown utility and exportable weights in `src/lib/game-logic.ts`.
+- Added progression panel content in quick dashboard view:
+  - per-source XP contribution
+  - next-rank XP delta
+  - current streak display
+- Added streak fields and indexes in:
+  - `supabase/migrations/20260313000126_add_streak_columns.sql`
+- Added sync-time streak progression and bounded streak bonus XP in:
+  - `src/app/api/sync/route.ts`
+
+**Impact:**
+- Users can understand exactly where XP comes from.
+- Daily engagement is reinforced with visible streak progression and bonus XP.
+
+### ✅ Seasonal Quest Activation (CW-012)
+
+**What changed:**
+- Added seasonal quest metadata columns:
+  - `season_name`, `season_starts_at`, `season_ends_at`
+- Added seasonal filtering helper and season metadata extraction:
+  - `src/lib/seasonal-quests.ts`
+- Applied seasonal filtering to quest fetch/progress and sync quest updates:
+  - `src/app/api/quests/route.ts`
+  - `src/app/api/sync/route.ts`
+
+**Impact:**
+- Seasonal quest packs can be activated/deactivated entirely through DB data.
+
+### ✅ Structured Logging + Correlation IDs (CW-014)
+
+**What changed:**
+- Added request context utility:
+  - `src/lib/request-context.ts`
+- Added `X-Request-Id` headers and request-context logs to high-risk routes:
+  - `src/app/api/sync/route.ts`
+  - `src/app/api/quests/claim/route.ts`
+  - `src/app/api/badges/equip/route.ts`
+
+**Impact:**
+- Faster cross-log tracing for production troubleshooting.
+
+### ✅ E2E Smoke + CI Integration (CW-013)
+
+**What changed:**
+- Added Playwright config and Chromium project:
+  - `playwright.config.ts`
+- Added smoke tests:
+  - Landing page CTA presence
+  - Unauthorized quest-claim API contract
+  - File: `tests/e2e/smoke.spec.ts`
+- Added CI steps for browser install and E2E execution:
+  - `.github/workflows/code-warrior-ci.yml`
+
+**Impact:**
+- Critical user entry + API auth contract is now covered by browser-level tests in CI.
+
+### Validation Summary
+
+- `npm run typecheck`: ✅ passed
+- `npm run test`: ✅ passed (49 tests)
+- `npm run test:e2e`: ✅ passed (2 smoke tests)
+- `npm run lint`: ⚠️ fails due to pre-existing lint issues outside sprint scope (not introduced by this sprint)
+
+**Migration note:**
+- Apply new migrations before deploying app code that depends on audit/idempotency tables:
+  - `20260313000124_create_api_idempotency_keys.sql`
+  - `20260313000125_create_audit_events_and_atomic_logging.sql`
+  - `20260313000126_add_streak_columns.sql`
+  - `20260313000127_add_seasonal_quest_fields.sql`
+  - `20260313000128_add_query_performance_indexes.sql`
+
+---
+
+---
+
 ## Issues Fixed
 
 ### 1. ✅ Inaccurate GitHub Data Fetching
