@@ -41,10 +41,10 @@ export default function NotFound() {
 
           {/* Error Message */}
           <p className="font-pixel text-[11px] text-[var(--gray-highlight)] mb-4">
-            You've wandered into the void!
+            You&apos;ve wandered into the void!
           </p>
           <p className="font-pixel text-[9px] text-[var(--gray-medium)] mb-8">
-            This area is still under development or doesn't exist.
+            This area is still under development or doesn&apos;t exist.
             Return to the dashboard to continue your adventure.
           </p>
 

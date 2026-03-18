@@ -64,6 +64,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) => {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const displayName = session?.user?.username || session?.user?.name || 'User';
 
   const navItems = [
     {
@@ -106,15 +107,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '', onNavigate }) 
           <div className="flex items-center gap-3">
             <PixelAvatar
               src={session.user.image}
-              alt={(session.user as any).username || session.user.name || 'User'}
+              alt={displayName}
               size="sm"
             />
             <div className="flex-1 min-w-0">
               <p className="font-pixel text-[11px] text-white truncate">
-                {(session.user as any).username || session.user.name}
+                {displayName}
               </p>
               <p className="font-pixel text-[9px] text-[var(--gray-medium)] truncate">
-                @{(session.user as any).username || session.user.name}
+                @{displayName}
               </p>
             </div>
           </div>
