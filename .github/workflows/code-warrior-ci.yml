@@ -1,0 +1,49 @@
+name: Code Warrior CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'code-warrior/**'
+      - '.github/workflows/code-warrior-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'code-warrior/**'
+      - '.github/workflows/code-warrior-ci.yml'
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: code-warrior
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: code-warrior/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Install Playwright browser
+        run: npx playwright install chromium
+
+      - name: E2E
+        run: npm run test:e2e
