@@ -12,6 +12,25 @@ export interface ApiError extends Error {
   details?: string;
 }
 
+export type ApiErrorCode =
+  | 'BAD_REQUEST'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'RATE_LIMITED'
+  | 'INTERNAL_ERROR';
+
+export interface ApiErrorResponse {
+  success: false;
+  error: string;
+  message: string;
+  code: ApiErrorCode;
+  details?: string;
+  retryable?: boolean;
+  retryAfter?: number;
+}
+
 /**
  * Creates a typed API error with status code
  */
@@ -80,6 +99,10 @@ export interface SyncResult {
     rank_tier: string;
   };
   xpGained: number;
+  syncMode?: 'quick' | 'full';
+  requestedMode?: 'quick' | 'full';
+  usedCachedStats?: boolean;
+  rankedUp?: boolean;
   rankChanged: boolean;
   oldRank?: string;
   newRank?: string;

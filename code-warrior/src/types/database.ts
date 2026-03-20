@@ -39,6 +39,9 @@ export interface User {
   avatar_url: string | null;
   xp: number;
   rank_tier: RankTier;
+  streak_count?: number;
+  streak_best_count?: number;
+  streak_last_active_date?: string | null;
   github_stats?: GitHubStats; // Optional for backward compatibility
   last_synced_at: string;
   created_at: string;
@@ -53,6 +56,9 @@ export interface Quest {
   criteria_type: CriteriaType;
   criteria_threshold: number;
   is_active: boolean;
+  season_name?: string | null;
+  season_starts_at?: string | null;
+  season_ends_at?: string | null;
   badge_reward: string | null;
   created_at: string;
 }
@@ -82,6 +88,18 @@ export interface UserBadge {
   badge_id: string;
   equipped: boolean;
   earned_at: string;
+}
+
+export interface AuditEvent {
+  id: string;
+  user_id: string | null;
+  github_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  xp_delta: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
 }
 
 // RPG Stats computed from GitHub data

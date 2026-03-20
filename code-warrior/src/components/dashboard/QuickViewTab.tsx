@@ -8,6 +8,7 @@ import { BattleStatsPanel } from '../rpg/BattleStatsPanel';
 import { AchievementBadges } from '../rpg/AchievementBadges';
 import { IconScroll } from '../icons/PixelIcons';
 import type { RPGStats, GitHubAchievementBadge } from '@/types/database';
+import type { XPBreakdownItem } from '@/lib/game-logic';
 
 interface QuickViewTabProps {
   xp: number;
@@ -17,6 +18,9 @@ interface QuickViewTabProps {
   claimableQuests: number;
   rpgStats: RPGStats;
   badges: GitHubAchievementBadge[];
+  xpBreakdown: XPBreakdownItem[];
+  xpToNextRank: number;
+  streakCount: number;
   hasNeverSynced: boolean;
   onNavigateToQuests: () => void;
 }
@@ -29,6 +33,9 @@ export const QuickViewTab: React.FC<QuickViewTabProps> = ({
   claimableQuests,
   rpgStats,
   badges,
+  xpBreakdown,
+  xpToNextRank,
+  streakCount,
   hasNeverSynced,
   onNavigateToQuests,
 }) => {
@@ -172,6 +179,42 @@ export const QuickViewTab: React.FC<QuickViewTabProps> = ({
                 </p>
               )}
             </div>
+          </div>
+        </PixelFrame>
+      </motion.div>
+
+      {/* Progression Insights */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <PixelFrame variant="mana" padding="md">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-pixel text-[10px] text-[var(--mana-light)]">XP Breakdown</h4>
+            <span className="font-pixel text-[8px] text-[var(--gold-light)]">
+              Next Rank In: {Math.max(0, xpToNextRank - xp).toLocaleString()} XP
+            </span>
+          </div>
+          <div className="space-y-2 mb-3">
+            {xpBreakdown.map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+                  {item.label} ({item.count.toLocaleString()})
+                </span>
+                <span className="font-pixel text-[8px] text-[var(--gold-light)]">
+                  +{item.xp.toLocaleString()} XP
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-[var(--gray-dark)] flex items-center justify-between">
+            <span className="font-pixel text-[8px] text-[var(--health-light)]">
+              Current Streak: {streakCount} day{streakCount === 1 ? '' : 's'}
+            </span>
+            <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+              Keep syncing daily for bonus XP
+            </span>
           </div>
         </PixelFrame>
       </motion.div>

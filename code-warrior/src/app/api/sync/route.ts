@@ -2,10 +2,82 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { getServiceSupabase } from '@/lib/supabase';
-import { calculateGitHubStats, fetchContributionCalendar, calculateGitHubAchievements } from '@/lib/github';
+import {
+  calculateGitHubStats,
+  fetchContributionCalendar,
+  calculateGitHubAchievements,
+  type GitHubStats,
+} from '@/lib/github';
 import { calculateXP, calculateRankTier } from '@/lib/game-logic';
 import { QUEST_STATUS, SYNC_COOLDOWN_MS } from '@/lib/constants';
+import { errorResponse, internalServerError } from '@/lib/api-response';
+import { checkRateLimit, getClientIp, getRateLimitHeaders } from '@/lib/rate-limit';
+import { logAuditEvent } from '@/lib/audit';
+import { filterActiveSeasonQuests } from '@/lib/seasonal-quests';
+import { getRequestId, logWithRequestContext } from '@/lib/request-context';
 import type { Quest } from '@/types/database';
+
+type SyncMode = 'quick' | 'full';
+
+const FULL_SYNC_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+const BASE_STREAK_BONUS_XP = 25;
+
+function getRequestedSyncMode(request: Request): SyncMode {
+  const mode = new URL(request.url).searchParams.get('mode');
+  return mode === 'full' ? 'full' : 'quick';
+}
+
+function getCachedGitHubStats(githubStats: unknown): GitHubStats | null {
+  if (!githubStats || typeof githubStats !== 'object') {
+    return null;
+  }
+
+  const stats = githubStats as Record<string, unknown>;
+  const requiredKeys = ['stars', 'repos', 'commits', 'prs', 'issues', 'reviews'];
+  const hasAllKeys = requiredKeys.every((key) => typeof stats[key] === 'number');
+
+  if (!hasAllKeys) {
+    return null;
+  }
+
+  return {
+    totalStars: stats.stars as number,
+    totalRepos: stats.repos as number,
+    totalCommits: stats.commits as number,
+    totalPRs: stats.prs as number,
+    totalIssues: stats.issues as number,
+    totalReviews: stats.reviews as number,
+  };
+}
+
+function getLastFullSyncAt(githubStats: unknown): Date | null {
+  if (!githubStats || typeof githubStats !== 'object') {
+    return null;
+  }
+
+  const syncMeta = (githubStats as Record<string, unknown>).sync_meta;
+  if (!syncMeta || typeof syncMeta !== 'object') {
+    return null;
+  }
+
+  const lastFull = (syncMeta as Record<string, unknown>).last_full_sync_at;
+  if (typeof lastFull !== 'string') {
+    return null;
+  }
+
+  const parsed = new Date(lastFull);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function toUtcDateString(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function getDateDiffInDays(from: string, to: string): number {
+  const start = new Date(`${from}T00:00:00.000Z`).getTime();
+  const end = new Date(`${to}T00:00:00.000Z`).getTime();
+  return Math.floor((end - start) / (24 * 60 * 60 * 1000));
+}
 
 /**
  * POST /api/sync
@@ -21,16 +93,36 @@ import type { Quest } from '@/types/database';
  * 5. Update Supabase database
  * 6. Return updated user data
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const requestId = getRequestId(request);
+    const requestedMode = getRequestedSyncMode(request);
+    const clientIp = getClientIp(request);
+    const ipLimit = checkRateLimit(`ip:${clientIp}`, 'sync');
+    if (ipLimit.isLimited) {
+      return errorResponse({
+        status: 429,
+        code: 'RATE_LIMITED',
+        message: `Too many requests from this IP. Please try again in ${ipLimit.retryAfter} seconds.`,
+        retryable: true,
+        retryAfter: ipLimit.retryAfter,
+        headers: {
+          ...getRateLimitHeaders(ipLimit.remaining, ipLimit.resetIn, ipLimit.retryAfter),
+          'X-Request-Id': requestId,
+        },
+      });
+    }
+
     // 1. Verify authentication
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized',
+        headers: { 'X-Request-Id': requestId },
+      });
     }
 
     const supabase = getServiceSupabase();
@@ -40,10 +132,27 @@ export async function POST() {
     const username = session.user.username || session.user.name;
     
     if (!githubId || !username) {
-      return NextResponse.json(
-        { error: 'Missing GitHub identity in session' },
-        { status: 400 }
-      );
+      return errorResponse({
+        status: 400,
+        code: 'BAD_REQUEST',
+        message: 'Missing GitHub identity in session',
+        headers: { 'X-Request-Id': requestId },
+      });
+    }
+
+    const userLimit = checkRateLimit(`user:${githubId}`, 'sync');
+    if (userLimit.isLimited) {
+      return errorResponse({
+        status: 429,
+        code: 'RATE_LIMITED',
+        message: `Too many sync attempts. Please try again in ${userLimit.retryAfter} seconds.`,
+        retryable: true,
+        retryAfter: userLimit.retryAfter,
+        headers: {
+          ...getRateLimitHeaders(userLimit.remaining, userLimit.resetIn, userLimit.retryAfter),
+          'X-Request-Id': requestId,
+        },
+      });
     }
 
     const userLookup = await supabase
@@ -71,20 +180,27 @@ export async function POST() {
         .single();
 
       if (createError) {
-        console.error('Error creating user during sync:', createError);
-        return NextResponse.json(
-          { error: 'Failed to create user' },
-          { status: 500 }
-        );
+        logWithRequestContext('error', 'Error creating user during sync', {
+          requestId,
+          githubId,
+          error: createError,
+        });
+        return internalServerError('Failed to create user');
       }
 
       user = newUser;
     } else if (userError || !user) {
-      console.error('User lookup error:', userError);
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      );
+      logWithRequestContext('error', 'User lookup error', {
+        requestId,
+        githubId,
+        error: userError,
+      });
+      return errorResponse({
+        status: 404,
+        code: 'NOT_FOUND',
+        message: 'User not found in database',
+        headers: { 'X-Request-Id': requestId },
+      });
     }
 
     // 2. Check last sync time (prevent rate limit abuse)
@@ -96,31 +212,75 @@ export async function POST() {
 
       if (timeSinceSync < SYNC_COOLDOWN_MS) {
         const waitTime = Math.ceil((SYNC_COOLDOWN_MS - timeSinceSync) / 1000);
-        return NextResponse.json(
-          { 
-            error: 'Sync on cooldown',
-            message: `Please wait ${waitTime} seconds before syncing again`,
-            waitTime 
-          },
-          { status: 429 }
-        );
+        return errorResponse({
+          status: 429,
+          code: 'RATE_LIMITED',
+          message: `Please wait ${waitTime} seconds before syncing again`,
+          details: 'Sync on cooldown',
+          retryable: true,
+          retryAfter: waitTime,
+          headers: { 'X-Request-Id': requestId },
+        });
       }
     }
 
     // 3. Fetch GitHub stats
     const accessToken = session.accessToken;
+    const cachedStats = getCachedGitHubStats(user.github_stats);
+    const lastFullSyncAt = getLastFullSyncAt(user.github_stats);
+    const shouldForceFullSync =
+      !cachedStats ||
+      !lastFullSyncAt ||
+      now.getTime() - lastFullSyncAt.getTime() > FULL_SYNC_MAX_AGE_MS;
+    const effectiveMode: SyncMode = requestedMode === 'full' || shouldForceFullSync ? 'full' : 'quick';
 
-    // Fetch stats, contributions, and calculate achievements in parallel
-    const [githubStats, contributions] = await Promise.all([
-      calculateGitHubStats(user.username, accessToken),
-      fetchContributionCalendar(user.username, accessToken),
-    ]);
+    let githubStats: GitHubStats;
+    let contributions = (user.github_stats?.contributions || []) as unknown[];
+
+    if (effectiveMode === 'full') {
+      [githubStats, contributions] = await Promise.all([
+        calculateGitHubStats(user.username, accessToken),
+        fetchContributionCalendar(user.username, accessToken),
+      ]);
+    } else {
+      githubStats = cachedStats as GitHubStats;
+    }
 
     // Calculate achievements from stats
     const badges = calculateGitHubAchievements(githubStats);
 
     // 4. Calculate RPG stats
-    const newXP = calculateXP(githubStats);
+    const today = toUtcDateString(now);
+    const previousStreak = user.streak_count ?? 0;
+    const previousBestStreak = user.streak_best_count ?? 0;
+    const previousActiveDate = user.streak_last_active_date;
+
+    let streakCount = previousStreak;
+    let streakBestCount = previousBestStreak;
+    let streakLastActiveDate = previousActiveDate;
+    let streakBonusXp = 0;
+
+    if (!previousActiveDate) {
+      streakCount = 1;
+      streakBestCount = Math.max(previousBestStreak, streakCount);
+      streakLastActiveDate = today;
+      streakBonusXp = BASE_STREAK_BONUS_XP;
+    } else {
+      const dayDiff = getDateDiffInDays(previousActiveDate, today);
+      if (dayDiff === 1) {
+        streakCount = previousStreak + 1;
+        streakBestCount = Math.max(previousBestStreak, streakCount);
+        streakLastActiveDate = today;
+        streakBonusXp = Math.min(100, BASE_STREAK_BONUS_XP + streakCount * 5);
+      } else if (dayDiff > 1) {
+        streakCount = 1;
+        streakBestCount = Math.max(previousBestStreak, streakCount);
+        streakLastActiveDate = today;
+        streakBonusXp = BASE_STREAK_BONUS_XP;
+      }
+    }
+
+    const newXP = calculateXP(githubStats) + streakBonusXp;
     const newRank = calculateRankTier(newXP);
 
     // 5. Update database
@@ -129,6 +289,9 @@ export async function POST() {
       .update({
         xp: newXP,
         rank_tier: newRank,
+        streak_count: streakCount,
+        streak_best_count: streakBestCount,
+        streak_last_active_date: streakLastActiveDate,
         github_stats: {
           stars: githubStats.totalStars,
           repos: githubStats.totalRepos,
@@ -138,6 +301,23 @@ export async function POST() {
           reviews: githubStats.totalReviews,
           contributions, // Year-long contribution calendar
           badges, // Calculated GitHub achievement badges
+          sync_meta: {
+            ...(user.github_stats?.sync_meta || {}),
+            last_requested_mode: requestedMode,
+            last_effective_mode: effectiveMode,
+            last_sync_at: now.toISOString(),
+            last_full_sync_at:
+              effectiveMode === 'full'
+                ? now.toISOString()
+                : user.github_stats?.sync_meta?.last_full_sync_at || null,
+            last_quick_sync_at:
+              effectiveMode === 'quick'
+                ? now.toISOString()
+                : user.github_stats?.sync_meta?.last_quick_sync_at || null,
+            streak_count: streakCount,
+            streak_best_count: streakBestCount,
+            streak_bonus_xp: streakBonusXp,
+          },
         },
         last_synced_at: now.toISOString(),
       })
@@ -146,11 +326,12 @@ export async function POST() {
       .single();
 
     if (updateError) {
-      console.error('Error updating synced user:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to update user stats' },
-        { status: 500 }
-      );
+      logWithRequestContext('error', 'Error updating synced user', {
+        requestId,
+        githubId,
+        error: updateError,
+      });
+      return internalServerError('Failed to update user stats');
     }
 
     // 6. Update quest progress and auto-enroll in new quests
@@ -163,6 +344,8 @@ export async function POST() {
         .select('*')
         .eq('is_active', true);
 
+      const activeQuests = filterActiveSeasonQuests((allQuests || []) as Quest[], now);
+
       // Fetch user's existing quest progress
       const { data: userQuests, error: questsError } = await supabase
         .from('user_quests')
@@ -172,7 +355,7 @@ export async function POST() {
       if (!allQuestsError && allQuests && !questsError) {
         const questUpdates = [];
         const newQuestEntries = [];
-        const typedQuests = allQuests as Quest[];
+        const typedQuests = activeQuests;
 
         for (const quest of typedQuests) {
           const { completed, progress } = checkQuestCompletion(quest, githubStats);
@@ -220,25 +403,65 @@ export async function POST() {
         }
       }
     } catch (questError) {
-      console.error('Quest update error (non-fatal):', questError);
+      logWithRequestContext('warn', 'Quest update error (non-fatal)', {
+        requestId,
+        githubId,
+        error: questError,
+      });
       // Don't fail the entire sync if quest update fails
     }
 
     // 7. Return success with updated data
+    await logAuditEvent(supabase, {
+      userId: updatedUser.id,
+      githubId,
+      action: 'SYNC_STATS_UPDATED',
+      entityType: 'user',
+      entityId: updatedUser.id,
+      xpDelta: newXP - user.xp,
+      metadata: {
+        oldRank: user.rank_tier,
+        newRank,
+        streakCount,
+        streakBestCount,
+        streakBonusXp,
+        requestedMode,
+        effectiveMode,
+        usedCachedStats: effectiveMode === 'quick',
+        stats: {
+          stars: githubStats.totalStars,
+          repos: githubStats.totalRepos,
+          commits: githubStats.totalCommits,
+          prs: githubStats.totalPRs,
+          issues: githubStats.totalIssues,
+          reviews: githubStats.totalReviews,
+        },
+      },
+    });
+
     return NextResponse.json({
       success: true,
       user: updatedUser,
       stats: githubStats,
       xpGained: newXP - user.xp,
+      streakCount,
+      streakBestCount,
+      streakBonusXp,
+      syncMode: effectiveMode,
+      requestedMode,
+      usedCachedStats: effectiveMode === 'quick',
       rankedUp: newRank !== user.rank_tier,
+      rankChanged: newRank !== user.rank_tier,
+    }, {
+      headers: {
+        'X-Request-Id': requestId,
+      },
     });
 
   } catch (error) {
-    console.error('Sync error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const requestId = getRequestId(request);
+    logWithRequestContext('error', 'Sync error', { requestId, error });
+    return internalServerError();
   }
 }
 
@@ -247,38 +470,72 @@ export async function POST() {
  * 
  * Check sync status and cooldown timer
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const requestId = getRequestId(request);
+    const clientIp = getClientIp(request);
+    const ipLimit = checkRateLimit(`ip:${clientIp}`, 'sync');
+    if (ipLimit.isLimited) {
+      return errorResponse({
+        status: 429,
+        code: 'RATE_LIMITED',
+        message: `Too many requests from this IP. Please try again in ${ipLimit.retryAfter} seconds.`,
+        retryable: true,
+        retryAfter: ipLimit.retryAfter,
+        headers: {
+          ...getRateLimitHeaders(ipLimit.remaining, ipLimit.resetIn, ipLimit.retryAfter),
+          'X-Request-Id': requestId,
+        },
+      });
+    }
+
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized',
+        headers: { 'X-Request-Id': requestId },
+      });
     }
 
     const supabase = getServiceSupabase();
 
     const githubId = session.user.id;
 
+    const userLimit = checkRateLimit(`user:${githubId || 'unknown'}`, 'sync');
+    if (userLimit.isLimited) {
+      return errorResponse({
+        status: 429,
+        code: 'RATE_LIMITED',
+        message: `Too many sync status checks. Please try again in ${userLimit.retryAfter} seconds.`,
+        retryable: true,
+        retryAfter: userLimit.retryAfter,
+        headers: {
+          ...getRateLimitHeaders(userLimit.remaining, userLimit.resetIn, userLimit.retryAfter),
+          'X-Request-Id': requestId,
+        },
+      });
+    }
+
     if (!githubId) {
       return NextResponse.json(
         { canSync: true, waitTime: 0 },
-        { status: 200 }
+        { status: 200, headers: { 'X-Request-Id': requestId } }
       );
     }
 
     const { data: user } = await supabase
       .from('users')
-      .select('last_synced_at')
+      .select('last_synced_at, github_stats')
       .eq('github_id', githubId)
       .single();
 
     if (!user || !user.last_synced_at) {
       return NextResponse.json(
         { canSync: true, waitTime: 0 },
-        { status: 200 }
+        { status: 200, headers: { 'X-Request-Id': requestId } }
       );
     }
 
@@ -288,18 +545,25 @@ export async function GET() {
 
     const canSync = timeSinceSync >= SYNC_COOLDOWN_MS;
     const waitTime = canSync ? 0 : Math.ceil((SYNC_COOLDOWN_MS - timeSinceSync) / 1000);
+    const lastFullSyncAt = getLastFullSyncAt(user.github_stats);
+    const fullSyncRecommended =
+      !lastFullSyncAt || now.getTime() - lastFullSyncAt.getTime() > FULL_SYNC_MAX_AGE_MS;
 
     return NextResponse.json({
       canSync,
       waitTime,
       lastSynced: user.last_synced_at,
+      fullSyncRecommended,
+      lastFullSyncAt: lastFullSyncAt?.toISOString() || null,
+    }, {
+      headers: {
+        'X-Request-Id': requestId,
+      },
     });
 
   } catch (error) {
-    console.error('Sync status error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const requestId = getRequestId(request);
+    logWithRequestContext('error', 'Sync status error', { requestId, error });
+    return internalServerError();
   }
 }

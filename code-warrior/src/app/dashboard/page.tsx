@@ -18,7 +18,7 @@ import {
   QuestsViewTab,
   type DashboardTab,
 } from '@/components';
-import { calculateRPGStats } from '@/lib/game-logic';
+import { calculateRPGStats, getXPBreakdown } from '@/lib/game-logic';
 import { soundManager } from '@/lib/sound';
 import { DashboardSkeleton } from '@/components/ui/LoadingSkeletons';
 import type { User, Quest, UserQuest, RankTier, ContributionDay, GitHubAchievementBadge } from '@/types/database';
@@ -44,6 +44,8 @@ interface LeaderboardUser {
   avatar_url: string; // Required by HeroSidebar component
 }
 
+type SyncUiState = 'idle' | 'syncing' | 'failed' | 'updated';
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -61,6 +63,7 @@ export default function DashboardPage() {
   });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning'; visible: boolean }>({ message: '', type: 'info', visible: false });
   const [floatingXP, setFloatingXP] = useState<{ amount: number; key: number } | null>(null);
+  const [syncUiState, setSyncUiState] = useState<SyncUiState>('idle');
 
   // Save tab preference to localStorage
   useEffect(() => {
@@ -99,6 +102,7 @@ export default function DashboardPage() {
   const shouldFetchData = status === 'authenticated';
 
   // Fetch dashboard data
+  const dashboardCacheKey = `dashboard_cache_${session?.user?.id || 'anonymous'}`;
   const { data, isLoading, refetch, error } = useQuery<DashboardData>({
     queryKey: ['dashboard', session?.user?.id],
     queryFn: async () => {
@@ -116,6 +120,19 @@ export default function DashboardPage() {
         userQuests: questsData.userQuests || [],
       };
     },
+    initialData: (() => {
+      if (!shouldFetchData || typeof window === 'undefined') return undefined;
+      const cached = localStorage.getItem(dashboardCacheKey);
+      if (!cached) return undefined;
+      try {
+        return JSON.parse(cached) as DashboardData;
+      } catch {
+        return undefined;
+      }
+    })(),
+    staleTime: 60 * 1000,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     enabled: shouldFetchData,
     retry: (failureCount, error) => {
       // Don't retry on auth errors
@@ -124,6 +141,12 @@ export default function DashboardPage() {
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
+
+  useEffect(() => {
+    if (data && typeof window !== 'undefined') {
+      localStorage.setItem(dashboardCacheKey, JSON.stringify(data));
+    }
+  }, [data, dashboardCacheKey]);
 
   // Fetch leaderboard data
   const { data: leaderboardData } = useQuery({
@@ -139,14 +162,17 @@ export default function DashboardPage() {
 
   // Sync mutation
   const syncMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/sync', { method: 'POST' });
+    mutationFn: async (mode: 'quick' | 'full' = 'quick') => {
+      const res = await fetch(`/api/sync?mode=${mode}`, { method: 'POST' });
       if (!res.ok) {
         const error: ApiError = new Error('Sync failed');
         error.status = res.status;
         throw error;
       }
       return res.json();
+    },
+    onMutate: () => {
+      setSyncUiState('syncing');
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -157,13 +183,18 @@ export default function DashboardPage() {
       }
 
       setToast({
-        message: 'Stats synced successfully!',
+        message:
+          result.syncMode === 'quick'
+            ? 'Quick sync complete (cached stats refreshed).'
+            : 'Full sync complete with fresh GitHub data.',
         type: 'success',
         visible: true,
       });
+      setSyncUiState('updated');
     },
     onError: (error: Error) => {
       handleApiError(error as ApiError, 'Failed to sync stats');
+      setSyncUiState('failed');
     },
   });
 
@@ -245,6 +276,20 @@ export default function DashboardPage() {
     []
   );
   const xpToNextRank = user ? rankThresholds[user.rank_tier] : 1000;
+  const xpBreakdown = useMemo(
+    () =>
+      user
+        ? getXPBreakdown({
+            totalStars: user.github_stats?.stars ?? 0,
+            totalRepos: user.github_stats?.repos ?? 0,
+            totalCommits: user.github_stats?.commits ?? 0,
+            totalPRs: user.github_stats?.prs ?? 0,
+            totalIssues: user.github_stats?.issues ?? 0,
+            totalReviews: user.github_stats?.reviews ?? 0,
+          })
+        : [],
+    [user]
+  );
 
   // Quest stats
   const completedQuests = useMemo(
@@ -278,6 +323,9 @@ export default function DashboardPage() {
             claimableQuests={claimableQuests}
             rpgStats={rpgStats}
             badges={badges}
+            xpBreakdown={xpBreakdown}
+            xpToNextRank={xpToNextRank}
+            streakCount={user.streak_count ?? 0}
             hasNeverSynced={hasNeverSynced}
             onNavigateToQuests={navigateToQuests}
           />
@@ -298,7 +346,7 @@ export default function DashboardPage() {
             userQuests={data?.userQuests ?? []}
             onClaim={(questId) => claimMutation.mutate(questId)}
             claimLoading={claimMutation.isPending}
-            onSync={() => syncMutation.mutate()}
+            onSync={() => syncMutation.mutate(hasNeverSynced ? 'full' : 'quick')}
             syncing={syncMutation.isPending}
           />
         );
@@ -320,6 +368,8 @@ export default function DashboardPage() {
     data?.userQuests,
     claimMutation,
     syncMutation,
+    xpBreakdown,
+    xpToNextRank,
   ]);
 
   // Loading states - early returns AFTER all hooks
@@ -394,11 +444,25 @@ export default function DashboardPage() {
         rankTier={user.rank_tier}
         level={level}
         xpToNextLevel={1000}
-        onSync={() => syncMutation.mutate()}
+        onSync={() => syncMutation.mutate(hasNeverSynced ? 'full' : 'quick')}
         syncing={syncMutation.isPending}
         lastSynced={user.last_synced_at}
         showProfile={false}
       />
+
+      <div className="max-w-7xl mx-auto px-4 mt-3">
+        <PixelFrame variant="stone" padding="sm">
+          <div className="flex items-center justify-between">
+            <span className="font-pixel text-[8px] text-[var(--gray-highlight)]">
+              Sync State:
+              <span className="ml-2 text-[var(--mana-light)] uppercase">{syncUiState}</span>
+            </span>
+            <span className="font-pixel text-[8px] text-[var(--gray-medium)]">
+              Last Updated: {user.last_synced_at ? new Date(user.last_synced_at).toLocaleString() : 'Never'}
+            </span>
+          </div>
+        </PixelFrame>
+      </div>
 
       {/* Main Dashboard Grid - Hybrid Layout */}
       <div className="dashboard-wrapper">

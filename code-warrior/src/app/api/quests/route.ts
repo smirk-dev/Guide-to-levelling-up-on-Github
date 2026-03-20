@@ -5,6 +5,8 @@ import { getServiceSupabase } from '@/lib/supabase';
 import { calculateGitHubStats } from '@/lib/github';
 import { updateQuestProgress } from '@/lib/quest-logic';
 import { QUEST_STATUS } from '@/lib/constants';
+import { errorResponse, internalServerError } from '@/lib/api-response';
+import { filterActiveSeasonQuests, getActiveSeasonMeta } from '@/lib/seasonal-quests';
 
 /**
  * GET /api/quests
@@ -15,15 +17,27 @@ export async function GET() {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized - no session' }, { status: 401 });
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized - no session',
+      });
     }
 
     if (!session.user) {
-      return NextResponse.json({ error: 'Unauthorized - no user in session' }, { status: 401 });
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized - no user in session',
+      });
     }
 
     if (!session.user.id) {
-      return NextResponse.json({ error: 'Unauthorized - no user ID in session' }, { status: 401 });
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized - no user ID in session',
+      });
     }
 
     const githubId = session.user.id;
@@ -38,13 +52,21 @@ export async function GET() {
 
     if (userError) {
       if (userError.code === 'PGRST116') {
-        return NextResponse.json({ error: 'User not found in database. Please sync your GitHub stats first.' }, { status: 404 });
+        return errorResponse({
+          status: 404,
+          code: 'NOT_FOUND',
+          message: 'User not found in database. Please sync your GitHub stats first.',
+        });
       }
       throw userError;
     }
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+      return errorResponse({
+        status: 404,
+        code: 'NOT_FOUND',
+        message: 'User not found in database',
+      });
     }
 
     // Fetch all quests
@@ -68,17 +90,18 @@ export async function GET() {
       throw userQuestsError;
     }
 
+    const activeQuests = filterActiveSeasonQuests(quests || []);
+    const activeSeason = getActiveSeasonMeta(activeQuests);
+
     return NextResponse.json({
       user,
-      quests: quests || [],
+      quests: activeQuests,
       userQuests: userQuests || [],
+      activeSeason,
     });
   } catch (error) {
     console.error('[Quests GET] Failed to fetch quests:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch quests' },
-      { status: 500 }
-    );
+    return internalServerError('Failed to fetch quests');
   }
 }
 
@@ -92,7 +115,11 @@ export async function POST() {
 
     if (!session?.user?.id) {
       console.error('Quests POST: No session or user ID found');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return errorResponse({
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized',
+      });
     }
 
     const githubId = session.user.id;
@@ -107,7 +134,11 @@ export async function POST() {
       .single();
 
     if (userError || !user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return errorResponse({
+        status: 404,
+        code: 'NOT_FOUND',
+        message: 'User not found',
+      });
     }
 
     // Fetch current GitHub stats
@@ -134,7 +165,8 @@ export async function POST() {
     }
 
     // Calculate quest updates
-    const updates = updateQuestProgress(quests || [], userQuests || [], stats);
+    const activeQuests = filterActiveSeasonQuests(quests || []);
+    const updates = updateQuestProgress(activeQuests, userQuests || [], stats);
 
     // Apply updates to database
     const updatedQuests = [];
@@ -192,9 +224,6 @@ export async function POST() {
     });
   } catch (error) {
     console.error('Error verifying quests:', error);
-    return NextResponse.json(
-      { error: 'Failed to verify quests' },
-      { status: 500 }
-    );
+    return internalServerError('Failed to verify quests');
   }
 }

@@ -154,8 +154,8 @@ export default function QuestsPage() {
 
   // Sync mutation
   const syncMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/sync', { method: 'POST' });
+    mutationFn: async (mode: 'quick' | 'full' = 'quick') => {
+      const res = await fetch(`/api/sync?mode=${mode}`, { method: 'POST' });
       if (!res.ok) {
         const error: ApiError = new Error('Sync failed');
         error.status = res.status;
@@ -172,7 +172,10 @@ export default function QuestsPage() {
       }
 
       setToast({
-        message: 'Quest progress updated!',
+        message:
+          result.syncMode === 'quick'
+            ? 'Quick sync complete. Quest progress checked from cached stats.'
+            : 'Full sync complete. Quest progress updated from fresh GitHub data.',
         type: 'success',
         visible: true,
       });
@@ -257,7 +260,7 @@ export default function QuestsPage() {
     <PageLayout
       title="QUESTS"
       subtitle="Complete challenges to earn XP and rewards"
-      onSync={() => syncMutation.mutate()}
+      onSync={() => syncMutation.mutate('quick')}
       syncing={syncMutation.isPending}
     >
       {/* Toast */}
