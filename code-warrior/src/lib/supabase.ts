@@ -19,13 +19,7 @@ if (!hasPublicSupabaseEnv) {
     hasUrl: Boolean(supabaseUrl),
     hasAnonKey: Boolean(supabaseAnonKey),
   };
-
-  if (process.env.NODE_ENV === 'production') {
-    console.warn('Missing Supabase environment variables; using placeholder values for build.', details);
-  } else {
-    console.error('Missing Supabase environment variables:', details);
-    throw new Error('Missing Supabase environment variables. Please check your .env.local file.');
-  }
+  console.warn('Missing Supabase environment variables; using placeholder values.', details);
 }
 
 // Client-side Supabase client (uses anon key)
