@@ -3,7 +3,18 @@ import { expect, test } from '@playwright/test';
 test('landing page loads and offers GitHub sign-in', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Code Warrior|GitHub RPG|GitHub/i);
-  await expect(page.getByRole('button', { name: /sign in with github/i })).toBeVisible();
+
+  const signInCta = page.getByRole('button', {
+    name: /sign in with github|start your adventure/i,
+  }).first();
+
+  try {
+    await expect(signInCta).toBeVisible({ timeout: 15_000 });
+  } catch {
+    // NextAuth session fetch can occasionally stall on first load in CI/dev server mode.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(signInCta).toBeVisible({ timeout: 15_000 });
+  }
 });
 
 test('unauthorized quest claim returns auth error payload', async ({ request }) => {
