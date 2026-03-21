@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('landing page loads and offers GitHub sign-in', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Code Warrior|GitHub RPG|GitHub/i);
-  await expect(page.locator('button:visible', { hasText: 'SIGN IN WITH GITHUB' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /sign in with github/i })).toBeVisible();
 });
 
 test('unauthorized quest claim returns auth error payload', async ({ request }) => {
