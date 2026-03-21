@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd code-warrior && npm install",
+  "buildCommand": "cd code-warrior && npm run build",
+  "outputDirectory": "code-warrior/.next"
+}
